@@ -16,7 +16,7 @@ export function CohortsPage() {
   const visible = cohorts.filter(cohort => cohort.name.toLowerCase().includes(search.toLowerCase().trim()) && (status === 'all' || cohort.status === status))
   function saved(cohort: Cohort) { setEditor(null); setNotice(`${cohort.name} 정보를 저장했습니다.`); reload() }
   return <>
-    <div className="page-heading"><div><p className="eyebrow">PROGRAM MANAGEMENT</p><h1>기수 관리</h1><p className="muted">프로그램의 시작과 마무리를 기수별로 관리합니다.</p></div>
+    <div className="page-heading"><div><p className="eyebrow">PROGRAM MANAGEMENT</p><h1>프로그램 관리</h1><p className="muted">프로그램의 시작과 마무리를 기수별로 관리합니다.</p></div>
       <Button onClick={() => { setEditor('new'); setNotice('') }} disabled={Boolean(editor)}><Plus size={18} aria-hidden="true" /> 새 기수</Button></div>
     {notice && <p className="success-message" role="status">{notice}</p>}
     <div className={editor ? 'cohort-workspace with-editor' : 'cohort-workspace'}><section className="panel" aria-label="기수 목록">

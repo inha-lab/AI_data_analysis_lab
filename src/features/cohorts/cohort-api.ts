@@ -9,8 +9,8 @@ function client() {
 function errorMessage(code: string) {
   if (code === '23505') return '같은 이름의 기수가 이미 있습니다.'
   if (code === '23514' || code === '22007' || code === '22008') return '기수명과 운영 기간을 확인해 주세요.'
-  if (code === '42501') return '기수 관리 권한이 없습니다. 다시 로그인해 주세요.'
-  if (code === 'PGRST205') return '기수 관리 데이터베이스 설정이 필요합니다.'
+  if (code === '42501') return '프로그램 관리 권한이 없습니다. 다시 로그인해 주세요.'
+  if (code === 'PGRST205') return '프로그램 관리 데이터베이스 설정이 필요합니다.'
   return '처리하지 못했습니다. 연결 상태를 확인하고 다시 시도해 주세요.'
 }
 export async function listCohorts(): Promise<Cohort[]> {
