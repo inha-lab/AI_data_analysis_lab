@@ -29,3 +29,9 @@ p { line-height: 1.8; }
 .login-card h1 { font-size: 34px; }
 footer { margin-top: 40px; border-top: 1px solid #dce3eb; padding: 24px 0; color: #67798b; font-size: 12px; }
 @media (max-width: 700px) { .app-shell { padding: 0 20px; } .brand span { display: block; margin: 0; font-size: 9px; } .stage-grid { grid-template-columns: 1fr 1fr; } .hero { padding: 56px 0 30px; } }
+
+.login-form { display: flex; flex-direction: column; gap: 12px; }
+.login-form label { font-weight: 600; }
+.login-form input { border: 1px solid #a9b9c9; background: white; border-radius: 8px; padding: 12px; font: inherit; }
+.login-form input:focus-visible { outline: 3px solid #2883cc; outline-offset: 2px; }
+.login-form button { margin-top: 12px; }
