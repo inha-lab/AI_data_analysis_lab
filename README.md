@@ -8,7 +8,7 @@ Node.js 22.12 이상(권장 24)에서 `npm ci` 후 `npm run dev`를 실행합니
 기본 주소는 개발 서버에 표시되는 `/AI_data_analysis_lab/` 경로입니다.
 `npm run lint`, `npm run typecheck`, `npm run build`로 검증합니다.
 
-Supabase 연결 준비 시 `.env.example`을 `.env.local`로 복사하고 프로젝트 URL과 공개 anon key를 입력합니다. 환경변수 없이도 공개 화면은 실행됩니다. 서버 관리자 키는 넣지 않습니다.
+Supabase 연결 준비 시 `.env.example`을 `.env.local`로 복사하고 설정된 `AI_Career_Lab` 프로젝트 URL을 확인하고 해당 프로젝트의 공개 anon key를 입력합니다. 환경변수 없이도 공개 화면은 실행됩니다. 서버 관리자 키는 넣지 않습니다.
 
 ## 구조
 
@@ -32,3 +32,12 @@ GitHub Pages 경로는 `/AI_data_analysis_lab/`입니다. 초기 골격은 새�
 상세 요구사항: [개발 명세서](INHA_AI_data_analysis_lab.md)
 
 설정 참고: [Vite 공식 문서](https://vite.dev/guide/), [Tailwind Vite 설치](https://tailwindcss.com/docs/installation/using-vite).
+
+## 공유 Supabase 프로젝트
+
+- 프로젝트: `AI_Career_Lab`
+- URL: `https://pyiltnkahsdscuotlenw.supabase.co`
+- 새 테이블은 반드시 대문자 `AD_` 프리픽스를 사용합니다(예: `AD_profiles`, `AD_teams`).
+- SQL에서는 `public."AD_teams"`처럼 큰따옴표로 대소문자를 보존합니다.
+- 기존 서비스 테이블과 정책은 유지하고, 이 앱의 역할·참여 정보는 별도 관리합니다.
+- 현재는 URL과 명명 규칙만 반영했습니다. 공개 키 입력과 연결 검증, 실제 테이블 생성은 아직 진행하지 않았습니다.
