@@ -10,7 +10,7 @@ export function useCohorts() {
     void listCohorts().then(data => {
       if (active) setResult({ revision, data, error: '' })
     }).catch(error => {
-      if (active) setResult({ revision, data: [], error: error instanceof Error ? error.message : '기수 목록을 불러오지 못했습니다.' })
+      if (active) setResult({ revision, data: [], error: error instanceof Error ? error.message : '프로그램 목록을 불러오지 못했습니다.' })
     })
     return () => { active = false }
   }, [revision])

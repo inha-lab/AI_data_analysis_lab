@@ -22,9 +22,9 @@ export function StudentDashboard() {
     }).catch(() => { if (active) setResult({ revision, rows: [], names: {}, error: '서버에 연결하지 못했습니다.' }) })
     return () => { active = false }
   }, [userId, revision])
-  return <><div className="page-heading"><div><p className="eyebrow">MY PROGRAM</p><h1>나의 프로그램</h1><p className="muted">참여 중인 기수와 등록 정보를 확인하세요.</p></div></div>
+  return <><div className="page-heading"><div><p className="eyebrow">MY PROGRAM</p><h1>나의 프로그램</h1><p className="muted">참여 중인 프로그램과 등록 정보를 확인하세요.</p></div></div>
     {result?.revision !== revision ? <p role="status">참여 정보를 확인하고 있습니다.</p> : result.error ? <div role="alert" className="notice"><p>{result.error}</p><Button onClick={() => setRevision(value => value + 1)}>다시 시도</Button></div>
-      : !result.rows.length ? <section className="panel empty-state"><h2>참여 중인 기수가 없습니다.</h2><p>참가 상태는 운영 담당자에게 문의해 주세요.</p></section>
-        : <div className="membership-grid">{result.rows.map(row => <section className="panel" key={row.id}><span className="badge status-active">참여 중</span><h2>{result.names[row.cohort_id] ?? '참여 기수'}</h2><p>{row.full_name} · {row.department} · {row.grade}</p><p className="muted">학번 {row.student_number}</p><p className="field-help">팀과 프로젝트 화면은 순차적으로 제공됩니다.</p></section>)}</div>}
+      : !result.rows.length ? <section className="panel empty-state"><h2>참여 중인 프로그램이 없습니다.</h2><p>참가 상태는 운영 담당자에게 문의해 주세요.</p></section>
+        : <div className="membership-grid">{result.rows.map(row => <section className="panel" key={row.id}><span className="badge status-active">참여 중</span><h2>{result.names[row.cohort_id] ?? '참여 프로그램'}</h2><p>{row.full_name} · {row.department} · {row.grade}</p><p className="muted">학번 {row.student_number}</p><p className="field-help">팀과 프로젝트 화면은 순차적으로 제공됩니다.</p></section>)}</div>}
   </>
 }
