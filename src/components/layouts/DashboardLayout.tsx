@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Link, NavLink, Outlet } from 'react-router-dom'
-import { LayoutDashboard, Layers3, LogOut, Users } from 'lucide-react'
+import { CalendarDays, LayoutDashboard, Layers3, LogOut, Users } from 'lucide-react'
 import { useAuth, roleLabels } from '@/features/auth/auth-context'
 import { Button } from '@/components/ui/button'
 
@@ -20,6 +20,7 @@ export function DashboardLayout() {
       <p className="nav-caption">프로그램 운영</p>
       <nav aria-label="관리 메뉴">
         <NavLink to="/dashboard"><LayoutDashboard size={18} aria-hidden="true" /> 대시보드</NavLink>
+        {(profile?.role === 'professor' || profile?.role === 'student') && <NavLink to="/schedules"><CalendarDays size={18} aria-hidden="true" /> 프로그램 일정</NavLink>}
         {profile?.role === 'professor' && <><NavLink to="/cohorts"><Layers3 size={18} aria-hidden="true" /> 프로그램 관리</NavLink><NavLink to="/participants"><Users size={18} aria-hidden="true" /> 참가자 관리</NavLink></>}
       </nav>
       <div className="sidebar-note">공공데이터에서 시작하는<br />새로운 가능성.</div>

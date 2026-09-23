@@ -23,7 +23,7 @@ function ProfessorDashboard() {
           : <div className="empty-state"><Layers3 size={32} aria-hidden="true" /><h2>아직 등록된 프로그램이 없습니다.</h2><p>첫 프로그램을 만들고 운영 기간을 설정해 주세요.</p><Link to="/cohorts?new=1" className="button">첫 프로그램 만들기</Link></div>}
       </section>
     </>}
-    <div className="notice"><h2>참가자 등록 시작하기</h2><p><Link to="/participants" className="text-link">프로그램별 참가자 관리로 이동 →</Link></p><p>팀 편성, 일정·프로젝트 관리는 순차적으로 추가될 예정입니다.</p></div>
+    <div className="notice"><h2>프로그램 운영</h2><p><Link to="/schedules" className="text-link">단계별 일정·제출 마감 관리 →</Link></p><p><Link to="/participants" className="text-link">프로그램별 참가자 관리로 이동 →</Link></p><p>팀 편성과 프로젝트 관리는 순차적으로 추가될 예정입니다.</p></div>
   </>
 }
 export function DashboardPage() {

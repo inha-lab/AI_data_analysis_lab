@@ -133,3 +133,10 @@ footer { margin-top: 40px; border-top: 1px solid #dce3eb; padding: 24px 0; color
 .file-picker input { display: block; margin-top: 8px; font: inherit; padding: 8px; border: 1px solid #cbd8e3; border-radius: 6px; width: 100%; }
 .file-picker input::file-selector-button { background: #e9eff5; border: 0; border-radius: 5px; padding: 8px 12px; margin-right: 12px; cursor: pointer; }
 .membership-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 18px; }
+.schedule-toolbar { margin: 18px 0; }
+.schedule-list { display: grid; gap: 16px; }
+.schedule-card { border: 1px solid #dce3eb; border-left: 4px solid #2883cc; border-radius: 10px; padding: 20px; background: white; min-width: 0; }
+.schedule-card-heading { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; }
+.schedule-card h3 { margin: 12px 0; font-size: 18px; overflow-wrap: anywhere; }
+.schedule-card .button { padding: 6px 10px; font-size: 12px; }
+.schedule-time { color: #476078; font-size: 13px; line-height: 1.8; }

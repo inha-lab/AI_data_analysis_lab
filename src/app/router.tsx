@@ -16,6 +16,9 @@ export const router = createHashRouter([
     { path: '/change-password', lazy: async () => ({ Component: (await import('@/features/auth/ChangePasswordPage')).ChangePasswordPage }) },
     { element: <DashboardLayout />, children: [
       { path: '/dashboard', lazy: async () => ({ Component: (await import('@/features/monitoring/DashboardPage')).DashboardPage }) },
+      { element: <RequireAuth roles={['professor', 'student']} />, children: [
+        { path: '/schedules', lazy: async () => ({ Component: (await import('@/features/schedules/SchedulesPage')).SchedulesPage }) },
+      ] },
       { element: <RequireAuth roles={['professor']} />, children: [
         { path: '/cohorts', lazy: async () => ({ Component: (await import('@/features/cohorts/CohortsPage')).CohortsPage }) },
         { path: '/participants', lazy: async () => ({ Component: (await import('@/features/participants/ParticipantsPage')).ParticipantsPage }) },

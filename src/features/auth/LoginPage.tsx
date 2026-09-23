@@ -14,7 +14,9 @@ export function LoginPage() {
   if (!loading && profile) {
     if (profile.must_change_password) return <Navigate to="/change-password" replace />
     const requested = (location.state as { from?: string } | null)?.from
-    const target = profile.role === 'professor' && (requested === '/cohorts' || requested === '/participants') ? requested : '/dashboard'
+    const canReturn = (profile.role === 'professor' && (requested === '/cohorts' || requested === '/participants'))
+      || ((profile.role === 'professor' || profile.role === 'student') && requested === '/schedules')
+    const target = canReturn && requested ? requested : '/dashboard'
     return <Navigate to={target} replace />
   }
 
