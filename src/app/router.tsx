@@ -13,6 +13,7 @@ export const router = createHashRouter([
     { path: '*', element: <NotFoundPage /> },
   ] },
   { element: <RequireAuth />, children: [
+    { path: '/change-password', lazy: async () => ({ Component: (await import('@/features/auth/ChangePasswordPage')).ChangePasswordPage }) },
     { element: <DashboardLayout />, children: [
       { path: '/dashboard', lazy: async () => ({ Component: (await import('@/features/monitoring/DashboardPage')).DashboardPage }) },
       { element: <RequireAuth roles={['professor']} />, children: [

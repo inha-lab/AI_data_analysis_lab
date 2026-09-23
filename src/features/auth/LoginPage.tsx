@@ -12,6 +12,7 @@ export function LoginPage() {
   const [busy, setBusy] = useState(false)
   const [message, setMessage] = useState('')
   if (!loading && profile) {
+    if (profile.must_change_password) return <Navigate to="/change-password" replace />
     const requested = (location.state as { from?: string } | null)?.from
     const target = profile.role === 'professor' && (requested === '/cohorts' || requested === '/participants') ? requested : '/dashboard'
     return <Navigate to={target} replace />

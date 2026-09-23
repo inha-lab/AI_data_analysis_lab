@@ -8,7 +8,7 @@
 - SQL 식별자 예시: `public."AD_profiles"`, `public."AD_teams"`
 - Supabase 클라이언트 테이블명 예시: `AD_profiles`, `AD_teams`
 
-`migrations/`는 스키마·RLS, `functions/`는 권한이 필요한 서버 작업을 위한 위치입니다. `AD_profiles`의 본인 조회 RLS와 `AD_cohorts`, `AD_participants`의 교수 전용 조회·생성·수정 RLS를 적용했습니다. Edge Function과 나머지 업무 테이블은 아직 구현하지 않았습니다. 예정 테이블 목록은 루트 개발 명세서 8.1절에 있습니다.
+`migrations/`는 스키마·RLS, `functions/`는 권한이 필요한 서버 작업을 위한 위치입니다. `AD_profiles`, `AD_cohorts`, `AD_participants`와 역할·참여 기반 RLS를 적용했습니다. 계정 생성·연결과 최초 비밀번호 변경 함수를 배포했습니다. 나머지 업무 테이블은 후속 구현 대상입니다.
 
 ## 공유 프로젝트 변경 원칙
 
@@ -36,4 +36,18 @@
 
 `migrations/20260924000300_ad_participants.sql`을 명시적으로 적용했습니다. `AD_participants` 테이블, 기수별 이메일·학번·프로필 고유 제약, 연락처·직무·상태 검증, 수정 시각 트리거와 교수 전용 RLS를 추가했습니다. 이 SQL도 공유 CLI migration history에는 등록하지 않았으므로 재실행하지 않습니다.
 
-`profile_id`는 계정 연결 전까지 NULL입니다. 브라우저에서 인증 계정을 지정하거나 기존 행의 기수·작성자·수정 시각을 바꿀 수 없습니다. 참가자 비활성화는 행의 상태만 변경하며 Auth에는 영향을 주지 않습니다. 테스트 파일은 `tests/ad_participants_access.sql`입니다. 계정 생성·연결은 후속 서버 작업으로 구현해야 합니다.
+`profile_id`는 계정 연결 전까지 NULL입니다. 브라우저에서 인증 계정을 지정하거나 기존 행의 기수·작성자·수정 시각을 바꿀 수 없습니다. 참가자 비활성화는 행의 상태만 변경하며 Auth에는 영향을 주지 않습니다. 계정 생성·연결은 `ad-provision-account` 서버 함수에서만 수행합니다.
+
+## 계정 생성·연결 적용 기록 (2026-09-24)
+
+`migrations/20260924000400_ad_account_provisioning.sql`을 명시적으로 적용했습니다. `AD_profiles.must_change_password`, 서버 전용 `AD_find_auth_user`·`AD_link_participant_account`, 연결된 이메일 변경 방지 트리거와 학생 본인 참가·기수 조회 정책을 추가했습니다. 이 SQL도 공유 migration history에는 등록하지 않았으며 재실행하지 않습니다.
+
+배포 함수는 `ad-provision-account`, `ad-change-password`입니다. 각 함수는 Auth `getUser`로 토큰을 검증하고 활성 앱 프로필과 권한을 확인합니다. `verify_jwt=false`는 기존 HS256 전용 게이트 대신 함수 내부 검증을 사용하기 위한 설정입니다. 무인증 접근을 허용하지 않으며 실제 배포에서 무인증·잘못된 토큰·anon 키 요청의 401 차단을 확인했습니다.
+
+계정 조회·연결 RPC는 `service_role`만 실행합니다. 호출 교수, 참가자의 이메일·수정 버전·활성 상태, 기존 앱 역할을 트랜잭션에서 재검증합니다. 신규 Auth 계정은 서버 메타데이터 `ad_lab_created`로 구분하고 신규 학생 프로필에 최초 비밀번호 변경을 요구합니다. 기존 프로필의 상태와 역할은 덮어쓰지 않습니다.
+
+기존 `on_auth_user_created` 트리거는 신규 Auth 사용자에 대해 기존 서비스 `public.profiles`도 생성합니다. 해당 동작을 검사했으며 기존 트리거는 수정하지 않았습니다. 테스트에서는 이 자료도 모두 롤백했습니다.
+
+최초 비밀번호 변경은 본인의 토큰으로 Auth API를 호출한 뒤 서버가 완료 플래그를 갱신합니다. DB 갱신만 실패하면 비밀번호는 이미 변경되었다는 안내를 반환합니다. 일반 비밀번호 초기화, 임시 비밀번호 재발급, 계정 삭제는 제공하지 않습니다.
+
+검증: 단위 테스트 18개, Deno·프론트엔드 타입 검사, 빌드, `tests/ad_account_provisioning.sql`, 배포 함수 인증 차단 검사 통과. 실제 참가자 대상 발급·비밀번호 변경은 운영자 검수가 필요합니다.

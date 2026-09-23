@@ -1,0 +1,9 @@
+project_id = "AI_data_analysis_lab"
+
+# Authorization is verified inside each handler with Supabase Auth getUser.
+# This supports the project's current JWT signing keys, not just legacy HS256.
+[functions.ad-provision-account]
+verify_jwt = false
+
+[functions.ad-change-password]
+verify_jwt = false

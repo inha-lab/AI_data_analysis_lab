@@ -7,6 +7,7 @@ export function RequireAuth({ roles }: { roles?: UserRole[] }) {
   const location = useLocation()
   if (loading) return <div className="route-loading" role="status">프로그램 접근 권한을 확인하고 있습니다.</div>
   if (!session || !profile) return <Navigate to="/login" replace state={{ from: location.pathname }} />
+  if (profile.must_change_password && location.pathname !== '/change-password') return <Navigate to="/change-password" replace />
   if (roles && !roles.includes(profile.role)) return <Navigate to="/dashboard" replace />
   return <Outlet />
 }

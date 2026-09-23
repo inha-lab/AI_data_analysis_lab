@@ -38,7 +38,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (!userId || !supabase) return
     let active = true
-    void Promise.resolve(supabase.from('AD_profiles').select('id, display_name, role, is_active')
+    void Promise.resolve(supabase.from('AD_profiles').select('id, display_name, role, is_active, must_change_password')
       .eq('id', userId).maybeSingle()).then(({ data, error }) => {
         if (!active) return
         const message = error ? '프로그램 권한을 확인하지 못했습니다. 다시 시도해 주세요.'

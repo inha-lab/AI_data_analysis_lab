@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom'
 import { ArrowUpRight, CalendarDays, Layers3 } from 'lucide-react'
+import { StudentDashboard } from './StudentDashboard'
 import { useAuth, roleLabels } from '@/features/auth/auth-context'
 import { useCohorts } from '@/features/cohorts/use-cohorts'
 import { cohortPeriod, cohortStatusLabels } from '@/features/cohorts/cohort-model'
@@ -28,5 +29,6 @@ function ProfessorDashboard() {
 export function DashboardPage() {
   const { profile } = useAuth()
   if (profile?.role === 'professor') return <ProfessorDashboard />
+  if (profile?.role === 'student') return <StudentDashboard />
   return <><div className="page-heading"><div><p className="eyebrow">MY PROGRAM</p><h1>{profile ? roleLabels[profile.role] : ''} 대시보드</h1></div></div><section className="panel empty-state"><h2>프로그램 참여가 확인되었습니다.</h2><p>소속 기수와 팀 연결 화면을 준비하고 있습니다.</p></section></>
 }

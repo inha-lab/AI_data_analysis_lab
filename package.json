@@ -10,7 +10,9 @@
     "lint": "eslint .",
     "typecheck": "tsc -b",
     "check:db": "node scripts/check-supabase.mjs",
-    "test": "node --experimental-strip-types --test tests/*.test.mjs"
+    "test": "node --experimental-strip-types --test tests/*.test.mjs",
+    "check:functions": "deno check supabase/functions/ad-provision-account/index.ts supabase/functions/ad-change-password/index.ts",
+    "check:function-auth": "node scripts/check-functions.mjs"
   },
   "engines": {
     "node": ">=22.12.0"
@@ -18,6 +20,7 @@
   "dependencies": {
     "@supabase/supabase-js": "^2.117.1",
     "clsx": "^2.1.1",
+    "exceljs": "^4.4.0",
     "lucide-react": "^1.47.0",
     "react": "^19.3.0",
     "react-dom": "^19.3.0",
@@ -31,6 +34,7 @@
     "@types/react": "^19.3.0",
     "@types/react-dom": "^19.3.0",
     "@vitejs/plugin-react": "^6.1.1",
+    "deno": "^2.9.6",
     "eslint": "^10.11.0",
     "eslint-plugin-react-hooks": "^7.1.1",
     "eslint-plugin-react-refresh": "^0.5.7",
@@ -39,5 +43,10 @@
     "typescript": "~5.9.3",
     "typescript-eslint": "^8.70.1",
     "vite": "^8.3.0"
+  },
+  "overrides": {
+    "exceljs": {
+      "uuid": "^11.1.1"
+    }
   }
 }
