@@ -54,14 +54,14 @@ export function ParticipantsPage() {
   const requested = params.get('cohort')
   const selected = requested ? cohorts.find(item => item.id === requested) : cohorts.find(item => item.status === 'active') ?? cohorts[0]
   return <>
-    <div className="page-heading"><div><p className="eyebrow">PARTICIPANT MANAGEMENT</p><h1>참가자 관리</h1><p className="muted">기수를 선택하고 선발된 참가자 정보를 관리합니다.</p></div></div>
-    {loading ? <p className="empty-state" role="status">기수를 불러오고 있습니다.</p> : error ? <div className="notice" role="alert"><p>{error}</p><Button onClick={reload}>다시 시도</Button></div>
-      : !cohorts.length ? <section className="panel empty-state"><h2>먼저 기수를 만들어 주세요.</h2><p>참가자는 기수별로 등록하고 관리합니다.</p><Link className="button" to="/cohorts?new=1">기수 만들기</Link></section>
-        : <><div className="cohort-selector"><label htmlFor="participant-cohort">관리할 기수</label><select id="participant-cohort" value={selected?.id ?? ''} onChange={event => {
-          if (editing && !window.confirm('작성 중인 내용을 저장하지 않고 기수를 변경할까요?')) return
+    <div className="page-heading"><div><p className="eyebrow">PARTICIPANT MANAGEMENT</p><h1>참가자 관리</h1><p className="muted">프로그램을 선택하고 선발된 참가자 정보를 관리합니다.</p></div></div>
+    {loading ? <p className="empty-state" role="status">프로그램을 불러오고 있습니다.</p> : error ? <div className="notice" role="alert"><p>{error}</p><Button onClick={reload}>다시 시도</Button></div>
+      : !cohorts.length ? <section className="panel empty-state"><h2>먼저 프로그램을 만들어 주세요.</h2><p>참가자는 프로그램별로 등록하고 관리합니다.</p><Link className="button" to="/cohorts?new=1">프로그램 만들기</Link></section>
+        : <><div className="cohort-selector"><label htmlFor="participant-cohort">관리할 프로그램</label><select id="participant-cohort" value={selected?.id ?? ''} onChange={event => {
+          if (editing && !window.confirm('작성 중인 내용을 저장하지 않고 프로그램을 변경할까요?')) return
           setEditing(false)
           setParams({ cohort: event.target.value })
-        }}><option value="" disabled>기수를 선택하세요</option>{cohorts.map(item => <option value={item.id} key={item.id}>{item.name}</option>)}</select></div>
-          {selected ? <ParticipantWorkspace key={selected.id} cohort={selected} onEditingChange={setEditing} /> : <p className="notice" role="alert">요청한 기수를 찾을 수 없습니다. 위 목록에서 기수를 선택해 주세요.</p>}</>}
+        }}><option value="" disabled>프로그램을 선택하세요</option>{cohorts.map(item => <option value={item.id} key={item.id}>{item.name}</option>)}</select></div>
+          {selected ? <ParticipantWorkspace key={selected.id} cohort={selected} onEditingChange={setEditing} /> : <p className="notice" role="alert">요청한 프로그램을 찾을 수 없습니다. 위 목록에서 프로그램을 선택해 주세요.</p>}</>}
   </>
 }

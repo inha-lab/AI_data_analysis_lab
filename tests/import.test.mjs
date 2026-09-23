@@ -14,6 +14,13 @@ test('numeric identifiers, formulas and cohort mismatches cannot be imported', (
   assert.equal(previewImport([[...importHeaders], row.map((value, index) => index === 0 ? { formula: '1+1' } : value)], [], '기수1')[0].status, 'invalid')
   assert.equal(previewImport([[...importHeaders, '기수'], [...row, '다른 기수']], [], '기수1')[0].status, 'invalid')
 })
+test('program headers support legacy files and reject mismatched or ambiguous destinations', () => {
+  for (const header of ['프로그램', '기수']) {
+    assert.equal(previewImport([[...importHeaders, header], [...row, '프로그램1']], [], '프로그램1')[0].status, 'ready')
+    assert.equal(previewImport([[...importHeaders, header], [...row, '다른 프로그램']], [], '프로그램1')[0].status, 'invalid')
+  }
+  assert.throws(() => previewImport([[...importHeaders, '프로그램', '기수'], [...row, '프로그램1', '프로그램1']], [], '프로그램1'), /중복/)
+})
 test('all duplicate file rows are rejected and existing rows are not overwritten', () => {
   assert.ok(previewImport([[...importHeaders], row, row], [], '기수1').every(item => item.status === 'invalid'))
   const original = previewImport([[...importHeaders], row], [], '기수1')[0].input

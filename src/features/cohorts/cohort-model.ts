@@ -18,7 +18,7 @@ export interface CohortInput {
 }
 export const cohortStatusLabels: Record<CohortStatus, string> = { draft: '준비 중', active: '운영 중', completed: '종료' }
 export function validateCohort(input: CohortInput): string | null {
-  if (!input.name.trim() || input.name.trim().length > 80) return '기수명은 1~80자로 입력해 주세요.'
+  if (!input.name.trim() || input.name.trim().length > 80) return '프로그램명은 1~80자로 입력해 주세요.'
   if (input.description.length > 2000) return '소개는 2,000자 이내로 입력해 주세요.'
   if (!Object.hasOwn(cohortStatusLabels, input.status)) return '운영 상태를 확인해 주세요.'
   if (Boolean(input.starts_on) !== Boolean(input.ends_on)) return '운영 시작일과 종료일을 함께 입력해 주세요.'

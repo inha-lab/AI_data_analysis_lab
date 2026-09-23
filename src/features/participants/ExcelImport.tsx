@@ -20,7 +20,7 @@ export function ExcelImport({ cohortId, cohortName, existing, onChanged, onBusy,
       sheet.getRow(1).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF102E4C' } }
       sheet.views = [{ state: 'frozen', ySplit: 1 }]
       const guide = workbook.addWorksheet('작성안내')
-      guide.addRows([['참가자 시트의 2행부터 입력하세요.'], ['학번과 전화번호는 텍스트 형식을 유지하세요.'], ['희망직무: SW 엔지니어링 / SW 개발 / AI 개발'], ['선택한 기수에 등록됩니다. 기존 참가자는 자동 덮어쓰지 않습니다.'], ['최대 500행, 2MB, .xlsx 파일만 지원합니다.'], ['계정 생성은 등록 후 별도로 실행합니다.']])
+      guide.addRows([['참가자 시트의 2행부터 입력하세요.'], ['학번과 전화번호는 텍스트 형식을 유지하세요.'], ['희망직무: SW 엔지니어링 / SW 개발 / AI 개발'], ['선택한 프로그램에 등록됩니다. 기존 참가자는 자동 덮어쓰지 않습니다.'], ['최대 500행, 2MB, .xlsx 파일만 지원합니다.'], ['계정 생성은 등록 후 별도로 실행합니다.']])
       guide.getColumn(1).width = 90
       const buffer = await workbook.xlsx.writeBuffer()
       const url = URL.createObjectURL(new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' }))

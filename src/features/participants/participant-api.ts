@@ -6,8 +6,8 @@ function client() {
   return supabase
 }
 function errorMessage(code: string) {
-  if (code === '23505') return '이 기수에 같은 이메일 또는 학번의 참가자가 이미 등록되어 있습니다.'
-  if (code === '23503') return '기수 정보를 확인하지 못했습니다. 새로고침 후 다시 시도해 주세요.'
+  if (code === '23505') return '이 프로그램에 같은 이메일 또는 학번의 참가자가 이미 등록되어 있습니다.'
+  if (code === '23503') return '프로그램 정보를 확인하지 못했습니다. 새로고침 후 다시 시도해 주세요.'
   if (code === '23514') return '필수 입력값과 이메일·전화번호 형식을 확인해 주세요.'
   if (code === '42501') return '참가자 관리 권한이 없습니다. 다시 로그인해 주세요.'
   if (code === 'PGRST205') return '참가자 데이터베이스 설정이 필요합니다.'
@@ -21,7 +21,7 @@ export async function listParticipants(cohortId: string): Promise<Participant[]>
 export async function saveParticipant(cohortId: string, input: ParticipantInput, previous?: Participant): Promise<Participant> {
   const validation = validateParticipant(input)
   if (validation) throw new Error(validation)
-  if (previous && previous.cohort_id !== cohortId) throw new Error('선택한 기수와 참가자 정보가 일치하지 않습니다.')
+  if (previous && previous.cohort_id !== cohortId) throw new Error('선택한 프로그램과 참가자 정보가 일치하지 않습니다.')
   const table = client().from('AD_participants')
   const values = normalizeParticipant(input)
   const request = previous
