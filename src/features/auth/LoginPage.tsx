@@ -13,7 +13,7 @@ export function LoginPage() {
   const [message, setMessage] = useState('')
   if (!loading && profile) {
     const requested = (location.state as { from?: string } | null)?.from
-    const target = profile.role === 'professor' && requested === '/cohorts' ? requested : '/dashboard'
+    const target = profile.role === 'professor' && (requested === '/cohorts' || requested === '/participants') ? requested : '/dashboard'
     return <Navigate to={target} replace />
   }
 

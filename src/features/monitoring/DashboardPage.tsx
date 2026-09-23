@@ -22,7 +22,7 @@ function ProfessorDashboard() {
           : <div className="empty-state"><Layers3 size={32} aria-hidden="true" /><h2>아직 등록된 기수가 없습니다.</h2><p>첫 기수를 만들고 운영 기간을 설정해 주세요.</p><Link to="/cohorts?new=1" className="button">첫 기수 만들기</Link></div>}
       </section>
     </>}
-    <div className="notice"><h2>다음 운영 기능</h2><p>참가자 등록, 팀 편성, 일정·프로젝트 관리는 순차적으로 추가될 예정입니다.</p></div>
+    <div className="notice"><h2>참가자 등록 시작하기</h2><p><Link to="/participants" className="text-link">기수별 참가자 관리로 이동 →</Link></p><p>팀 편성, 일정·프로젝트 관리는 순차적으로 추가될 예정입니다.</p></div>
   </>
 }
 export function DashboardPage() {

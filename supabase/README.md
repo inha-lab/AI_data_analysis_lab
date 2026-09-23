@@ -8,7 +8,7 @@
 - SQL 식별자 예시: `public."AD_profiles"`, `public."AD_teams"`
 - Supabase 클라이언트 테이블명 예시: `AD_profiles`, `AD_teams`
 
-`migrations/`는 스키마·RLS, `functions/`는 권한이 필요한 서버 작업을 위한 위치입니다. `AD_profiles`의 본인 조회 RLS와 `AD_cohorts`의 교수 전용 조회·생성·수정 RLS를 적용했습니다. Edge Function과 나머지 업무 테이블은 아직 구현하지 않았습니다. 예정 테이블 목록은 루트 개발 명세서 8.1절에 있습니다.
+`migrations/`는 스키마·RLS, `functions/`는 권한이 필요한 서버 작업을 위한 위치입니다. `AD_profiles`의 본인 조회 RLS와 `AD_cohorts`, `AD_participants`의 교수 전용 조회·생성·수정 RLS를 적용했습니다. Edge Function과 나머지 업무 테이블은 아직 구현하지 않았습니다. 예정 테이블 목록은 루트 개발 명세서 8.1절에 있습니다.
 
 ## 공유 프로젝트 변경 원칙
 
@@ -31,3 +31,9 @@
 인증 사용자의 쓰기 권한은 기수명·소개·운영 기간·상태 컬럼에만 부여했습니다. 작성자와 시각은 DB에서 설정하며 브라우저에서 변경할 수 없습니다. 종료 기수도 유지하도록 삭제 권한은 부여하지 않았습니다. `tests/ad_cohorts_access.sql`의 트랜잭션 롤백 검증을 통과했습니다.
 
 참고: [Supabase RLS](https://supabase.com/docs/guides/database/postgres/row-level-security), [컬럼 접근 제어](https://supabase.com/docs/guides/database/postgres/column-level-security).
+
+## 참가자 관리 적용 기록 (2026-09-24)
+
+`migrations/20260924000300_ad_participants.sql`을 명시적으로 적용했습니다. `AD_participants` 테이블, 기수별 이메일·학번·프로필 고유 제약, 연락처·직무·상태 검증, 수정 시각 트리거와 교수 전용 RLS를 추가했습니다. 이 SQL도 공유 CLI migration history에는 등록하지 않았으므로 재실행하지 않습니다.
+
+`profile_id`는 계정 연결 전까지 NULL입니다. 브라우저에서 인증 계정을 지정하거나 기존 행의 기수·작성자·수정 시각을 바꿀 수 없습니다. 참가자 비활성화는 행의 상태만 변경하며 Auth에는 영향을 주지 않습니다. 테스트 파일은 `tests/ad_participants_access.sql`입니다. 계정 생성·연결은 후속 서버 작업으로 구현해야 합니다.

@@ -105,3 +105,20 @@ footer { margin-top: 40px; border-top: 1px solid #dce3eb; padding: 24px 0; color
 .success-message { color: #167052; background: #dff3ed; padding: 14px 18px; border-radius: 8px; }
 @media (max-width: 1100px) { .cohort-workspace.with-editor { grid-template-columns: 1fr; } .editor-panel { grid-row: 1; } .workspace-sidebar { width: 200px; padding: 28px 18px; } .workspace-content { padding: 30px 24px; } }
 @media (max-width: 760px) { .workspace { display: block; } .workspace-sidebar { width: 100%; padding: 18px 20px; } .workspace-brand { font-size: 24px; } .workspace-brand span { display: inline-block; margin-left: 12px; } .nav-caption, .sidebar-note { display: none; } .workspace-sidebar nav { display: flex; margin-top: 18px; } .workspace-sidebar nav a { padding: 8px 12px; } .workspace-topbar { padding: 14px 20px; min-height: 70px; } .workspace-topbar > div { display: flex; flex-direction: column; gap: 5px; align-items: flex-start; } .account-name { margin-left: 0; font-size: 12px; } .workspace-content { padding: 26px 18px; } .page-heading { align-items: flex-start; flex-direction: column; } .stats-grid { grid-template-columns: 1fr 1fr; gap: 12px; } .stat-card { padding: 18px; } .panel { padding: 20px; } .date-fields { grid-template-columns: 1fr; gap: 0; } }
+
+.cohort-selector { display: flex; align-items: center; gap: 14px; margin-bottom: 26px; }
+.cohort-selector label { font-size: 14px; font-weight: 650; }
+.cohort-selector select { background: white; border: 1px solid #cbd8e3; border-radius: 7px; padding: 10px 14px; font: inherit; min-width: 240px; max-width: 100%; }
+.participant-summary { display: flex; justify-content: space-between; align-items: center; gap: 16px; margin-bottom: 20px; }
+.participant-summary p { margin: 0; overflow-wrap: anywhere; }
+.participant-summary .button { flex-shrink: 0; }
+.participants-panel { margin-top: 24px; }
+.table-scroll { overflow-x: auto; margin-top: 20px; }
+.data-table { border-collapse: collapse; width: 100%; text-align: left; font-size: 13px; }
+.data-table th { padding: 14px 12px; background: #f3f6f9; color: #62768a; font-size: 12px; font-weight: 600; white-space: nowrap; }
+.data-table th button { border: 0; background: transparent; color: inherit; font: inherit; cursor: pointer; padding: 0; }
+.data-table td { padding: 16px 12px; border-bottom: 1px solid #e5ebf1; white-space: nowrap; }
+.data-table .name-cell { font-weight: 650; }
+.data-table .button { padding: 6px 10px; font-size: 12px; }
+.account-status { display: block; font-size: 11px; color: #62768a; margin-top: 6px; }
+@media (max-width: 760px) { .cohort-selector { align-items: stretch; flex-direction: column; gap: 8px; } .cohort-selector select { min-width: 0; } .participant-summary { flex-direction: column; align-items: flex-start; } .workspace-sidebar nav { flex-wrap: wrap; } }
