@@ -1,0 +1,35 @@
+import { useState } from 'react'
+import { Link, NavLink, Outlet } from 'react-router-dom'
+import { LayoutDashboard, Layers3, LogOut } from 'lucide-react'
+import { useAuth, roleLabels } from '@/features/auth/auth-context'
+import { Button } from '@/components/ui/button'
+
+export function DashboardLayout() {
+  const { profile, session, signOut } = useAuth()
+  const [busy, setBusy] = useState(false)
+  const [error, setError] = useState('')
+  async function logout() {
+    setBusy(true); setError('')
+    try { await signOut() }
+    catch { setError('로그아웃하지 못했습니다. 다시 시도해 주세요.') }
+    finally { setBusy(false) }
+  }
+  return <div className="workspace">
+    <aside className="workspace-sidebar">
+      <Link to="/dashboard" className="workspace-brand">INHA<span>AI DATA ANALYSIS LAB</span></Link>
+      <p className="nav-caption">프로그램 운영</p>
+      <nav aria-label="관리 메뉴">
+        <NavLink to="/dashboard"><LayoutDashboard size={18} aria-hidden="true" /> 대시보드</NavLink>
+        {profile?.role === 'professor' && <NavLink to="/cohorts"><Layers3 size={18} aria-hidden="true" /> 기수 관리</NavLink>}
+      </nav>
+      <div className="sidebar-note">공공데이터에서 시작하는<br />새로운 가능성.</div>
+    </aside>
+    <div className="workspace-body">
+      <header className="workspace-topbar"><div><span className="badge">{profile && roleLabels[profile.role]}</span><span className="account-name">{profile?.display_name || session?.user.email}</span></div>
+        <Button className="button-secondary" onClick={() => void logout()} disabled={busy}><LogOut size={16} aria-hidden="true" /> 로그아웃</Button>
+      </header>
+      {error && <p className="notice" role="alert">{error}</p>}
+      <main className="workspace-content"><Outlet /></main>
+    </div>
+  </div>
+}

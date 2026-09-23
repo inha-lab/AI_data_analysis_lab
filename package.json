@@ -9,7 +9,8 @@
     "preview": "vite preview",
     "lint": "eslint .",
     "typecheck": "tsc -b",
-    "check:db": "node scripts/check-supabase.mjs"
+    "check:db": "node scripts/check-supabase.mjs",
+    "test": "node --experimental-strip-types --test tests/*.test.mjs"
   },
   "engines": {
     "node": ">=22.12.0"

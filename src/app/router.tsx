@@ -1,14 +1,23 @@
 import { createHashRouter } from 'react-router-dom'
 import { PublicLayout } from '@/components/layouts/PublicLayout'
-import { HomePage } from '@/pages/HomePage'
+import { DashboardLayout } from '@/components/layouts/DashboardLayout'
+import { HomeEntry } from '@/pages/HomeEntry'
 import { LoginPage } from '@/features/auth/LoginPage'
+import { RequireAuth } from '@/features/auth/RequireAuth'
 import { NotFoundPage } from '@/pages/NotFoundPage'
 
-// GitHub Pages에서 하위 화면 새로고침을 지원하는 초기 라우팅 방식.
 export const router = createHashRouter([
   { element: <PublicLayout />, children: [
-    { path: '/', element: <HomePage /> },
+    { path: '/', element: <HomeEntry /> },
     { path: '/login', element: <LoginPage /> },
     { path: '*', element: <NotFoundPage /> },
+  ] },
+  { element: <RequireAuth />, children: [
+    { element: <DashboardLayout />, children: [
+      { path: '/dashboard', lazy: async () => ({ Component: (await import('@/features/monitoring/DashboardPage')).DashboardPage }) },
+      { element: <RequireAuth roles={['professor']} />, children: [
+        { path: '/cohorts', lazy: async () => ({ Component: (await import('@/features/cohorts/CohortsPage')).CohortsPage }) },
+      ] },
+    ] },
   ] },
 ])

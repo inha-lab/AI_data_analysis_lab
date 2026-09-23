@@ -8,7 +8,7 @@
 - SQL 식별자 예시: `public."AD_profiles"`, `public."AD_teams"`
 - Supabase 클라이언트 테이블명 예시: `AD_profiles`, `AD_teams`
 
-`migrations/`는 스키마·RLS, `functions/`는 권한이 필요한 서버 작업을 위한 위치입니다. `AD_profiles` 테이블과 본인 조회 RLS를 적용했습니다. Edge Function과 나머지 업무 테이블은 아직 구현하지 않았습니다. 예정 테이블 목록은 루트 개발 명세서 8.1절에 있습니다.
+`migrations/`는 스키마·RLS, `functions/`는 권한이 필요한 서버 작업을 위한 위치입니다. `AD_profiles`의 본인 조회 RLS와 `AD_cohorts`의 교수 전용 조회·생성·수정 RLS를 적용했습니다. Edge Function과 나머지 업무 테이블은 아직 구현하지 않았습니다. 예정 테이블 목록은 루트 개발 명세서 8.1절에 있습니다.
 
 ## 공유 프로젝트 변경 원칙
 
@@ -23,3 +23,11 @@
 공유 프로젝트의 기존 마이그레이션 이력을 덮어쓰지 않기 위해 이번 SQL은 명시적으로 실행했으며 CLI migration history에는 등록하지 않았습니다. 이 파일을 원격에 재실행하거나 `db push`하지 마세요. 후속 배포 전 공유 프로젝트의 마이그레이션 관리 방식과 적용 이력을 먼저 조정해야 합니다.
 
 테이블 이름이 이미 있으면 최초 생성 SQL은 실패하도록 되어 있습니다. RLS 검증 파일은 `tests/ad_profiles_access.sql`이며 권한 있는 DB 연결에서 실행합니다. 익명 조회와 인증 사용자의 삽입·수정·삭제는 허용하지 않습니다. 현재 인증 사용자는 본인의 활성 프로필만 조회합니다.
+
+## 기수 관리 적용 기록 (2026-09-24)
+
+`migrations/20260924000200_ad_cohorts.sql`을 명시적으로 적용했습니다. `AD_cohorts` 테이블, 대소문자 무시 이름 고유 인덱스, 수정 시각 갱신 함수·트리거, 교수 전용 RLS를 추가했습니다. 기존 서비스 객체는 변경하지 않았습니다. 이 SQL도 공유 CLI migration history에는 등록하지 않았으므로 재실행하지 않습니다.
+
+인증 사용자의 쓰기 권한은 기수명·소개·운영 기간·상태 컬럼에만 부여했습니다. 작성자와 시각은 DB에서 설정하며 브라우저에서 변경할 수 없습니다. 종료 기수도 유지하도록 삭제 권한은 부여하지 않았습니다. `tests/ad_cohorts_access.sql`의 트랜잭션 롤백 검증을 통과했습니다.
+
+참고: [Supabase RLS](https://supabase.com/docs/guides/database/postgres/row-level-security), [컬럼 접근 제어](https://supabase.com/docs/guides/database/postgres/column-level-security).
