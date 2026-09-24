@@ -8,7 +8,7 @@
 - SQL 식별자 예시: `public."AD_profiles"`, `public."AD_teams"`
 - Supabase 클라이언트 테이블명 예시: `AD_profiles`, `AD_teams`
 
-`migrations/`는 스키마·RLS, `functions/`는 권한이 필요한 서버 작업을 위한 위치입니다. `AD_profiles`, `AD_cohorts`, `AD_participants`, `AD_schedules`, `AD_teams`, `AD_team_members`와 역할·참여 기반 접근 제어를 적용했습니다. 계정 생성·연결과 최초 비밀번호 변경 함수를 배포했습니다. 보고서·평가 테이블은 후속 구현 대상입니다.
+`migrations/`는 스키마·RLS, `functions/`는 권한이 필요한 서버 작업을 위한 위치입니다. `AD_profiles`, `AD_cohorts`, `AD_participants`, `AD_schedules`, `AD_teams`, `AD_team_members`, `AD_proposals`와 역할·참여 기반 접근 제어를 적용했습니다. 계정 생성·연결과 최초 비밀번호 변경 함수를 배포했습니다. 보고서·평가 테이블은 후속 구현 대상입니다.
 
 ## 공유 프로젝트 변경 원칙
 
@@ -73,3 +73,11 @@
 이 SQL들도 공유 CLI migration history에는 등록하지 않습니다. 이미 적용된 파일을 재실행하거나 `db push`하지 않습니다. 향후 팀 제출물은 `AD_teams`에 `ON DELETE RESTRICT`로 참조하여 자료가 있는 팀의 삭제를 제한해야 합니다. 참고: [PostgreSQL 행 잠금](https://www.postgresql.org/docs/17/explicit-locking.html).
 
 `migrations/20260924000700_ad_team_workspace.sql`도 전체 팀 검증을 포함한 롤백 사전 실행 후 적용했습니다. `AD_team_workspace()`는 하나의 STABLE SQL에서 팀 정보·수정 버전·명단·배정 후보를 같은 스냅샷으로 반환합니다. 별도 HTTP 조회 시 새 버전과 이전 명단이 섞일 수 있는 문제를 방지합니다. 학생 응답의 배정 후보는 항상 빈 배열이며 소속 팀만 반환합니다. 이 파일도 공유 migration history에 등록하지 않았으므로 재실행하지 않습니다.
+
+## 프로젝트 기획서 적용 기록 (2026-09-25)
+
+`migrations/20260924000800_ad_proposals.sql`을 이름 충돌 조회와 전체 롤백 검증 후 적용했습니다. `AD_proposals`는 팀당 한 건의 기획서, 프로젝트명·6개 본문·보조 링크, 임시 저장/제출/검토 완료 상태, 최종 변경·제출·최근 검토 기록을 보관합니다. 팀 FK는 `ON DELETE RESTRICT`로 기획서가 있는 팀의 삭제를 막습니다. 기존 서비스·Auth 스키마는 변경하지 않았습니다.
+
+RLS와 전용 `AD_save_proposal`·`AD_review_proposal` 함수가 교수·현재 활성 팀원 권한을 재검사합니다. 팀원은 현재 팀 소속이며 최초 비밀번호 변경을 마친 경우에만 초안을 작성·제출합니다. 교수는 제출 내용에 검토 완료 또는 사유를 포함한 수정 요청을 남깁니다. 제출·검토 완료 중 팀원 수정은 잠그고 수정 요청으로 작성 중 상태를 다시 엽니다. 교수에게 학생 본문 직접 수정 권한은 부여하지 않았습니다. 함수에서 팀 행을 잠가 첫 초안과 상태 변경을 직렬화하고 `updated_at`으로 오래된 편집을 차단합니다.
+
+`tests/ad_proposals_access.sql`에서 공동 작성, 제출 필수 항목, 상태·본문 위조, 검토/수정 요청/재제출, 개인정보·다른 팀 접근, 삭제 제한과 동시 수정 충돌을 검증했습니다. 검증용 Auth 사용자·기존 Auth 트리거 생성 자료는 모두 롤백했습니다. 원격 DB에는 CLI migration history 등록 없이 명시적으로 적용했으므로 이미 적용된 SQL을 재실행하거나 `db push`하지 않습니다.

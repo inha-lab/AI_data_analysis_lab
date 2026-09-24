@@ -149,3 +149,8 @@ footer { margin-top: 40px; border-top: 1px solid #dce3eb; padding: 24px 0; color
 .team-roster li { font-size: 13px; }
 .team-roster li > span:last-child { display: block; color: #62768a; margin-top: 3px; }
 .schedule-card h2 { font-size: 20px; overflow-wrap: anywhere; }
+.proposal-review { margin: 24px 0; }
+.proposal-review h2 { font-size: 18px; }
+.proposal-section { margin: 28px 0; border-top: 1px solid #dce3eb; padding-top: 16px; }
+.proposal-section h3 { font-size: 17px; }
+.proposal-text { white-space: pre-wrap; overflow-wrap: anywhere; line-height: 1.9; font-size: 14px; }
