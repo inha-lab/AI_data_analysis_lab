@@ -161,3 +161,6 @@ footer { margin-top: 40px; border-top: 1px solid #dce3eb; padding: 24px 0; color
 .report-row h3 { margin: 10px 0; overflow-wrap: anywhere; }
 .report-row p { margin: 0; }
 @media(max-width:760px) { .report-meta-fields { grid-template-columns: 1fr; } .report-row { align-items: flex-start; flex-direction: column; } }
+.comment-list { display: grid; gap: 1rem; margin: 1rem 0; }
+.comment-item { border: 1px solid #dce3eb; border-radius: 12px; padding: 1rem; }
+.comment-item .section-heading { margin-bottom: .5rem; }

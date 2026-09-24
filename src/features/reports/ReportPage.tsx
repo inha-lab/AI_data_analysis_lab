@@ -3,6 +3,7 @@ import { Link, useBlocker, useParams } from 'react-router-dom'
 import { useAuth } from '@/features/auth/auth-context'
 import { Button } from '@/components/ui/button'
 import { formatScheduleTime } from '@/features/schedules/schedule-model'
+import { CommentsPanel } from '@/features/comments/CommentsPanel'
 import { loadReports, reviewReport, saveReport } from './report-api'
 import { emptyReport, nextReportRound, reportFields, reportStatusLabels, reportTypeLabels, reportValues, type Report, type ReportInput, type ReportType } from './report-model'
 
@@ -113,6 +114,7 @@ function ReportWorkspace({teamId}:{teamId:string}) {
       {!manage&&current.status==='reviewed'&&<p className="field-help">검토가 완료되었습니다. 수정이 필요하면 교수의 수정 요청을 받아 다시 작성할 수 있습니다.</p>}
       {reviewing&&<ReportReview key={current.id} report={current} onLockedChange={setLocked} onCancel={()=>{if(!locked||window.confirm('입력 중인 피드백을 버릴까요?'))setReviewing(false)}} onSaved={message=>{setNotice(message);setReviewing(false);reload()}} />}
     </section>}
+    {current&&<CommentsPanel key={current.id} teamId={team.id} reportId={current.id} />}
   </>
 }
 export function ReportPage() {

@@ -8,7 +8,7 @@
 - SQL 식별자 예시: `public."AD_profiles"`, `public."AD_teams"`
 - Supabase 클라이언트 테이블명 예시: `AD_profiles`, `AD_teams`
 
-`migrations/`는 스키마·RLS, `functions/`는 권한이 필요한 서버 작업을 위한 위치입니다. `AD_profiles`, `AD_cohorts`, `AD_participants`, `AD_schedules`, `AD_teams`, `AD_team_members`, `AD_proposals`, `AD_reports`와 역할·참여 기반 접근 제어를 적용했습니다. 계정 생성·연결과 최초 비밀번호 변경 함수를 배포했습니다. 산출물·평가 테이블은 후속 구현 대상입니다.
+`migrations/`는 스키마·RLS, `functions/`는 권한이 필요한 서버 작업을 위한 위치입니다. `AD_profiles`, `AD_cohorts`, `AD_participants`, `AD_schedules`, `AD_teams`, `AD_team_members`, `AD_proposals`, `AD_reports`, `AD_comments`와 역할·참여 기반 접근 제어를 적용했습니다. 계정 생성·연결과 최초 비밀번호 변경 함수를 배포했습니다. 산출물·평가 테이블은 후속 구현 대상입니다.
 
 ## 공유 프로젝트 변경 원칙
 
@@ -89,3 +89,9 @@ RLS와 전용 `AD_save_proposal`·`AD_review_proposal` 함수가 교수·현재 
 RLS와 `AD_save_report`·`AD_review_report` 함수가 현재 활성 팀원과 교수 권한을 확인합니다. 팀원은 검토 전 제출 보고서를 수정 저장해 제출 상태를 유지하거나 재제출해 제출자·시각을 갱신할 수 있습니다. 검토 완료 후에는 교수의 수정 요청이 있어야 다시 작성합니다. 팀 행 잠금과 수정 버전으로 동시 변경을 차단합니다.
 
 `tests/ad_reports_access.sql`에서 초안·필수 입력·공동 수정·상태 유지·재제출·검토·수정 요청, 타 팀·비활성 계정 제한, 자료 보존을 검증했습니다. 임시 Auth 사용자와 공유 트리거 생성 자료는 롤백했습니다. 공유 CLI migration history에는 등록하지 않았으므로 재실행하거나 `db push`하지 않습니다.
+
+## 기획서·보고서 코멘트 적용 기록 (2026-09-25)
+
+`migrations/20260925000200_ad_comments.sql`을 스키마·권한 전체 롤백 검증 후 적용했습니다. `AD_comments`는 기획서 또는 보고서 한 곳만 가리키며 팀 일치 여부를 검증합니다. 작성자·본문·작성/수정 시각을 기록하고 대상·팀 자료가 남은 동안 삭제를 제한합니다. RLS로 현재 팀원과 교수 조회를 허용하며 익명 접근을 막습니다.
+
+`AD_save_comment`·`AD_delete_comment`는 현재 교수만 실행할 수 있습니다. 교수는 본인이 작성한 코멘트만 수정·삭제하며 수정 버전으로 오래된 요청을 차단합니다. 검토 완료·수정 요청 함수와 코멘트 기록은 분리했습니다. `tests/ad_comments_access.sql`은 대상 일치, 작성자·학생·익명 권한, 수정 충돌과 삭제를 확인하며 모든 임시 자료를 롤백합니다. 이 SQL도 공유 CLI migration history에는 등록하지 않았으므로 재실행하거나 `db push`하지 않습니다.

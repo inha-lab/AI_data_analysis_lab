@@ -4,6 +4,7 @@ import { useAuth } from '@/features/auth/auth-context'
 import { Button } from '@/components/ui/button'
 import { safeTeamUrl } from '@/features/teams/team-model'
 import { formatScheduleTime } from '@/features/schedules/schedule-model'
+import { CommentsPanel } from '@/features/comments/CommentsPanel'
 import { loadProposal, saveProposal, reviewProposal } from './proposal-api'
 import { emptyProposal, proposalSections, proposalStatusLabels, proposalValues, type Proposal, type ProposalInput } from './proposal-model'
 
@@ -88,6 +89,7 @@ function ProposalWorkspace({ teamId }: { teamId: string }) {
       : proposal ? <section className="panel"><h2>{proposal.title}</h2>{proposalSections.map((section, index) => <section className="proposal-section" key={section.key}><h3>{index + 1}. {section.label}</h3><p className="proposal-text">{proposal[section.key] || '미작성'}</p></section>)}{notion && <a className="text-link" href={notion} target="_blank" rel="noopener noreferrer">Notion 보조 문서 ↗</a>}</section>
         : <section className="panel empty-state"><h2>아직 작성된 기획서가 없습니다.</h2><p>소속 학생이 ‘내 팀’에서 기획서를 작성할 수 있습니다.</p></section>}
     {manage && proposal && proposal.status !== 'draft' && <ReviewPanel proposal={proposal} onSaved={saved} reload={reload} />}
+    {proposal && <CommentsPanel teamId={team.id} />}
   </>
 }
 export function ProposalPage() {
