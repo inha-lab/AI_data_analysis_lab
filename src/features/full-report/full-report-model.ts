@@ -1,0 +1,26 @@
+import { proposalSections, proposalStatusLabels, type Proposal } from '../proposals/proposal-model.ts'
+import { reportFields, reportStatusLabels, reportTypeLabels, type Report } from '../reports/report-model.ts'
+import { jobGroups } from '../participants/participant-model.ts'
+import { safeTeamUrl, teamStages, type Team, type TeamMember } from '../teams/team-model.ts'
+
+export type FullReportTeam=Pick<Team,'id'|'cohort_id'|'name'|'topic'|'stage'|'notion_url'|'github_url'|'demo_url'>
+export type FullReportMember=Pick<TeamMember,'full_name'|'department'|'job_group'|'is_leader'|'is_active'>
+export type FullReportProposal=Omit<Proposal,'team_id'>
+export type FullReportReport=Report
+export interface FullReportData {program_name:string;team:FullReportTeam;members:FullReportMember[];proposal:FullReportProposal|null;reports:FullReportReport[]}
+export function fullReportTitle(data:FullReportData){return `INHA AI Data Analysis LAB — ${data.program_name} — ${data.team.name}`}
+export function formatKst(value:string){return new Intl.DateTimeFormat('ko-KR',{timeZone:'Asia/Seoul',year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',hour12:false}).format(new Date(value))}
+export function escapeHtml(value:string){return value.replace(/[&<>"']/g,char=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char]!))}
+function text(value:string|null|undefined){return escapeHtml(value||'미작성')}
+function section(label:string,value:string|null|undefined){return `<section><h3>${escapeHtml(label)}</h3><p>${text(value)}</p></section>`}
+function link(label:string,value:string){const url=safeTeamUrl(value);return url?`<li>${escapeHtml(label)}: <a href="${escapeHtml(url)}" rel="noopener noreferrer">${escapeHtml(url)}</a></li>`:''}
+function audit(name:string|null,time:string|null){return name&&time?`${escapeHtml(name)} · ${escapeHtml(formatKst(time))} KST`:'기록 없음'}
+export function buildFullReportHtml(data:FullReportData,generatedAt:string){
+  const title=fullReportTitle(data)
+  const links=[link('Notion',data.team.notion_url),link('GitHub',data.team.github_url),link('데모',data.team.demo_url)].filter(Boolean)
+  const proposal=data.proposal
+  const proposalHtml=proposal?`<p>상태: ${proposalStatusLabels[proposal.status]} · 최종 변경: ${audit(proposal.updated_name,proposal.updated_at)} · 최근 제출: ${audit(proposal.submitted_name,proposal.submitted_at)}</p><h3>${text(proposal.title)}</h3>${proposalSections.map(item=>section(item.label,proposal[item.key])).join('')}${proposal.notion_url?`<ul>${link('기획서 Notion',proposal.notion_url)}</ul>`:''}${proposal.reviewed_at?section(`최근 검토 · ${proposal.reviewer_name||''} · ${formatKst(proposal.reviewed_at)} KST`,proposal.review_note):''}`:'<p>등록된 기획서가 없습니다.</p>'
+  const reports=data.reports.map(report=>`<article class="report"><h3>${escapeHtml(report.title)}</h3><p>${reportTypeLabels[report.report_type]} ${report.round_number}회차 · 작성일 ${escapeHtml(report.report_date)} · ${reportStatusLabels[report.status]}</p><p>최종 변경: ${audit(report.updated_name,report.updated_at)} · 최근 제출: ${audit(report.submitted_name,report.submitted_at)}</p>${reportFields.map(item=>section(item.label,report[item.key])).join('')}${report.reviewed_at?section(`최근 검토 · ${report.reviewer_name||''} · ${formatKst(report.reviewed_at)} KST`,report.review_note):''}</article>`).join('')
+  return `<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'"><title>${escapeHtml(title)}</title><style>body{font:16px/1.65 system-ui,sans-serif;color:#18344e;max-width:900px;margin:40px auto;padding:0 24px}h1{font-size:28px}h2{border-bottom:2px solid #286d9d;padding-bottom:8px;margin-top:40px}h3{font-size:17px;margin:22px 0 6px}p{white-space:pre-wrap;overflow-wrap:anywhere}li{margin:5px 0;overflow-wrap:anywhere}.muted{color:#586f82}.report{border:1px solid #dce3eb;border-radius:9px;padding:20px;margin:18px 0;break-inside:avoid-page}a{color:#1269a6}@media print{body{max-width:none;margin:0;padding:0}.report{break-inside:auto}a{color:inherit}}</style></head><body><h1>${escapeHtml(title)}</h1><p class="muted">생성 일시: ${escapeHtml(formatKst(generatedAt))} KST</p><h2>팀 정보</h2><p>팀명: ${escapeHtml(data.team.name)}<br>프로젝트 단계: ${teamStages[data.team.stage]}</p>${section('프로젝트 주제',data.team.topic)}${links.length?`<h3>관련 URL</h3><ul>${links.join('')}</ul>`:''}<h2>팀원 · ${data.members.length}명</h2>${data.members.length?`<ul>${data.members.map(member=>`<li>${escapeHtml(member.full_name)}${member.is_leader?' (팀장)':''} · ${escapeHtml(member.department)} · ${jobGroups[member.job_group]}${member.is_active?'':' · 비활성'}</li>`).join('')}</ul>`:'<p>팀원이 없습니다.</p>'}<h2>프로젝트 기획서</h2>${proposalHtml}<h2>일일·주간 보고서 · ${data.reports.length}건</h2>${reports||'<p>등록된 보고서가 없습니다.</p>'}<h2>산출물</h2><p>산출물 등록 기능 준비 중입니다.</p></body></html>`
+}
+export function fullReportFilename(data:FullReportData){return `INHA_AI_Data_Analysis_LAB_${`${data.program_name}_${data.team.name}`.replace(/[^가-힣a-zA-Z0-9_-]+/g,'_').slice(0,80)}.html`}

@@ -173,3 +173,10 @@ footer { margin-top: 40px; border-top: 1px solid #dce3eb; padding: 24px 0; color
 .monitoring-rounds { display: grid; gap: .8rem; }
 .monitoring-round { border: 1px solid #dce3eb; border-radius: 10px; padding: 1rem; }
 .monitoring-round > div { display: flex; justify-content: space-between; gap: 1rem; }
+.full-report { background: white; border: 1px solid #dce3eb; border-radius: 12px; padding: 2rem; max-width: 1000px; margin: 1.5rem auto; }
+.full-report h1 { font-size: 1.7rem; letter-spacing: 0; }
+.full-report h2 { border-bottom: 2px solid #286d9d; padding-bottom: .5rem; margin: 2.5rem 0 1rem; }
+.full-report h3 { margin: 1.25rem 0 .4rem; }
+.full-report h4 { margin: 1rem 0 .3rem; }
+.full-report-entry { border: 1px solid #dce3eb; border-radius: 10px; padding: 1.25rem; margin: 1.2rem 0; }
+@media print { .workspace-sidebar,.workspace-topbar,.report-actions { display: none !important; } .workspace { display: block; } .workspace-content { max-width: none; padding: 0; } .full-report { border: 0; max-width: none; margin: 0; padding: 0; } .full-report-entry { break-inside: auto; } }
