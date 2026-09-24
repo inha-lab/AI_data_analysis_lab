@@ -24,4 +24,6 @@ test('only supported job groups and participation statuses are accepted', () => 
   assert.ok(validateParticipant({ ...valid, job_group: 'professor' }))
   assert.ok(validateParticipant({ ...valid, status: 'deleted' }))
   assert.equal(validateParticipant({ ...valid, status: 'inactive' }), null)
+  assert.equal(validateParticipant({ ...valid, status: 'completed' }), null)
+  assert.equal(validateParticipant({ ...valid, status: 'dropout' }), null)
 })

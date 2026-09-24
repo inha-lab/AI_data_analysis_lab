@@ -101,3 +101,9 @@ RLS와 `AD_save_report`·`AD_review_report` 함수가 현재 활성 팀원과 �
 `migrations/20260925000300_ad_monitoring.sql`의 교수 전용 `AD_program_monitoring()`을 롤백 검증 후 명시적으로 적용했습니다. 프로그램별 활성 참가자·팀·기획서 제출 수, 팀별 단계와 보고서/이슈 건수, 보고 구분·회차별 제출 및 미제출 팀을 한 DB 스냅샷에서 반환합니다. 초안은 미제출로 집계하며 실제 생성된 회차만 표시합니다. 학생과 익명 실행을 차단하고 기존 서비스 객체는 변경하지 않았습니다.
 
 `tests/ad_monitoring_access.sql`은 집계 수치·미제출 팀·권한을 검증하고 모든 임시 자료를 롤백합니다. 공유 CLI migration history에는 등록하지 않았으므로 재실행하거나 `db push`하지 않습니다.
+
+## 참가자 수료·중탈 및 대시보드 카드 (2026-09-25)
+
+`migrations/20260925000400_ad_participant_outcomes.sql`을 롤백 검증 후 명시적으로 적용했습니다. 기존 `AD_participants.status` 제약에 `completed`, `dropout`을 추가하되 기존 `active`, `inactive` 데이터는 변경하지 않았습니다. `AD_dashboard_participant_counts()`는 교수에게 전체 프로그램 참가 등록 건수와 상태별 수치를 반환합니다. 비활성은 전체 수에 포함하지만 중탈로 합치지 않습니다.
+
+`tests/ad_participant_outcomes.sql`은 새 상태, 무효 상태 거부, 상태별 합계 및 비인가/익명 차단을 검증하며 임시 자료를 롤백합니다. 기존 active 조건의 팀·일정 접근 및 계정 연결 정책은 수료·중탈 참가자에게 접근을 허용하지 않습니다. 이 SQL도 공유 CLI migration history에 등록하지 않았으므로 재실행하거나 `db push`하지 않습니다.

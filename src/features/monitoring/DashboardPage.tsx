@@ -6,6 +6,7 @@ import { useCohorts } from '@/features/cohorts/use-cohorts'
 import { cohortPeriod, cohortStatusLabels } from '@/features/cohorts/cohort-model'
 import { Button } from '@/components/ui/button'
 import { ProgramMonitoringPanel } from './ProgramMonitoringPanel'
+import { ParticipantCards } from './ParticipantCards'
 
 function ProfessorDashboard() {
   const { cohorts, loading, error, reload } = useCohorts()
@@ -21,6 +22,7 @@ function ProfessorDashboard() {
     <div className="page-heading"><div><p className="eyebrow">PROGRAM OVERVIEW</p><h1>프로그램 대시보드</h1><p className="muted">프로그램별 운영 현황을 확인하고 다음 프로그램을 준비하세요.</p></div><Link to="/cohorts?new=1" className="button">새 프로그램 만들기 <ArrowUpRight size={18} aria-hidden="true" /></Link></div>
     {error ? <div className="notice" role="alert"><p>{error}</p><Button onClick={reload}>다시 시도</Button></div> : <>
       <div className="stats-grid">{counts.map(item => <article className="stat-card" key={item.label}><p>{item.label}</p><strong>{loading ? '—' : item.count}</strong><span>프로그램</span></article>)}</div>
+      <ParticipantCards />
       <section className="panel"><div className="section-heading"><h2><CalendarDays size={20} aria-hidden="true" /> 최근 등록한 프로그램</h2><Link to="/cohorts" className="text-link">전체 보기 →</Link></div>
         {loading ? <p className="empty-state" role="status">운영 현황을 불러오고 있습니다.</p> : cohorts.length ? <div className="cohort-list">{cohorts.slice(0, 5).map(cohort => <article className="cohort-row" key={cohort.id}><div><span className={`badge status-${cohort.status}`}>{cohortStatusLabels[cohort.status]}</span><h3>{cohort.name}</h3><p className="muted">{cohortPeriod(cohort)}</p></div><Link to="/cohorts" className="text-link">관리 →</Link></article>)}</div>
           : <div className="empty-state"><Layers3 size={32} aria-hidden="true" /><h2>아직 등록된 프로그램이 없습니다.</h2><p>첫 프로그램을 만들고 운영 기간을 설정해 주세요.</p><Link to="/cohorts?new=1" className="button">첫 프로그램 만들기</Link></div>}
