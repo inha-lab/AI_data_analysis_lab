@@ -164,3 +164,12 @@ footer { margin-top: 40px; border-top: 1px solid #dce3eb; padding: 24px 0; color
 .comment-list { display: grid; gap: 1rem; margin: 1rem 0; }
 .comment-item { border: 1px solid #dce3eb; border-radius: 12px; padding: 1rem; }
 .comment-item .section-heading { margin-bottom: .5rem; }
+.monitoring-panel .stats-grid { margin: 1.5rem 0; }
+.monitoring-table-wrap { overflow-x: auto; }
+.monitoring-table { width: 100%; border-collapse: collapse; min-width: 700px; }
+.monitoring-table th, .monitoring-table td { border-bottom: 1px solid #dce3eb; padding: .8rem; text-align: left; vertical-align: top; }
+.monitoring-table th { color: #52677b; font-size: .85rem; }
+.monitoring-table small { display: block; color: #52677b; margin-top: .35rem; }
+.monitoring-rounds { display: grid; gap: .8rem; }
+.monitoring-round { border: 1px solid #dce3eb; border-radius: 10px; padding: 1rem; }
+.monitoring-round > div { display: flex; justify-content: space-between; gap: 1rem; }

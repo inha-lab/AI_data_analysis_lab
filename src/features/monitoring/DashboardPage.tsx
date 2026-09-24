@@ -5,9 +5,12 @@ import { useAuth, roleLabels } from '@/features/auth/auth-context'
 import { useCohorts } from '@/features/cohorts/use-cohorts'
 import { cohortPeriod, cohortStatusLabels } from '@/features/cohorts/cohort-model'
 import { Button } from '@/components/ui/button'
+import { ProgramMonitoringPanel } from './ProgramMonitoringPanel'
 
 function ProfessorDashboard() {
   const { cohorts, loading, error, reload } = useCohorts()
+  const [selectedId,setSelectedId]=useState('')
+  const selected=cohorts.find(item=>item.id===selectedId)??cohorts.find(item=>item.status==='active')??cohorts[0]
   const counts = [
     { label: '전체 프로그램', count: cohorts.length },
     { label: '운영 중', count: cohorts.filter(item => item.status === 'active').length },
@@ -22,8 +25,9 @@ function ProfessorDashboard() {
         {loading ? <p className="empty-state" role="status">운영 현황을 불러오고 있습니다.</p> : cohorts.length ? <div className="cohort-list">{cohorts.slice(0, 5).map(cohort => <article className="cohort-row" key={cohort.id}><div><span className={`badge status-${cohort.status}`}>{cohortStatusLabels[cohort.status]}</span><h3>{cohort.name}</h3><p className="muted">{cohortPeriod(cohort)}</p></div><Link to="/cohorts" className="text-link">관리 →</Link></article>)}</div>
           : <div className="empty-state"><Layers3 size={32} aria-hidden="true" /><h2>아직 등록된 프로그램이 없습니다.</h2><p>첫 프로그램을 만들고 운영 기간을 설정해 주세요.</p><Link to="/cohorts?new=1" className="button">첫 프로그램 만들기</Link></div>}
       </section>
+      {selected&&<><div className="cohort-selector"><label htmlFor="monitor-cohort">진행 현황 프로그램</label><select id="monitor-cohort" value={selected.id} onChange={event=>setSelectedId(event.target.value)}>{cohorts.map(cohort=><option key={cohort.id} value={cohort.id}>{cohort.name}</option>)}</select></div><ProgramMonitoringPanel key={selected.id} cohortId={selected.id} /></>}
     </>}
-    <div className="notice"><h2>프로그램 운영</h2><p><Link to="/schedules" className="text-link">단계별 일정·제출 마감 관리 →</Link></p><p><Link to="/participants" className="text-link">프로그램별 참가자 관리로 이동 →</Link></p><p><Link to="/teams" className="text-link">팀 구성·프로젝트 정보 관리 →</Link></p><p>기획서·보고서·산출물 제출 기능은 순차적으로 추가될 예정입니다.</p></div>
+    <div className="notice"><h2>프로그램 운영</h2><p><Link to="/schedules" className="text-link">단계별 일정·제출 마감 관리 →</Link></p><p><Link to="/participants" className="text-link">프로그램별 참가자 관리로 이동 →</Link></p><p><Link to="/teams" className="text-link">팀 구성·프로젝트 정보 관리 →</Link></p><p>산출물 제출과 평가 기능은 순차적으로 추가될 예정입니다.</p></div>
   </>
 }
 export function DashboardPage() {
@@ -32,3 +36,4 @@ export function DashboardPage() {
   if (profile?.role === 'student') return <StudentDashboard />
   return <><div className="page-heading"><div><p className="eyebrow">MY PROGRAM</p><h1>{profile ? roleLabels[profile.role] : ''} 대시보드</h1></div></div><section className="panel empty-state"><h2>프로그램 참여가 확인되었습니다.</h2><p>소속 프로그램과 팀 연결 화면을 준비하고 있습니다.</p></section></>
 }
+import { useState } from 'react'
