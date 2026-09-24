@@ -10,7 +10,7 @@ if (key.split('.').length === 3) {
   const payload = JSON.parse(Buffer.from(key.split('.')[1], 'base64url').toString())
   if (payload.role !== 'anon') throw new Error('Expected a public anon key')
 }
-for (const path of ['/auth/v1/settings', '/rest/v1/AD_profiles?select=id&limit=0', '/rest/v1/AD_cohorts?select=id&limit=0', '/rest/v1/AD_participants?select=id&limit=0', '/rest/v1/AD_schedules?select=id&limit=0']) {
+for (const path of ['/auth/v1/settings', '/rest/v1/AD_profiles?select=id&limit=0', '/rest/v1/AD_cohorts?select=id&limit=0', '/rest/v1/AD_participants?select=id&limit=0', '/rest/v1/AD_schedules?select=id&limit=0', '/rest/v1/AD_teams?select=id&limit=0', '/rest/v1/AD_team_members?select=team_id&limit=0', '/rest/v1/rpc/AD_team_workspace?p_cohort=00000000-0000-0000-0000-000000000000']) {
   try {
     const response = await fetch(new URL(path, url), {
       headers: { apikey: key, Authorization: `Bearer ${key}` },
@@ -21,7 +21,7 @@ for (const path of ['/auth/v1/settings', '/rest/v1/AD_profiles?select=id&limit=0
     // Anonymous reads of this private table must be denied after provisioning.
     const accessDenied = path.startsWith('/rest/') && response.status === 401 && body.code === '42501'
     if (path.startsWith('/rest/') ? !accessDenied : !response.ok) process.exitCode = 1
-    if (accessDenied) console.log('App table exists; anonymous access is denied as expected')
+    if (accessDenied) console.log('Private app endpoint denies anonymous access as expected')
   } catch {
     console.error('Supabase network request failed (credentials omitted)')
     process.exitCode = 1

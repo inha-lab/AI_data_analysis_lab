@@ -140,3 +140,12 @@ footer { margin-top: 40px; border-top: 1px solid #dce3eb; padding: 24px 0; color
 .schedule-card h3 { margin: 12px 0; font-size: 18px; overflow-wrap: anywhere; }
 .schedule-card .button { padding: 6px 10px; font-size: 12px; }
 .schedule-time { color: #476078; font-size: 13px; line-height: 1.8; }
+.team-members-heading { font-size: 16px; margin: 28px 0 8px; }
+.team-candidates { max-height: 320px; overflow-y: auto; border: 1px solid #dce3eb; border-radius: 8px; margin-top: 12px; padding: 12px; }
+.cohort-form label.team-candidate { display: flex; gap: 10px; align-items: flex-start; margin: 0; padding: 10px 0; border-bottom: 1px solid #edf1f5; font-weight: 400; }
+.cohort-form .team-candidate input { width: 18px; height: 18px; flex-shrink: 0; margin-top: 3px; }
+.team-candidate small { display: block; color: #62768a; margin-top: 4px; }
+.team-roster { padding: 0; list-style: none; margin: 18px 0; display: grid; gap: 10px; }
+.team-roster li { font-size: 13px; }
+.team-roster li > span:last-child { display: block; color: #62768a; margin-top: 3px; }
+.schedule-card h2 { font-size: 20px; overflow-wrap: anywhere; }

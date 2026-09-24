@@ -27,6 +27,6 @@ export function StudentDashboard() {
     <p><Link to="/schedules" className="text-link">프로그램 일정·제출 마감 확인 →</Link></p>
     {result?.revision !== revision ? <p role="status">참여 정보를 확인하고 있습니다.</p> : result.error ? <div role="alert" className="notice"><p>{result.error}</p><Button onClick={() => setRevision(value => value + 1)}>다시 시도</Button></div>
       : !result.rows.length ? <section className="panel empty-state"><h2>참여 중인 프로그램이 없습니다.</h2><p>참가 상태는 운영 담당자에게 문의해 주세요.</p></section>
-        : <div className="membership-grid">{result.rows.map(row => <section className="panel" key={row.id}><span className="badge status-active">참여 중</span><h2>{result.names[row.cohort_id] ?? '참여 프로그램'}</h2><p>{row.full_name} · {row.department} · {row.grade}</p><p className="muted">학번 {row.student_number}</p><p className="field-help">팀과 프로젝트 화면은 순차적으로 제공됩니다.</p></section>)}</div>}
+        : <div className="membership-grid">{result.rows.map(row => <section className="panel" key={row.id}><span className="badge status-active">참여 중</span><h2>{result.names[row.cohort_id] ?? '참여 프로그램'}</h2><p>{row.full_name} · {row.department} · {row.grade}</p><p className="muted">학번 {row.student_number}</p><p><Link to={`/teams?cohort=${row.cohort_id}`} className="text-link">내 팀·프로젝트 정보 →</Link></p></section>)}</div>}
   </>
 }

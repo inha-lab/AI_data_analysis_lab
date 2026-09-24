@@ -8,7 +8,7 @@
 - SQL 식별자 예시: `public."AD_profiles"`, `public."AD_teams"`
 - Supabase 클라이언트 테이블명 예시: `AD_profiles`, `AD_teams`
 
-`migrations/`는 스키마·RLS, `functions/`는 권한이 필요한 서버 작업을 위한 위치입니다. `AD_profiles`, `AD_cohorts`, `AD_participants`와 역할·참여 기반 RLS를 적용했습니다. 계정 생성·연결과 최초 비밀번호 변경 함수를 배포했습니다. 나머지 업무 테이블은 후속 구현 대상입니다.
+`migrations/`는 스키마·RLS, `functions/`는 권한이 필요한 서버 작업을 위한 위치입니다. `AD_profiles`, `AD_cohorts`, `AD_participants`, `AD_schedules`, `AD_teams`, `AD_team_members`와 역할·참여 기반 접근 제어를 적용했습니다. 계정 생성·연결과 최초 비밀번호 변경 함수를 배포했습니다. 보고서·평가 테이블은 후속 구현 대상입니다.
 
 ## 공유 프로젝트 변경 원칙
 
@@ -61,3 +61,15 @@
 공개 RPC는 공개 지정 일정과 프로그램명만 반환하는 고정 SQL입니다. `security definer`와 빈 `search_path`, 스키마를 명시한 참조를 사용하며 익명 역할에는 이 함수 실행 권한만 부여합니다. 일정·프로그램 원본 테이블의 익명 조회 권한은 없습니다. 작성자, 프로필, 참가자 데이터는 RPC 반환 대상에서 제외합니다. 참고: [Supabase 함수 권한](https://supabase.com/docs/guides/database/functions).
 
 `tests/ad_schedules_access.sql`의 교수 CRUD·수정 충돌·입력 제약·학생 소속·비활성/미등록/다른 역할 차단·공개 해제 검증을 통과했습니다. 모든 테스트 자료와 임시 역할 변경은 롤백했습니다. `npm run check:db`는 일정 원본 테이블의 익명 차단과 공개 RPC 응답도 검사합니다.
+
+## 팀 관리 적용 기록 (2026-09-24)
+
+`migrations/20260924000600_ad_teams.sql`을 이름 충돌 확인과 스키마·검증 전체 롤백 실행 후 적용했습니다. `AD_teams`, `AD_team_members`, RLS, 교수의 원자적 팀 구성 저장·빈 팀 삭제, 소속 학생의 프로젝트 정보 수정, 최소 필드 팀원 조회와 교수 전용 배정 후보 조회 함수를 추가했습니다. 기존 `AD_participants`에 프로그램 일치 검증용 `(id, cohort_id)` 고유 제약만 추가했습니다. 다른 서비스 테이블·정책·Auth는 변경하지 않았습니다.
+
+인증 클라이언트의 팀·구성원 직접 쓰기는 차단합니다. 교수와 학생 모두 전용 RPC를 사용하며 역할·프로필·현재 소속을 서버에서 다시 확인합니다. 프로그램별 팀명 고유 인덱스, 참가자당 하나의 소속, 팀당 하나의 팀장과 프로그램 일치 FK를 적용했습니다. 구성원 저장은 프로그램 행 잠금 후 팀 정보·전체 명단·팀장을 한 트랜잭션에서 갱신하며 팀 버전으로 오래된 편집을 차단합니다. 학생은 주제·단계·링크만 수정할 수 있습니다.
+
+`tests/ad_teams_access.sql`은 임시 Auth 계정과 기존 Auth 트리거의 생성 자료까지 롤백합니다. 원자적 저장, 중복·미연결·타 프로그램 배정, 팀장, 링크 제약, 빈 팀 삭제, 학생의 개인정보·쓰기 범위, 소속 해제·계정 상태·미등록·익명 접근과 수정 충돌을 검증합니다. 실제 운영 참가자의 배정은 변경하지 않았습니다.
+
+이 SQL들도 공유 CLI migration history에는 등록하지 않습니다. 이미 적용된 파일을 재실행하거나 `db push`하지 않습니다. 향후 팀 제출물은 `AD_teams`에 `ON DELETE RESTRICT`로 참조하여 자료가 있는 팀의 삭제를 제한해야 합니다. 참고: [PostgreSQL 행 잠금](https://www.postgresql.org/docs/17/explicit-locking.html).
+
+`migrations/20260924000700_ad_team_workspace.sql`도 전체 팀 검증을 포함한 롤백 사전 실행 후 적용했습니다. `AD_team_workspace()`는 하나의 STABLE SQL에서 팀 정보·수정 버전·명단·배정 후보를 같은 스냅샷으로 반환합니다. 별도 HTTP 조회 시 새 버전과 이전 명단이 섞일 수 있는 문제를 방지합니다. 학생 응답의 배정 후보는 항상 빈 배열이며 소속 팀만 반환합니다. 이 파일도 공유 migration history에 등록하지 않았으므로 재실행하지 않습니다.
