@@ -148,6 +148,23 @@ footer { margin-top: 40px; border-top: 1px solid #dce3eb; padding: 24px 0; color
 .team-roster { padding: 0; list-style: none; margin: 18px 0; display: grid; gap: 10px; }
 .team-roster li { font-size: 13px; }
 .team-roster li > span:last-child { display: block; color: #62768a; margin-top: 3px; }
+.team-overview-grid { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 14px; align-items: start; margin-top: 16px; }
+.team-overview-card { display: flex; flex-direction: column; min-width: 0; border: 1px solid #dce3eb; border-radius: 10px; background: #fff; padding: 18px; }
+.team-overview-heading { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.team-overview-heading .field-help { margin: 0; white-space: nowrap; }
+.team-overview-card h2 { font-size: 18px; line-height: 1.35; margin: 12px 0 8px; overflow-wrap: anywhere; }
+.team-overview-topic { font-size: 13px; color: #52677b; line-height: 1.55; min-height: 2.8em; margin: 0 0 10px; overflow: hidden; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow-wrap: anywhere; }
+.team-overview-leader { font-size: 13px; margin: 0 0 12px; }
+.team-overview-links { display: flex; flex-wrap: wrap; gap: 8px 14px; border-top: 1px solid #e5ebf1; padding: 12px 0; }
+.team-overview-links a { color: #1269a6; font-size: 12px; white-space: nowrap; }
+.team-overview-details { border-top: 1px solid #e5ebf1; padding: 10px 0; }
+.team-overview-details summary { color: #294b68; font-size: 12px; font-weight: 650; cursor: pointer; }
+.team-overview-details .team-roster { margin: 12px 0; }
+.team-overview-actions { display: flex; flex-wrap: wrap; gap: 8px; padding-top: 12px; }
+.team-overview-actions .button { padding: 7px 11px; font-size: 12px; }
+.with-editor .team-overview-grid { grid-template-columns: 1fr; }
+@media (max-width: 1250px) { .team-overview-grid { grid-template-columns: repeat(2,minmax(0,1fr)); } }
+@media (max-width: 680px) { .team-overview-grid { grid-template-columns: 1fr; } }
 .schedule-card h2 { font-size: 20px; overflow-wrap: anywhere; }
 .proposal-review { margin: 24px 0; }
 .proposal-review h2 { font-size: 18px; }

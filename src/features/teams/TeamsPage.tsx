@@ -7,8 +7,22 @@ import type { Cohort } from '@/features/cohorts/cohort-model'
 import { jobGroups } from '@/features/participants/participant-model'
 import { Button } from '@/components/ui/button'
 import { deleteEmptyTeam, loadTeams } from './team-api'
-import { jobSummary, safeTeamUrl, teamStages, type Team } from './team-model'
+import { jobSummary, safeTeamUrl, teamStages, type Team, type TeamMember } from './team-model'
 import { TeamEditor } from './TeamEditor'
+
+function TeamCard({team,members,manage,editing,deleting,onEdit,onDelete}:{team:Team;members:TeamMember[];manage:boolean;editing:boolean;deleting:boolean;onEdit:()=>void;onDelete:()=>void}){
+  const leader=members.find(item=>item.is_leader)
+  return <article className="team-overview-card"><div className="team-overview-heading"><span className="badge">{teamStages[team.stage]}</span><span className="field-help">{members.length}명</span></div>
+    <h2>{team.name}</h2><p className="team-overview-topic">{team.topic||'프로젝트 주제 미등록'}</p>
+    <p className="team-overview-leader">팀장 <strong>{leader?.full_name||'미지정'}</strong></p>
+    <div className="team-overview-links"><Link to={`/teams/${team.id}/proposal`}>기획서 →</Link><Link to={`/teams/${team.id}/reports`}>보고서 →</Link><Link to={`/teams/${team.id}/full-report`}>전체리포트 →</Link></div>
+    <details className="team-overview-details"><summary>팀원·직무·링크 자세히</summary><p className="field-help">{jobSummary(members)}</p>
+      {members.length?<ul className="team-roster">{members.map(member=><li key={member.participant_id}><strong>{member.full_name}</strong> {member.is_leader&&<span className="badge status-active">팀장</span>} {!member.is_active&&<span className="badge">비활성</span>}<span>{member.department} · {jobGroups[member.job_group]}</span></li>)}</ul>:<p className="field-help">배정된 팀원이 없습니다.</p>}
+      <div className="button-row">{([['Notion',team.notion_url],['GitHub',team.github_url],['데모',team.demo_url]] as const).map(([label,value])=>{const url=safeTeamUrl(value);return url?<a key={label} href={url} target="_blank" rel="noopener noreferrer" className="text-link">{label} ↗</a>:null})}</div>
+    </details>
+    <div className="team-overview-actions"><Button className="button-secondary" disabled={editing||deleting} onClick={onEdit}>{manage?'팀 수정':'프로젝트 수정'}</Button>{manage&&!members.length&&<Button className="button-secondary" disabled={editing||deleting} onClick={onDelete}>빈 팀 삭제</Button>}</div>
+  </article>
+}
 
 function TeamWorkspace({ cohort, manage, editing, setEditing, deleting, setDeleting }: {
   cohort: Cohort; manage: boolean; editing: Team | 'new' | null; setEditing: (value: Team | 'new' | null) => void; deleting: boolean; setDeleting: (value: boolean) => void
@@ -34,27 +48,24 @@ function TeamWorkspace({ cohort, manage, editing, setEditing, deleting, setDelet
     catch (cause) { setActionError(cause instanceof Error ? cause.message : '팀을 삭제하지 못했습니다.') }
     finally { setDeleting(false) }
   }
-  const visible = (result?.teams ?? []).filter(team => `${team.name} ${team.topic}`.toLowerCase().includes(search.trim().toLowerCase()) && (stage === 'all' || team.stage === stage))
+  const rosterByTeam=new Map<string,TeamMember[]>()
+  for(const member of result?.roster??[]){
+    const members=rosterByTeam.get(member.team_id)??[]
+    members.push(member)
+    rosterByTeam.set(member.team_id,members)
+  }
+  const visible=(result?.teams??[]).filter(team=>`${team.name} ${team.topic} ${(rosterByTeam.get(team.id)??[]).map(member=>member.full_name).join(' ')}`.toLowerCase().includes(search.trim().toLowerCase())&&(stage==='all'||team.stage===stage)).sort((left,right)=>left.name.localeCompare(right.name,'ko',{numeric:true}))
   return <>
     <div className="participant-summary"><p><strong>{cohort.name}</strong> · {result?.teams.length ?? 0}개 팀</p><div className="button-row"><Button className="button-secondary" disabled={loading || Boolean(editing) || deleting} onClick={() => { setActionError(''); setRevision(value => value + 1) }}><RefreshCw size={16} aria-hidden="true" /> 새로고침</Button>
       {manage && <Button disabled={loading || Boolean(result?.error) || Boolean(editing) || deleting} onClick={() => { setNotice(''); setEditing('new') }}><Plus size={16} aria-hidden="true" /> 새 팀</Button>}</div></div>
     {notice && <p className="success-message" role="status">{notice}</p>}{actionError && <p className="form-error" role="alert">{actionError}</p>}
-    <div className={editing ? 'cohort-workspace with-editor' : 'cohort-workspace'}><section className="panel" aria-label="팀 목록">
+    <div className={editing ? 'cohort-workspace with-editor' : 'cohort-workspace'}><section className="panel team-list-panel" aria-label="팀 목록">
       {loading ? <p className="empty-state" role="status">팀 정보를 불러오고 있습니다.</p> : result.error ? <p className="form-error" role="alert">{result.error}</p> : <>
         {manage && <p className="field-help">배정 대기 {result.candidates.filter(item => item.eligibility === 'ready' && !item.team_id).length}명 · 계정 연결 필요 {result.candidates.filter(item => item.eligibility === 'unlinked').length}명 · <Link to={`/participants?cohort=${cohort.id}`} className="text-link">참가자 관리 →</Link></p>}
-        <div className="list-toolbar schedule-toolbar"><div><input aria-label="팀명·주제 검색" placeholder="팀명·주제 검색" type="search" value={search} onChange={e => setSearch(e.target.value)} /></div><select aria-label="프로젝트 단계 필터" value={stage} onChange={e => setStage(e.target.value)}><option value="all">모든 단계</option>{Object.entries(teamStages).map(([key, label]) => <option key={key} value={key}>{label}</option>)}</select></div>
+        <div className="list-toolbar schedule-toolbar"><div><input aria-label="팀명·주제·팀원 검색" placeholder="팀명·주제·팀원 검색" type="search" value={search} onChange={e => setSearch(e.target.value)} /></div><select aria-label="프로젝트 단계 필터" value={stage} onChange={e => setStage(e.target.value)}><option value="all">모든 단계</option>{Object.entries(teamStages).map(([key, label]) => <option key={key} value={key}>{label}</option>)}</select></div>
+        <p className="field-help" role="status">전체 {result.teams.length}개 팀 · 표시 {visible.length}개 팀</p>
         {!visible.length ? <div className="empty-state"><h2>{result.teams.length ? '검색 결과가 없습니다.' : manage ? '등록된 팀이 없습니다.' : '배정된 팀이 없습니다.'}</h2><p>{manage ? '참가자 계정을 연결한 뒤 팀을 만들고 팀원을 배정하세요.' : '팀 배정은 운영 담당자에게 문의해 주세요.'}</p></div>
-          : <div className="schedule-list">{visible.map(team => {
-            const members = result.roster.filter(item => item.team_id === team.id)
-            return <article className="schedule-card" key={team.id}><div className="schedule-card-heading"><span className="badge">{teamStages[team.stage]}</span><div className="button-row"><Button className="button-secondary" disabled={Boolean(editing) || deleting} onClick={() => { setNotice(''); setEditing(team) }}>{manage ? '팀 수정' : '프로젝트 수정'}</Button>{manage && !members.length && <Button className="button-secondary" disabled={Boolean(editing) || deleting} onClick={() => void remove(team)}>빈 팀 삭제</Button>}</div></div>
-              <h2>{team.name}</h2><p className="cohort-description">{team.topic || '프로젝트 주제 미등록'}</p>
-              <p className="button-row"><Link className="text-link" to={`/teams/${team.id}/proposal`}>{manage ? '기획서 조회·검토' : '기획서 작성·조회'} →</Link><Link className="text-link" to={`/teams/${team.id}/reports`}>{manage ? '보고서 조회·검토' : '일일·주간 보고서'} →</Link><Link className="text-link" to={`/teams/${team.id}/full-report`}>팀 전체리포트 →</Link></p>
-              <p className="field-help">{members.length}명 · {jobSummary(members)}</p>
-              <ul className="team-roster">{members.map(member => <li key={member.participant_id}><strong>{member.full_name}</strong> {member.is_leader && <span className="badge status-active">팀장</span>} {!member.is_active && <span className="badge">비활성</span>}<span>{member.department} · {jobGroups[member.job_group]}</span></li>)}</ul>
-              {!members.some(item => item.is_leader) && <p className="field-help">팀장 미지정</p>}
-              <div className="button-row">{([['Notion', team.notion_url], ['GitHub', team.github_url], ['데모', team.demo_url]] as const).map(([label, value]) => { const url = safeTeamUrl(value); return url ? <a key={label} href={url} target="_blank" rel="noopener noreferrer" className="text-link">{label} ↗</a> : null })}</div>
-            </article>
-          })}</div>}
+          : <div className="team-overview-grid">{visible.map(team=><TeamCard key={team.id} team={team} members={rosterByTeam.get(team.id)??[]} manage={manage} editing={Boolean(editing)} deleting={deleting} onEdit={()=>{setNotice('');setEditing(team)}} onDelete={()=>void remove(team)}/>)}</div>}
       </>}
     </section>
     {editing && result && <TeamEditor key={editing === 'new' ? 'new' : editing.id} cohortId={cohort.id} team={editing === 'new' ? undefined : editing} roster={editing === 'new' ? [] : result.roster.filter(item => item.team_id === editing.id)} candidates={result.candidates} manage={manage} onCancel={() => setEditing(null)} onSaved={() => { setEditing(null); setNotice('팀 정보를 저장했습니다.'); setRevision(value => value + 1) }} />}
