@@ -154,3 +154,10 @@ footer { margin-top: 40px; border-top: 1px solid #dce3eb; padding: 24px 0; color
 .proposal-section { margin: 28px 0; border-top: 1px solid #dce3eb; padding-top: 16px; }
 .proposal-section h3 { font-size: 17px; }
 .proposal-text { white-space: pre-wrap; overflow-wrap: anywhere; line-height: 1.9; font-size: 14px; }
+.report-detail { margin-top: 24px; }
+.report-review { margin-top: 24px; }
+.report-meta-fields { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 12px; }
+.report-row { display: flex; align-items: center; justify-content: space-between; gap: 16px; border-bottom: 1px solid #dce3eb; padding: 18px 0; }
+.report-row h3 { margin: 10px 0; overflow-wrap: anywhere; }
+.report-row p { margin: 0; }
+@media(max-width:760px) { .report-meta-fields { grid-template-columns: 1fr; } .report-row { align-items: flex-start; flex-direction: column; } }

@@ -48,7 +48,7 @@ function TeamWorkspace({ cohort, manage, editing, setEditing, deleting, setDelet
             const members = result.roster.filter(item => item.team_id === team.id)
             return <article className="schedule-card" key={team.id}><div className="schedule-card-heading"><span className="badge">{teamStages[team.stage]}</span><div className="button-row"><Button className="button-secondary" disabled={Boolean(editing) || deleting} onClick={() => { setNotice(''); setEditing(team) }}>{manage ? '팀 수정' : '프로젝트 수정'}</Button>{manage && !members.length && <Button className="button-secondary" disabled={Boolean(editing) || deleting} onClick={() => void remove(team)}>빈 팀 삭제</Button>}</div></div>
               <h2>{team.name}</h2><p className="cohort-description">{team.topic || '프로젝트 주제 미등록'}</p>
-              <p><Link className="text-link" to={`/teams/${team.id}/proposal`}>{manage ? '기획서 조회·검토' : '기획서 작성·조회'} →</Link></p>
+              <p className="button-row"><Link className="text-link" to={`/teams/${team.id}/proposal`}>{manage ? '기획서 조회·검토' : '기획서 작성·조회'} →</Link><Link className="text-link" to={`/teams/${team.id}/reports`}>{manage ? '보고서 조회·검토' : '일일·주간 보고서'} →</Link></p>
               <p className="field-help">{members.length}명 · {jobSummary(members)}</p>
               <ul className="team-roster">{members.map(member => <li key={member.participant_id}><strong>{member.full_name}</strong> {member.is_leader && <span className="badge status-active">팀장</span>} {!member.is_active && <span className="badge">비활성</span>}<span>{member.department} · {jobGroups[member.job_group]}</span></li>)}</ul>
               {!members.some(item => item.is_leader) && <p className="field-help">팀장 미지정</p>}
