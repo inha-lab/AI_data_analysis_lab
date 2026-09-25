@@ -197,6 +197,17 @@ footer { margin-top: 40px; border-top: 1px solid #dce3eb; padding: 24px 0; color
 .with-editor .team-overview-grid { grid-template-columns: 1fr; }
 @media (max-width: 1250px) { .team-overview-grid { grid-template-columns: repeat(2,minmax(0,1fr)); } }
 @media (max-width: 680px) { .team-overview-grid { grid-template-columns: 1fr; } }
+.team-overview-grid.student-team-grid { grid-template-columns: 1fr; }
+.student-team-card { padding: 24px; }
+.student-team-card h2 { font-size: 24px; }
+.student-team-card .team-overview-topic { min-height: 0; display: block; }
+.student-team-nav { display: grid; grid-template-columns: repeat(4,minmax(0,1fr)); gap: 12px; border-top: 1px solid #e5ebf1; padding: 18px 0; }
+.student-team-nav a { display: flex; flex-direction: column; gap: 8px; min-height: 94px; padding: 16px; border: 1px solid #cbdfea; border-radius: 10px; background: #eef6fc; color: #1269a6; }
+.student-team-nav a:hover,.student-team-nav a:focus-visible { background: #dceefb; }
+.student-team-nav strong { font-size: 16px; }
+.student-team-nav span { font-size: 12px; color: #52677b; }
+@media (max-width: 1000px) { .student-team-nav { grid-template-columns: repeat(2,minmax(0,1fr)); } }
+@media (max-width: 520px) { .student-team-nav { grid-template-columns: 1fr; } .student-team-nav a { min-height: 0; } }
 .schedule-card h2 { font-size: 20px; overflow-wrap: anywhere; }
 .proposal-review { margin: 24px 0; }
 .proposal-review h2 { font-size: 18px; }
