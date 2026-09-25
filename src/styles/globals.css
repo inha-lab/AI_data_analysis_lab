@@ -205,3 +205,12 @@ footer { margin-top: 40px; border-top: 1px solid #dce3eb; padding: 24px 0; color
 .deliverable-row .button { padding: 8px 12px; font-size: 12px; }
 .deliverable-editor { margin-top: 20px; }
 @media (max-width: 760px) { .deliverable-row { flex-direction: column; } .deliverable-row .button-row { justify-content: flex-start; flex-shrink: 1; } }
+.deliverable-group-list { display: grid; gap: 14px; margin-top: 18px; }
+.deliverable-group h3 { margin: 8px 0 0; }
+.deliverable-group-items { display: grid; margin-top: 14px; }
+.deliverable-group-items article { display: grid; grid-template-columns: auto minmax(0,1fr) auto; gap: 14px; align-items: start; border-top: 1px solid #e5ebf1; padding: 14px 0; }
+.deliverable-group-items article > div { min-width: 0; }
+.deliverable-group-items article strong { overflow-wrap: anywhere; }
+.deliverable-group-items article .proposal-text { margin: 5px 0 0; }
+.deliverable-overview-toggle { display: flex; align-items: center; gap: 6px; font-size: 13px; white-space: nowrap; }
+@media (max-width: 760px) { .deliverable-group-items article { grid-template-columns: auto minmax(0,1fr); } .deliverable-group-items article > a { grid-column: 2; } }

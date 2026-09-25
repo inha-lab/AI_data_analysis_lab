@@ -119,3 +119,9 @@ RLS와 `AD_save_report`·`AD_review_report` 함수가 현재 활성 팀원과 �
 `migrations/20260925000600_ad_deliverable_links.sql`을 전체 롤백 검증 후 명시적으로 적용했습니다. `AD_deliverables`는 팀·유형·제목·설명·검증된 http/https URL·최근 제출자/시각을 보관합니다. 팀 FK는 `ON DELETE RESTRICT`입니다. 직접 클라이언트 쓰기를 막고 RLS 조회 및 `AD_save_deliverable`·`AD_delete_deliverable`에서 현재 활성 팀원과 수정 버전을 검증합니다. 교수는 조회만 가능합니다. 파일 첨부를 위한 Storage 설정은 변경하지 않았습니다.
 
 `tests/ad_deliverable_links_access.sql`은 URL·유형 제약, 팀원 공동 수정·삭제, 다른 팀·교수·익명 차단과 동시 수정 충돌을 검증하며 임시 자료를 롤백합니다. 공유 CLI migration history에는 등록하지 않았으므로 재실행하거나 `db push`하지 않습니다.
+
+## 프로그램 산출물 현황 적용 기록 (2026-09-25)
+
+`migrations/20260925000700_ad_program_deliverables.sql`을 롤백 검증 후 명시적으로 적용했습니다. 교수 전용 `AD_program_deliverables()`는 선택 프로그램의 모든 팀을 최근 제출 시각 내림차순으로, 팀 내 링크 산출물을 최신 제출 순으로 반환합니다. 전체·제출·미제출 팀 수와 산출물 건수를 함께 집계하며 자료가 없는 팀은 마지막에 표시합니다. 기존 서비스 객체는 변경하지 않았습니다.
+
+`tests/ad_program_deliverables_access.sql`은 팀 그룹·자료 정렬, 빈 팀·집계 수치, 비인가·익명 실행 차단을 검증하며 임시 자료를 롤백합니다. 공유 CLI migration history에는 등록하지 않았으므로 재실행하거나 `db push`하지 않습니다.
