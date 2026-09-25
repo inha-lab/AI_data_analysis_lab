@@ -160,4 +160,6 @@ RLS와 `AD_save_report`·`AD_review_report` 함수가 현재 활성 팀원과 �
 
 `migrations/20260926000200_ad_team_member_role_edit.sql`은 학생 직접 역할 수정을 위한 `AD_update_team_member_role()`을 추가합니다. 교수는 모든 팀원, 팀장은 자기 팀원 전체, 일반 팀원은 본인 역할만 수정할 수 있습니다. `AD_team_workspace()`는 본인의 참가자 ID를 추가 반환합니다. `tests/ad_team_member_role_edit_access.sql`은 이 권한과 타 팀 접근·길이 제한·익명 차단을 롤백 검증합니다.
 
+`migrations/20260926000300_ad_monitoring_deliverables.sql`은 교수 전용 `AD_program_monitoring()`에 팀별 산출물 건수, 산출물 등록 팀 수, 전체 건수를 추가합니다. 기존 산출물 테이블을 읽기 전용으로 집계하며 변경하지 않습니다.
+
 `migrations/20260926000100_ad_team_member_roles_fix.sql`은 최초 적용 후 발견된 역할 검증 함수의 변수명 충돌을 수정합니다. 이미 적용된 공유 DB에는 보정 마이그레이션도 적용했으며, 두 파일 모두 CLI migration history에 등록하지 않았습니다.

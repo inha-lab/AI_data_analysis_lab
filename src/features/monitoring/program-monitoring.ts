@@ -1,8 +1,8 @@
 import { supabase } from '@/lib/supabase'
 import type { Team } from '@/features/teams/team-model'
-export type MonitoringTeam = Pick<Team,'id'|'name'|'topic'|'stage'> & { proposal_status:'draft'|'submitted'|'reviewed'|null;proposal_title:string|null;daily_submitted:number;weekly_submitted:number;report_drafts:number;reports_needing_attention:number }
+export type MonitoringTeam = Pick<Team,'id'|'name'|'topic'|'stage'> & { proposal_status:'draft'|'submitted'|'reviewed'|null;proposal_title:string|null;daily_submitted:number;weekly_submitted:number;report_drafts:number;reports_needing_attention:number;deliverable_count:number }
 export type MonitoringRound = {type:'daily'|'weekly';round:number;submitted_teams:number;latest_date:string|null;missing_teams:{id:string;name:string}[]}
-export type ProgramMonitoring = {active_participants:number;team_count:number;proposal_submitted:number;teams:MonitoringTeam[];rounds:MonitoringRound[]}
+export type ProgramMonitoring = {active_participants:number;team_count:number;proposal_submitted:number;deliverable_submitted_teams:number;deliverable_count:number;teams:MonitoringTeam[];rounds:MonitoringRound[]}
 export function proposalRate(submitted:number,total:number){return total?`${Math.round(submitted/total*100)}%`:'대상 없음'}
 export async function loadProgramMonitoring(cohortId:string):Promise<ProgramMonitoring>{
   if(!supabase)throw new Error('데이터베이스 연결 설정이 필요합니다.')
