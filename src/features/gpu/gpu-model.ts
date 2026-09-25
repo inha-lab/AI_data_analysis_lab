@@ -1,6 +1,8 @@
 export type GpuChoice='0'|'1'|'both'
 export type ReservationInput={teamId:string;day:string;start:string;end:string;choice:GpuChoice;purpose:string}
 export type GpuReservation={id:string;team_id:string|null;program_name:string;team_name:string;gpu_ids:number[];starts_at:string;ends_at:string;purpose:string;can_cancel:boolean;requester_name:string|null}
+export type GpuApplicationSegment={gpu_ids:number[];starts_at:string;ends_at:string}
+export type GpuApplication={application_id:string;team_id:string|null;program_name:string;team_name:string;purpose:string;requester_name:string|null;starts_at:string;ends_at:string;segments:GpuApplicationSegment[];can_cancel:boolean}
 export type TeamOption={id:string;name:string;topic:string}
 export function kstDay(date=new Date()){
   const parts=new Intl.DateTimeFormat('en-US',{timeZone:'Asia/Seoul',year:'numeric',month:'2-digit',day:'2-digit'}).formatToParts(date)

@@ -5,16 +5,16 @@ import { Button } from '@/components/ui/button'
 import { useAuth } from '@/features/auth/auth-context'
 import { useCohorts } from '@/features/cohorts/use-cohorts'
 import { formatScheduleTime } from '@/features/schedules/schedule-model'
-import { cancelGpuReservationSlot,listGpuDay,listGpuTeams,saveGpuReservation } from './gpu-api'
+import { cancelGpuApplication,listGpuApplications,listGpuDay,listGpuTeams,saveGpuReservation } from './gpu-api'
 import { GpuHourlyGrid } from './GpuHourlyGrid'
-import { kstDay,overlapsKstHour,reservationTimes,type GpuChoice,type GpuReservation,type ReservationInput,type TeamOption } from './gpu-model'
+import { kstDay,overlapsKstHour,reservationTimes,type GpuApplication,type GpuChoice,type GpuReservation,type ReservationInput,type TeamOption } from './gpu-model'
 
 const hours=Array.from({length:24},(_,hour)=>`${String(hour).padStart(2,'0')}:00`)
 
 function Workspace({cohortId,manage}:{cohortId:string;manage:boolean}){
   const [day,setDay]=useState(kstDay)
   const [revision,setRevision]=useState(0)
-  const [result,setResult]=useState<{revision:number;rows:GpuReservation[];teams:TeamOption[];error:string}|null>(null)
+  const [result,setResult]=useState<{revision:number;rows:GpuReservation[];teams:TeamOption[];applications:GpuApplication[];error:string}|null>(null)
   const [teamId,setTeamId]=useState('')
   const [start,setStart]=useState('09:00')
   const [end,setEnd]=useState('10:00')
@@ -27,10 +27,10 @@ function Workspace({cohortId,manage}:{cohortId:string;manage:boolean}){
   const blocker=useBlocker(dirty||busy)
   useEffect(()=>{
     let active=true
-    void Promise.all([listGpuDay(cohortId,day),listGpuTeams(cohortId)]).then(([rows,teams])=>{
-      if(active)setResult({revision,rows,teams,error:''})
+    void Promise.all([listGpuDay(cohortId,day),listGpuTeams(cohortId),listGpuApplications(cohortId)]).then(([rows,teams,applications])=>{
+      if(active)setResult({revision,rows,teams,applications,error:''})
     }).catch(cause=>{
-      if(active)setResult({revision,rows:[],teams:[],error:cause instanceof Error?cause.message:'GPU 현황을 불러오지 못했습니다.'})
+      if(active)setResult({revision,rows:[],teams:[],applications:[],error:cause instanceof Error?cause.message:'GPU 현황을 불러오지 못했습니다.'})
     })
     return()=>{active=false}
   },[cohortId,day,revision])
@@ -63,10 +63,10 @@ function Workspace({cohortId,manage}:{cohortId:string;manage:boolean}){
     catch(cause){setError(cause instanceof Error?cause.message:'GPU 예약을 저장하지 못했습니다.')}
     finally{setBusy(false)}
   }
-  async function cancel(item:GpuReservation,gpu:number,hour:number){
-    if(busy||!window.confirm(`${item.team_name}의 ${day} ${String(hour).padStart(2,'0')}:00 GPU_#${gpu} 예약만 취소할까요?`))return
+  async function cancel(item:GpuApplication){
+    if(busy||!window.confirm(`${item.team_name}의 신청 1건을 삭제할까요? 포함된 모든 GPU·시간 예약이 함께 삭제됩니다.`))return
     setBusy(true);setError('');setNotice('')
-    try{await cancelGpuReservationSlot(item.id,gpu,day,hour);setNotice(`GPU_#${gpu} ${String(hour).padStart(2,'0')}:00 예약을 취소했습니다.`);reload()}
+    try{await cancelGpuApplication(item.application_id);setNotice('신청 1건의 모든 GPU·시간 예약을 삭제했습니다.');reload()}
     catch(cause){setError(cause instanceof Error?cause.message:'예약을 취소하지 못했습니다.')}
     finally{setBusy(false)}
   }
@@ -85,9 +85,10 @@ function Workspace({cohortId,manage}:{cohortId:string;manage:boolean}){
           <Button type="submit" disabled={!times||!selectedGpus.length}>{busy?'예약 중…':'GPU 예약 신청'}</Button>
         </fieldset></form>}
       </section>
-      <div className="gpu-overview-grid">{summary.map(item=><article className="stat-card" key={item.gpu}><Cpu size={18} aria-hidden="true"/><span>GPU_#{item.gpu}</span><strong>{item.count}개 시간대</strong><p>사용 예정 {Math.floor(item.minutes/60)}시간 {item.minutes%60}분</p></article>)}<section className="panel gpu-overview-note"><h2><CalendarDays size={19} aria-hidden="true"/> {day} 예약 현황</h2><p className="field-help">선택한 날짜의 시간대별 예약표입니다. 다른 프로그램 예약도 점유 시간에 포함됩니다.</p><Button className="button-secondary" disabled={busy} onClick={reload}>새로고침</Button></section></div>
+      <div className="gpu-overview-grid">{summary.map(item=><article className="stat-card" key={item.gpu}><Cpu size={18} aria-hidden="true"/><span>GPU_#{item.gpu}</span><strong>{item.count}개 시간대</strong><p>사용 예정 {Math.floor(item.minutes/60)}시간 {item.minutes%60}분</p></article>)}<section className="panel gpu-overview-note"><h2><CalendarDays size={19} aria-hidden="true"/> 전체 예약 현황</h2><p className="field-help">모든 날짜의 신청을 한 건씩 확인하고 삭제할 수 있습니다.</p><Button className="button-secondary" disabled={busy} onClick={reload}>새로고침</Button></section></div>
     </div>
-    <section className="panel gpu-schedule-panel"><div className="section-heading"><h2>시간대별 예약표</h2><span className="field-help">한국 시간(KST) · GPU와 시간 칸마다 개별 취소</span></div>{result?.revision!==revision?<p role="status">예약표를 불러오고 있습니다.</p>:result.error?<p className="form-error" role="alert">{result.error}</p>:<GpuHourlyGrid day={day} rows={result.rows} busy={busy} manage={manage} onCancel={(item,gpu,hour)=>void cancel(item,gpu,hour)}/>}</section>
+    <section className="panel gpu-schedule-panel"><div className="section-heading"><h2>전체 예약 현황</h2><span className="field-help">모든 날짜 · 신청 1건당 목록 1건</span></div>{result?.revision!==revision?<p role="status">전체 예약을 불러오고 있습니다.</p>:result.error?<p className="form-error" role="alert">{result.error}</p>:!result.applications.length?<p className="empty-state">예약 신청이 없습니다.</p>:<div className="gpu-application-list">{result.applications.map(item=><article className="gpu-application" key={item.application_id}><div className="section-heading"><div><strong>{item.team_name}</strong><p className="field-help">{item.program_name}</p></div>{item.can_cancel&&<Button className="button-secondary" disabled={busy} onClick={()=>void cancel(item)}>신청 삭제</Button>}</div><p>{formatScheduleTime(item.starts_at)} ~ {formatScheduleTime(item.ends_at)} (KST)</p><p className="proposal-text">{item.purpose}</p>{manage&&item.requester_name&&<p className="field-help">신청: {item.requester_name}</p>}<ul>{item.segments.map((segment,index)=><li key={index}>{segment.gpu_ids.map(gpu=>`GPU_#${gpu}`).join(', ')} · {formatScheduleTime(segment.starts_at)} ~ {formatScheduleTime(segment.ends_at)}</li>)}</ul></article>)}</div>}</section>
+    <section className="panel gpu-schedule-panel"><div className="section-heading"><h2>{day} 시간대별 예약표</h2><span className="field-help">한국 시간(KST)</span></div>{result?.revision!==revision?<p role="status">예약표를 불러오고 있습니다.</p>:result.error?<p className="form-error" role="alert">{result.error}</p>:<GpuHourlyGrid day={day} rows={result.rows} manage={manage}/>}</section>
     {blocker.state==='blocked'&&<div className="notice" role="alert"><p>{busy?'처리가 끝난 뒤 이동해 주세요.':'작성 중인 예약을 버리고 이동할까요?'}</p><div className="button-row"><Button disabled={busy} onClick={()=>blocker.proceed()}>이동</Button><Button className="button-secondary" onClick={()=>blocker.reset()}>계속 작성</Button></div></div>}
   </>
 }

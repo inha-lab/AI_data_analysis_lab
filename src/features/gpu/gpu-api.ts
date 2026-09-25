@@ -1,5 +1,5 @@
 import { supabase } from '@/lib/supabase'
-import { gpuIds,validateReservation,type GpuReservation,type ReservationInput,type TeamOption } from './gpu-model'
+import { gpuIds,validateReservation,type GpuApplication,type GpuReservation,type ReservationInput,type TeamOption } from './gpu-model'
 function client(){if(!supabase)throw new Error('데이터베이스 연결 설정이 필요합니다.');return supabase}
 function fail(code:string){
   if(code==='23P01')return new Error('선택한 시간에 GPU 예약이 겹칩니다. 다른 시간이나 GPU를 선택해 주세요.')
@@ -22,7 +22,16 @@ export async function saveGpuReservation(input:ReservationInput){
   const {error}=await client().rpc('AD_save_gpu_reservation',{p_team:input.teamId,p_day:input.day,p_start:input.start,p_end:input.end,p_gpu_ids:gpuIds(input.choice),p_purpose:input.purpose.trim()})
   if(error)throw fail(error.code)
 }
-export async function cancelGpuReservationSlot(id:string,gpu:number,day:string,hour:number){
-  const {error}=await client().rpc('AD_cancel_gpu_reservation_slot',{p_reservation:id,p_gpu:gpu,p_day:day,p_hour:hour})
-  if(error)throw error.code==='23514'?new Error('해당 GPU·시간 예약이 변경되었습니다. 현황을 새로고침해 주세요.'):fail(error.code)
+export async function listGpuApplications(cohortId:string){
+  const rows:GpuApplication[]=[]
+  for(let start=0;;start+=1000){
+    const {data,error}=await client().rpc('AD_gpu_application_list',{p_cohort:cohortId}).range(start,start+999)
+    if(error)throw fail(error.code)
+    rows.push(...data as GpuApplication[])
+    if(!data||data.length<1000)return rows
+  }
+}
+export async function cancelGpuApplication(id:string){
+  const {error}=await client().rpc('AD_cancel_gpu_application',{p_application:id})
+  if(error)throw error.code==='23514'?new Error('이미 삭제된 신청입니다. 현황을 새로고침해 주세요.'):fail(error.code)
 }

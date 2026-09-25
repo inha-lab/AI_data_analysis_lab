@@ -149,3 +149,7 @@ RLS와 `AD_save_report`·`AD_review_report` 함수가 현재 활성 팀원과 �
 ## GPU별·시간별 개별 취소 (2026-09-25)
 
 `migrations/20260925001300_ad_gpu_slot_cancellation.sql`은 `AD_cancel_gpu_reservation_slot(예약 ID, GPU 번호, KST 날짜, 시)`를 추가하고 기존 전체 예약 취소 함수의 일반 사용자 실행 권한을 제거합니다. 함수는 기존 예약을 취소 이력으로 남기고 선택한 GPU·1시간과 겹치지 않는 나머지를 최대 세 활성 구간으로 분할합니다. 원래 신청자·작성 시각·사용 목적을 유지하며 GPU별 잠금을 사용합니다. `tests/ad_gpu_slot_cancellation_access.sql`은 두 GPU·다시간 예약의 한 칸 취소, 나머지 GPU와 앞뒤 시간 보존, 오래된 ID·다른 팀·익명 차단을 롤백 검증합니다. 기존 GPU 회귀 테스트도 새 개별 취소 함수에 맞춰 갱신했습니다. 공유 CLI migration history에는 등록하지 않았으므로 `db push`로 재적용하지 않습니다.
+
+## 전체 GPU 신청 목록·일괄 삭제 (2026-09-25)
+
+`migrations/20260925001400_ad_gpu_application_list.sql`은 `application_id`를 추가하고 이전 개별 취소로 분할된 행을 원래 신청자·팀·작성 시각·목적 기준으로 묶어 보정합니다. `AD_gpu_application_list()`는 모든 날짜의 활성 신청을 한 건씩 반환하고, `AD_cancel_gpu_application()`은 해당 신청의 모든 활성 구간을 한 트랜잭션에서 취소합니다. 이전 개별 시간 취소 함수의 사용자 실행 권한은 제거했습니다. 취소 이력은 DB에 남기되 활성 목록·시간표에서 모두 사라집니다. `tests/ad_gpu_application_list_access.sql`은 분할된 신청의 단일 표시, 타 팀 취소 차단, 이전 시간별 취소 권한 제거, 모든 구간 일괄 취소를 롤백 검증합니다. 공유 CLI migration history에는 등록하지 않았으므로 `db push`로 재적용하지 않습니다.
