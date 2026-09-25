@@ -141,3 +141,7 @@ RLS와 `AD_save_report`·`AD_review_report` 함수가 현재 활성 팀원과 �
 ## GPU 예약 적용 기록 (2026-09-25)
 
 `migrations/20260925001100_ad_gpu_reservations.sql`은 프로그램·팀에 연결된 예약, GPU 배열, KST 시작·종료 시각, 사용 목적, 신청자와 취소 상태를 저장합니다. 앱 테이블 직접 접근은 막고 `AD_gpu_day_schedule()`이 전체 GPU 점유 시간과 날짜별 목록을 반환합니다. 학생에게 다른 프로그램의 팀명·목적은 가립니다. `AD_save_gpu_reservation()`은 활성 소속 팀원만 실행하며 GPU별 advisory transaction lock을 0→1 순서로 잡아 겹침을 검사하고 두 GPU 신청을 한 행으로 저장합니다. `AD_cancel_gpu_reservation()`은 교수 또는 현재 소속 팀원에게만 허용합니다. `tests/ad_gpu_reservations_access.sql`로 자정 넘김, 부분 예약 방지, 다른 프로그램 정보 가림, 팀별 조회·취소 권한을 롤백 검증합니다. 공유 CLI migration history에는 등록하지 않았으므로 `db push`로 재적용하지 않습니다.
+
+## GPU 신청·관리 화면 확장 (2026-09-25)
+
+`migrations/20260925001200_ad_gpu_management.sql`은 기존 신청 함수에 교수의 팀 대리 신청을 허용하고 시작·종료를 정시로 제한합니다. GPU별 잠금·겹침 차단과 두 GPU 원자적 저장은 유지합니다. `AD_gpu_day_schedule_v2()`는 기존 프로그램 권한 검사를 거친 목록에 신청자 이름을 추가하되 교수에게만 표시합니다. `tests/ad_gpu_management_access.sql`은 교수 신청·충돌, 정시 제약, 학생의 신청자 이름 비노출과 타 팀·익명 차단을 롤백 검증합니다. 공유 CLI migration history에는 등록하지 않았으므로 `db push`로 재적용하지 않습니다.

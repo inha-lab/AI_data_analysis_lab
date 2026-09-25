@@ -216,3 +216,25 @@ footer { margin-top: 40px; border-top: 1px solid #dce3eb; padding: 24px 0; color
 .deliverable-group-items article .proposal-text { margin: 5px 0 0; }
 .deliverable-overview-toggle { display: flex; align-items: center; gap: 6px; font-size: 13px; white-space: nowrap; }
 @media (max-width: 760px) { .deliverable-group-items article { grid-template-columns: auto minmax(0,1fr); } .deliverable-group-items article > a { grid-column: 2; } }
+.gpu-main-grid { display: grid; grid-template-columns: minmax(320px,.95fr) minmax(320px,1.05fr); gap: 20px; align-items: start; }
+.gpu-request-panel h2,.gpu-overview-note h2 { display: flex; align-items: center; gap: 8px; }
+.gpu-overview-grid { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 16px; }
+.gpu-overview-grid .stat-card { min-width: 0; }
+.gpu-overview-note { grid-column: 1/-1; }
+.cohort-form .gpu-choice-fieldset { border: 1px solid #cbd8e3; border-radius: 9px; padding: 14px; margin-top: 18px; }
+.gpu-choice-fieldset legend { padding: 0 5px; font-size: 13px; font-weight: 600; }
+.gpu-choice-row { display: flex; gap: 10px; flex-wrap: wrap; }
+.cohort-form .gpu-choice-row label { display: flex; align-items: center; gap: 8px; margin: 0; padding: 9px 13px; background: #f3f6f9; border-radius: 8px; }
+.cohort-form .gpu-choice-row input { width: auto; min-width: auto; }
+.gpu-schedule-panel { margin-top: 20px; }
+.gpu-table-scroll { overflow-x: auto; }
+.gpu-hour-grid { width: 100%; min-width: 760px; border-collapse: collapse; table-layout: fixed; }
+.gpu-hour-grid th,.gpu-hour-grid td { border-bottom: 1px solid #e5ebf1; padding: 11px; text-align: left; vertical-align: top; }
+.gpu-hour-grid thead th,.gpu-hour-grid tbody th { background: #f3f6f9; color: #52677b; }
+.gpu-hour-grid thead th:first-child { width: 105px; }
+.gpu-slot-free { color: #9aaabb; font-size: 12px; }
+.gpu-slot-reservation { background: #eef6fc; border: 1px solid #cbdfea; border-radius: 9px; padding: 11px; margin-bottom: 6px; overflow-wrap: anywhere; }
+.gpu-slot-reservation .section-heading { align-items: start; }
+.gpu-slot-reservation .button { padding: 5px 8px; font-size: 11px; }
+.gpu-slot-reservation p { margin: 5px 0 0; font-size: 12px; }
+@media (max-width: 850px) { .gpu-main-grid { grid-template-columns: 1fr; } }

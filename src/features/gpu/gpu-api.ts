@@ -8,12 +8,12 @@ function fail(code:string){
   return new Error('GPU 예약을 처리하지 못했습니다. 다시 시도해 주세요.')
 }
 export async function listGpuTeams(cohortId:string){
-  const {data,error}=await client().from('AD_teams').select('id,name').eq('cohort_id',cohortId).order('name')
+  const {data,error}=await client().from('AD_teams').select('id,name,topic').eq('cohort_id',cohortId).order('name')
   if(error)throw fail(error.code)
   return data as TeamOption[]
 }
 export async function listGpuDay(cohortId:string,day:string){
-  const {data,error}=await client().rpc('AD_gpu_day_schedule',{p_cohort:cohortId,p_day:day})
+  const {data,error}=await client().rpc('AD_gpu_day_schedule_v2',{p_cohort:cohortId,p_day:day})
   if(error)throw fail(error.code)
   return data as GpuReservation[]
 }
