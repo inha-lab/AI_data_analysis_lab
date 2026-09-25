@@ -3,7 +3,7 @@ export const teamStages = { planning: '기획', design: '설계', implementation
 export interface TeamProject { topic: string; stage: keyof typeof teamStages; notion_url: string; github_url: string; demo_url: string }
 export interface TeamInput extends TeamProject { name: string }
 export interface Team extends TeamInput { id: string; cohort_id: string; updated_at: string }
-export interface TeamMember { team_id: string; participant_id: string; full_name: string; department: string; job_group: JobGroup; is_leader: boolean; is_active: boolean }
+export interface TeamMember { team_id: string; participant_id: string; full_name: string; department: string; job_group: JobGroup; is_leader: boolean; is_active: boolean; role_title: string }
 export const eligibilityLabels = { ready: '배정 가능', unlinked: '계정 연결 필요', inactive_participant: '참가 비활성', inactive_profile: '계정 비활성', wrong_role: '학생 계정 필요' } as const
 export interface TeamCandidate { participant_id: string; full_name: string; department: string; job_group: JobGroup; team_id: string | null; eligibility: keyof typeof eligibilityLabels }
 export const emptyTeam: TeamInput = { name: '', topic: '', stage: 'planning', notion_url: '', github_url: '', demo_url: '' }
@@ -36,6 +36,10 @@ export function validateTeamMembers(ids: string[], leader: string | null, candid
     if (!candidate || candidate.eligibility !== 'ready') return '활성 학생 계정과 연결된 참가자만 배정할 수 있습니다.'
     if (candidate.team_id && candidate.team_id !== teamId) return '다른 팀에 배정된 참가자는 기존 팀에서 해제한 뒤 배정해 주세요.'
   }
+  return null
+}
+export function validateMemberRoles(ids:string[],roles:Record<string,string>):string|null{
+  for(const [id,role] of Object.entries(roles))if(!ids.includes(id)||role.trim().length>80)return '팀원 역할은 배정된 팀원에게만 80자 이내로 입력해 주세요.'
   return null
 }
 export function teamSizeHint(count: number) { return count >= 4 && count <= 5 ? '기본 권장 인원 4~5명에 맞습니다.' : `현재 ${count}명입니다. 기본 권장 인원은 4~5명이며 다른 인원수도 저장할 수 있습니다.` }

@@ -26,11 +26,11 @@ export async function loadTeams(cohortId: string): Promise<{ teams: Team[]; rost
   if (error) throw fail(error.code)
   return data
 }
-export async function saveTeam(cohortId: string, input: TeamInput, members: string[], leader: string | null, previous?: Team) {
+export async function saveTeam(cohortId: string, input: TeamInput, members: string[], leader: string | null, roles:Record<string,string>, previous?: Team) {
   const validation = validateTeam(input)
   if (validation) throw new Error(validation)
   if (previous && previous.cohort_id !== cohortId) throw new Error('프로그램이 변경되었습니다. 다시 조회해 주세요.')
-  const { error } = await client().rpc('AD_save_team', { p_cohort: cohortId, p_values: normalizeTeam(input), p_members: members, p_leader: leader, p_team: previous?.id ?? null, p_version: previous?.updated_at ?? null })
+  const { error } = await client().rpc('AD_save_team_v2', { p_cohort: cohortId, p_values: normalizeTeam(input), p_members: members, p_leader: leader, p_team: previous?.id ?? null, p_version: previous?.updated_at ?? null, p_roles:Object.fromEntries(members.map(id=>[id,roles[id]?.trim()??''])) })
   if (error) throw fail(error.code)
 }
 export async function updateTeamProject(input: TeamInput, previous: Team) {

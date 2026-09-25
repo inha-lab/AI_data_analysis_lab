@@ -153,3 +153,9 @@ RLS와 `AD_save_report`·`AD_review_report` 함수가 현재 활성 팀원과 �
 ## 전체 GPU 신청 목록·일괄 삭제 (2026-09-25)
 
 `migrations/20260925001400_ad_gpu_application_list.sql`은 `application_id`를 추가하고 이전 개별 취소로 분할된 행을 원래 신청자·팀·작성 시각·목적 기준으로 묶어 보정합니다. `AD_gpu_application_list()`는 모든 날짜의 활성 신청을 한 건씩 반환하고, `AD_cancel_gpu_application()`은 해당 신청의 모든 활성 구간을 한 트랜잭션에서 취소합니다. 이전 개별 시간 취소 함수의 사용자 실행 권한은 제거했습니다. 취소 이력은 DB에 남기되 활성 목록·시간표에서 모두 사라집니다. `tests/ad_gpu_application_list_access.sql`은 분할된 신청의 단일 표시, 타 팀 취소 차단, 이전 시간별 취소 권한 제거, 모든 구간 일괄 취소를 롤백 검증합니다. 공유 CLI migration history에는 등록하지 않았으므로 `db push`로 재적용하지 않습니다.
+
+## 팀원별 역할 등록 (2026-09-26)
+
+`migrations/20260925001500_ad_team_member_roles.sql`은 `AD_team_members.role_title`을 추가합니다. 교수 전용 `AD_save_team_v2()`는 팀 구성과 각 역할을 한 트랜잭션에서 저장하고, 기존 `AD_save_team()`의 클라이언트 실행 권한은 제거합니다. `AD_team_roster_v2()`와 팀 작업공간·전체리포트 v2가 역할을 반환하며 학생은 소속 팀 역할만 읽습니다. `tests/ad_team_member_roles_access.sql`로 저장·길이 제한·학생 조회·학생 변경 차단을 롤백 검증합니다. 공유 CLI migration history에는 등록하지 않았으므로 `db push`로 재적용하지 않습니다.
+
+`migrations/20260926000100_ad_team_member_roles_fix.sql`은 최초 적용 후 발견된 역할 검증 함수의 변수명 충돌을 수정합니다. 이미 적용된 공유 DB에는 보정 마이그레이션도 적용했으며, 두 파일 모두 CLI migration history에 등록하지 않았습니다.

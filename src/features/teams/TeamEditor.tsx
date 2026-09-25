@@ -3,7 +3,7 @@ import { useBlocker } from 'react-router-dom'
 import { Button } from '@/components/ui/button'
 import { jobGroups } from '@/features/participants/participant-model'
 import { saveTeam, updateTeamProject } from './team-api'
-import { emptyTeam, eligibilityLabels, teamStages, teamSizeHint, validateTeamMembers, type Team, type TeamCandidate, type TeamInput, type TeamMember } from './team-model'
+import { emptyTeam, eligibilityLabels, teamStages, teamSizeHint, validateMemberRoles, validateTeamMembers, type Team, type TeamCandidate, type TeamInput, type TeamMember } from './team-model'
 
 export function TeamEditor({ cohortId, team, roster, candidates, manage, onSaved, onCancel }: {
   cohortId: string; team?: Team; roster: TeamMember[]; candidates: TeamCandidate[]; manage: boolean; onSaved: () => void; onCancel: () => void
@@ -11,6 +11,7 @@ export function TeamEditor({ cohortId, team, roster, candidates, manage, onSaved
   const [input, setInput] = useState<TeamInput>(() => team ? { name: team.name, topic: team.topic, stage: team.stage, notion_url: team.notion_url, github_url: team.github_url, demo_url: team.demo_url } : { ...emptyTeam })
   const [members, setMembers] = useState(() => roster.map(item => item.participant_id))
   const [leader, setLeader] = useState<string | null>(() => roster.find(item => item.is_leader)?.participant_id ?? null)
+  const [roles,setRoles]=useState<Record<string,string>>(()=>Object.fromEntries(roster.map(item=>[item.participant_id,item.role_title])))
   const [search, setSearch] = useState('')
   const [busy, setBusy] = useState(false)
   const [dirty, setDirty] = useState(false)
@@ -25,18 +26,19 @@ export function TeamEditor({ cohortId, team, roster, candidates, manage, onSaved
   function change<K extends keyof TeamInput>(key: K, value: TeamInput[K]) { setInput(current => ({ ...current, [key]: value })); setDirty(true) }
   function toggle(id: string) {
     setMembers(current => current.includes(id) ? current.filter(value => value !== id) : [...current, id])
+    if(members.includes(id))setRoles(current=>Object.fromEntries(Object.entries(current).filter(([key])=>key!==id)))
     if (leader === id) setLeader(null)
     setDirty(true)
   }
   async function submit(event: FormEvent) {
     event.preventDefault(); setError('')
     if (manage) {
-      const validation = validateTeamMembers(members, leader, candidates, team?.id)
+      const validation = validateTeamMembers(members, leader, candidates, team?.id)||validateMemberRoles(members,roles)
       if (validation) { setError(validation); return }
     }
     setBusy(true)
     try {
-      if (manage) await saveTeam(cohortId, input, members, leader, team)
+      if (manage) await saveTeam(cohortId, input, members, leader, roles, team)
       else if (team) await updateTeamProject(input, team)
       onSaved()
     } catch (cause) { setError(cause instanceof Error ? cause.message : '팀 정보를 저장하지 못했습니다.') }
@@ -59,6 +61,8 @@ export function TeamEditor({ cohortId, team, roster, candidates, manage, onSaved
           return <label className="team-candidate" key={item.participant_id}><input type="checkbox" checked={selected} disabled={!selected && (item.eligibility !== 'ready' || elsewhere)} onChange={() => toggle(item.participant_id)} /><span><strong>{item.full_name}</strong> · {item.department}<small>{jobGroups[item.job_group]} · {elsewhere ? '다른 팀 배정' : eligibilityLabels[item.eligibility]}</small></span></label>
         }) : <p className="muted">표시할 참가자가 없습니다. 참가자 등록·계정 연결 상태를 확인해 주세요.</p>}</div>
         <label htmlFor="team-leader">팀장</label><select id="team-leader" value={leader ?? ''} onChange={e => { setLeader(e.target.value || null); setDirty(true) }}><option value="">미지정</option>{candidates.filter(item => members.includes(item.participant_id)).map(item => <option key={item.participant_id} value={item.participant_id}>{item.full_name} · {item.department}</option>)}</select>
+        <h3 className="team-members-heading">팀원별 역할</h3><p className="field-help">팀에서 실제 맡는 업무를 입력하세요. 예: 데이터 수집, 모델 개발, 발표 자료.</p>
+        {candidates.filter(item=>members.includes(item.participant_id)).map(item=><div key={item.participant_id}><label htmlFor={`team-role-${item.participant_id}`}>{item.full_name} 역할</label><input id={`team-role-${item.participant_id}`} maxLength={80} value={roles[item.participant_id]??''} placeholder="역할 미지정" onChange={event=>{setRoles(current=>({...current,[item.participant_id]:event.target.value}));setDirty(true)}}/></div>)}
       </>}
       {error && <p className="form-error" role="alert">{error}</p>}
       <div className="button-row"><Button type="submit">{busy ? '저장 중…' : '저장'}</Button><Button className="button-secondary" onClick={() => { if (!dirty || window.confirm('작성 중인 내용을 저장하지 않고 닫을까요?')) onCancel() }}>닫기</Button></div>

@@ -1,6 +1,6 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
-import { emptyTeam, normalizeTeam, safeTeamUrl, validateTeam, validateTeamMembers, teamSizeHint, jobSummary } from '../src/features/teams/team-model.ts'
+import { emptyTeam, normalizeTeam, safeTeamUrl, validateTeam, validateTeamMembers, validateMemberRoles, teamSizeHint, jobSummary } from '../src/features/teams/team-model.ts'
 const valid = { ...emptyTeam, name: ' Team A ', topic: ' Topic ', github_url: 'https://github.com/example/project' }
 const candidates = [
   { participant_id: 'one', eligibility: 'ready', team_id: null },
@@ -27,6 +27,11 @@ test('team membership rejects duplicates, outsiders, unlinked and ineligible can
   assert.equal(validateTeamMembers([], null, candidates), null)
   for (const [ids, leader] of [[['one', 'one'], null], [['one'], 'two'], [['missing'], null], [['three'], null], [['two'], null]]) assert.ok(validateTeamMembers(ids, leader, candidates))
   for (const eligibility of ['inactive_participant', 'inactive_profile', 'wrong_role']) assert.ok(validateTeamMembers(['one'], null, [{ ...candidates[0], eligibility }]))
+})
+test('team roles belong to selected members and fit the stored length',()=>{
+  assert.equal(validateMemberRoles(['one','two'],{one:'모델 개발',two:''}),null)
+  assert.ok(validateMemberRoles(['one'],{two:'데이터 수집'}))
+  assert.ok(validateMemberRoles(['one'],{one:'가'.repeat(81)}))
 })
 test('recommended size stays advisory and job composition is counted separately', () => {
   assert.match(teamSizeHint(3), /저장할 수/)
