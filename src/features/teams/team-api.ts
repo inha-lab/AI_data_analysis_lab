@@ -21,10 +21,16 @@ function fail(code: string) {
   if (code === 'PGRST202' || code === 'PGRST205') return new Error('팀 관리 데이터베이스 설정이 필요합니다.')
   return new Error('팀 정보를 처리하지 못했습니다. 연결 상태를 확인하고 다시 시도해 주세요.')
 }
-export async function loadTeams(cohortId: string): Promise<{ teams: Team[]; roster: TeamMember[]; candidates: TeamCandidate[] }> {
+export async function loadTeams(cohortId: string): Promise<{ teams: Team[]; roster: TeamMember[]; candidates: TeamCandidate[]; my_participant_id: string | null }> {
   const { data, error } = await client().rpc('AD_team_workspace', { p_cohort: cohortId })
   if (error) throw fail(error.code)
   return data
+}
+export async function updateTeamMemberRole(teamId: string, participantId: string, role: string) {
+  const value = role.trim()
+  if (value.length > 80) throw new Error('역할은 80자 이내로 입력해 주세요.')
+  const { error } = await client().rpc('AD_update_team_member_role', { p_team: teamId, p_participant: participantId, p_role: value })
+  if (error) throw error.code === '23514' ? new Error('팀원 또는 역할 정보를 확인해 주세요.') : fail(error.code)
 }
 export async function saveTeam(cohortId: string, input: TeamInput, members: string[], leader: string | null, roles:Record<string,string>, previous?: Team) {
   const validation = validateTeam(input)

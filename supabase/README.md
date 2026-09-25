@@ -158,4 +158,6 @@ RLS와 `AD_save_report`·`AD_review_report` 함수가 현재 활성 팀원과 �
 
 `migrations/20260925001500_ad_team_member_roles.sql`은 `AD_team_members.role_title`을 추가합니다. 교수 전용 `AD_save_team_v2()`는 팀 구성과 각 역할을 한 트랜잭션에서 저장하고, 기존 `AD_save_team()`의 클라이언트 실행 권한은 제거합니다. `AD_team_roster_v2()`와 팀 작업공간·전체리포트 v2가 역할을 반환하며 학생은 소속 팀 역할만 읽습니다. `tests/ad_team_member_roles_access.sql`로 저장·길이 제한·학생 조회·학생 변경 차단을 롤백 검증합니다. 공유 CLI migration history에는 등록하지 않았으므로 `db push`로 재적용하지 않습니다.
 
+`migrations/20260926000200_ad_team_member_role_edit.sql`은 학생 직접 역할 수정을 위한 `AD_update_team_member_role()`을 추가합니다. 교수는 모든 팀원, 팀장은 자기 팀원 전체, 일반 팀원은 본인 역할만 수정할 수 있습니다. `AD_team_workspace()`는 본인의 참가자 ID를 추가 반환합니다. `tests/ad_team_member_role_edit_access.sql`은 이 권한과 타 팀 접근·길이 제한·익명 차단을 롤백 검증합니다.
+
 `migrations/20260926000100_ad_team_member_roles_fix.sql`은 최초 적용 후 발견된 역할 검증 함수의 변수명 충돌을 수정합니다. 이미 적용된 공유 DB에는 보정 마이그레이션도 적용했으며, 두 파일 모두 CLI migration history에 등록하지 않았습니다.
