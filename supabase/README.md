@@ -124,4 +124,8 @@ RLS와 `AD_save_report`·`AD_review_report` 함수가 현재 활성 팀원과 �
 
 `migrations/20260925000700_ad_program_deliverables.sql`을 롤백 검증 후 명시적으로 적용했습니다. 교수 전용 `AD_program_deliverables()`는 선택 프로그램의 모든 팀을 최근 제출 시각 내림차순으로, 팀 내 링크 산출물을 최신 제출 순으로 반환합니다. 전체·제출·미제출 팀 수와 산출물 건수를 함께 집계하며 자료가 없는 팀은 마지막에 표시합니다. 기존 서비스 객체는 변경하지 않았습니다.
 
+## 산출물 코멘트 적용 기록 (2026-09-25)
+
+`migrations/20260925000800_ad_deliverable_comments.sql`은 `AD_comments`에 산출물 대상을 추가하고 세 대상 중 정확히 하나만 지정하도록 제한합니다. 교수 전용 `AD_save_deliverable_comment()`는 팀과 산출물의 일치, 작성자, 수정 버전을 확인합니다. 기존 `AD_delete_comment()`로 본인 코멘트를 삭제합니다. 코멘트가 남은 산출물은 외래 키로 삭제를 제한합니다. `tests/ad_deliverable_comments_access.sql`은 팀원·다른 팀·익명 접근, 직접 쓰기, 수정 충돌과 삭제 제한을 임시 자료로 검증하고 롤백합니다. 공유 CLI migration history에는 등록하지 않았으므로 `db push`로 재적용하지 않습니다.
+
 `tests/ad_program_deliverables_access.sql`은 팀 그룹·자료 정렬, 빈 팀·집계 수치, 비인가·익명 실행 차단을 검증하며 임시 자료를 롤백합니다. 공유 CLI migration history에는 등록하지 않았으므로 재실행하거나 `db push`하지 않습니다.

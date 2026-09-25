@@ -4,6 +4,7 @@ function client(){if(!supabase)throw new Error('데이터베이스 연결 설정
 function fail(code:string){
   if(code==='42501')return new Error('현재 팀의 산출물을 조회하거나 변경할 권한이 없습니다.')
   if(code==='40001'||code==='40P01')return new Error('다른 팀원이 산출물을 변경했습니다. 최신 목록을 불러와 주세요.')
+  if(code==='23503')return new Error('코멘트가 남은 산출물은 삭제할 수 없습니다. 교수에게 코멘트 삭제를 요청해 주세요.')
   if(code==='23514'||code==='23502'||code.startsWith('22'))return new Error('유형·제목·설명·URL을 확인해 주세요.')
   return new Error('산출물을 처리하지 못했습니다. 잠시 후 다시 시도해 주세요.')
 }
