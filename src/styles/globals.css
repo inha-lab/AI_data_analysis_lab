@@ -227,11 +227,25 @@ footer { margin-top: 40px; border-top: 1px solid #dce3eb; padding: 24px 0; color
 .cohort-form .gpu-choice-row label { display: flex; align-items: center; gap: 8px; margin: 0; padding: 9px 13px; background: #f3f6f9; border-radius: 8px; }
 .cohort-form .gpu-choice-row input { width: auto; min-width: auto; }
 .gpu-schedule-panel { margin-top: 20px; }
-.gpu-application-list { display: grid; grid-template-columns: repeat(auto-fill,minmax(280px,1fr)); gap: 12px; }
-.gpu-application { border: 1px solid #dce5ed; border-radius: 10px; padding: 16px; overflow-wrap: anywhere; }
-.gpu-application p { margin: 8px 0; }
-.gpu-application ul { margin: 12px 0 0; padding-left: 20px; font-size: 13px; }
-.gpu-application li { margin-top: 5px; }
+.gpu-request-panel select,.gpu-request-panel input[type="date"],.cohort-selector select { min-height: 46px; line-height: 1.5; font-size: 14px; }
+.gpu-request-panel select:disabled { color: #102e4c; background: #f3f6f9; opacity: 1; -webkit-text-fill-color: #102e4c; }
+.gpu-list-heading { flex-wrap: wrap; margin-bottom: 16px; }
+.gpu-list-heading .field-help { margin-top: 5px; }
+.gpu-list-controls { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.gpu-list-controls label { font-size: 13px; font-weight: 600; white-space: nowrap; }
+.gpu-list-controls input { min-height: 42px; padding: 8px 10px; border: 1px solid #cbd8e3; border-radius: 7px; font: inherit; font-size: 14px; background: white; }
+.gpu-list-controls .button { padding: 9px 12px; font-size: 12px; }
+.gpu-application-list { border-top: 1px solid #e5ebf1; }
+.gpu-application { border-bottom: 1px solid #e5ebf1; padding: 10px 0; overflow-wrap: anywhere; }
+.gpu-application-main { display: grid; grid-template-columns: minmax(200px,1.4fr) minmax(130px,1fr) minmax(95px,.7fr) minmax(150px,1.4fr) auto; align-items: center; gap: 12px; font-size: 13px; }
+.gpu-application-team span { display: block; color: #62768a; font-size: 11px; }
+.gpu-application-time,.gpu-application-gpus { color: #294b68; }
+.gpu-application-purpose { color: #52677b; }
+.gpu-application .button { padding: 7px 10px; font-size: 12px; white-space: nowrap; }
+.gpu-application details { margin-top: 6px; font-size: 12px; color: #52677b; }
+.gpu-application summary { cursor: pointer; }
+.gpu-application ul { margin: 6px 0; padding-left: 20px; }
+@media (max-width: 900px) { .gpu-application-main { display: flex; flex-wrap: wrap; } .gpu-application-time,.gpu-application-purpose { flex-basis: 100%; } .gpu-application-main .button { margin-left: auto; } }
 .gpu-table-scroll { overflow-x: auto; }
 .gpu-hour-grid { width: 100%; min-width: 760px; border-collapse: collapse; table-layout: fixed; }
 .gpu-hour-grid th,.gpu-hour-grid td { border-bottom: 1px solid #e5ebf1; padding: 11px; text-align: left; vertical-align: top; }

@@ -1,6 +1,6 @@
 import { useEffect,useState,type FormEvent } from 'react'
 import { Link,useBlocker,useSearchParams } from 'react-router-dom'
-import { CalendarDays,Cpu } from 'lucide-react'
+import { Cpu } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { useAuth } from '@/features/auth/auth-context'
 import { useCohorts } from '@/features/cohorts/use-cohorts'
@@ -13,8 +13,10 @@ const hours=Array.from({length:24},(_,hour)=>`${String(hour).padStart(2,'0')}:00
 
 function Workspace({cohortId,manage}:{cohortId:string;manage:boolean}){
   const [day,setDay]=useState(kstDay)
+  const [listDay,setListDay]=useState('')
+  const scheduleDay=listDay||day
   const [revision,setRevision]=useState(0)
-  const [result,setResult]=useState<{revision:number;rows:GpuReservation[];teams:TeamOption[];applications:GpuApplication[];error:string}|null>(null)
+  const [result,setResult]=useState<{revision:number;viewDay:string;rows:GpuReservation[];teams:TeamOption[];applications:GpuApplication[];error:string}|null>(null)
   const [teamId,setTeamId]=useState('')
   const [start,setStart]=useState('09:00')
   const [end,setEnd]=useState('10:00')
@@ -27,13 +29,13 @@ function Workspace({cohortId,manage}:{cohortId:string;manage:boolean}){
   const blocker=useBlocker(dirty||busy)
   useEffect(()=>{
     let active=true
-    void Promise.all([listGpuDay(cohortId,day),listGpuTeams(cohortId),listGpuApplications(cohortId)]).then(([rows,teams,applications])=>{
-      if(active)setResult({revision,rows,teams,applications,error:''})
+    void Promise.all([listGpuDay(cohortId,scheduleDay),listGpuTeams(cohortId),listGpuApplications(cohortId)]).then(([rows,teams,applications])=>{
+      if(active)setResult({revision,viewDay:scheduleDay,rows,teams,applications,error:''})
     }).catch(cause=>{
-      if(active)setResult({revision,rows:[],teams:[],applications:[],error:cause instanceof Error?cause.message:'GPU 현황을 불러오지 못했습니다.'})
+      if(active)setResult({revision,viewDay:scheduleDay,rows:[],teams:[],applications:[],error:cause instanceof Error?cause.message:'GPU 현황을 불러오지 못했습니다.'})
     })
     return()=>{active=false}
-  },[cohortId,day,revision])
+  },[cohortId,scheduleDay,revision])
   useEffect(()=>{
     if(!dirty&&!busy)return
     const handler=(event:BeforeUnloadEvent)=>{event.preventDefault();event.returnValue=''}
@@ -45,12 +47,16 @@ function Workspace({cohortId,manage}:{cohortId:string;manage:boolean}){
   const choice:GpuChoice=selectedGpus.length===2?'both':selectedGpus[0]===1?'1':'0'
   const input:ReservationInput={teamId:selectedTeam,day,start,end,choice,purpose}
   const times=reservationTimes(input)
-  const dayStart=Date.parse(`${day}T00:00:00+09:00`)
+  const dayStart=Date.parse(`${scheduleDay}T00:00:00+09:00`)
   const dayEnd=dayStart+86400000
+  const filteredApplications=result?.applications.filter(item=>!listDay||item.segments.some(segment=>{
+    const start=Date.parse(`${listDay}T00:00:00+09:00`)
+    return Date.parse(segment.starts_at)<start+86400000&&Date.parse(segment.ends_at)>start
+  }))??[]
   const summary=[0,1].map(gpu=>{
     const matching=result?.rows.filter(row=>row.gpu_ids.includes(gpu))??[]
     const minutes=matching.reduce((total,row)=>total+Math.max(0,Math.min(dayEnd,Date.parse(row.ends_at))-Math.max(dayStart,Date.parse(row.starts_at)))/60000,0)
-    const count=hours.filter((_,hour)=>matching.some(row=>overlapsKstHour(row,day,hour))).length
+    const count=hours.filter((_,hour)=>matching.some(row=>overlapsKstHour(row,scheduleDay,hour))).length
     return {gpu,count,minutes}
   })
   function reload(){setRevision(value=>value+1)}
@@ -74,9 +80,9 @@ function Workspace({cohortId,manage}:{cohortId:string;manage:boolean}){
     {notice&&<p className="success-message" role="status">{notice}</p>}{error&&<p className="form-error" role="alert">{error}</p>}
     <div className="gpu-main-grid">
       <section className="panel gpu-request-panel"><div className="section-heading"><h2><Cpu size={19} aria-hidden="true"/> 예약 신청</h2></div>
-        {result?.revision!==revision?<p role="status">팀과 예약 현황을 불러오고 있습니다.</p>:result.error?<p className="form-error" role="alert">{result.error}</p>:!result.teams.length?<p className="empty-state">{manage?'이 프로그램에 팀을 먼저 등록해 주세요.':'팀 배정 후 GPU 서버 예약을 신청할 수 있습니다.'}</p>:<form className="cohort-form" onSubmit={event=>void submit(event)}><fieldset disabled={busy}>
+        {result?.revision!==revision||result?.viewDay!==scheduleDay?<p role="status">팀과 예약 현황을 불러오고 있습니다.</p>:result.error?<p className="form-error" role="alert">{result.error}</p>:!result.teams.length?<p className="empty-state">{manage?'이 프로그램에 팀을 먼저 등록해 주세요.':'팀 배정 후 GPU 서버 예약을 신청할 수 있습니다.'}</p>:<form className="cohort-form" onSubmit={event=>void submit(event)}><fieldset disabled={busy}>
           <label htmlFor="gpu-team">팀</label><select id="gpu-team" value={selectedTeam} disabled={!manage&&result.teams.length===1} onChange={event=>{setTeamId(event.target.value);setDirty(true)}}>{result.teams.map(team=><option key={team.id} value={team.id}>{team.name} · {team.topic||'프로젝트 미정'}</option>)}</select>
-          <label htmlFor="gpu-day">예약일 (KST)</label><input id="gpu-day" type="date" required value={day} onChange={event=>{setDay(event.target.value);setResult(null);setDirty(true)}}/>
+          <label htmlFor="gpu-day">예약일 (KST)</label><input id="gpu-day" type="date" required value={day} onChange={event=>{setDay(event.target.value);setDirty(true)}}/>
           <div className="date-fields"><div><label htmlFor="gpu-start">시작 시간</label><select id="gpu-start" value={start} onChange={event=>{setStart(event.target.value);setDirty(true)}}>{hours.map(hour=><option key={hour}>{hour}</option>)}</select></div><div><label htmlFor="gpu-end">종료 시간</label><select id="gpu-end" value={end} onChange={event=>{setEnd(event.target.value);setDirty(true)}}>{hours.map(hour=><option key={hour}>{hour}</option>)}</select></div></div>
           <p className="field-help">종료시간이 시작 시간과 같거나 빠르면 다음날 종료됩니다.</p>
           <fieldset className="gpu-choice-fieldset"><legend>GPU 선택</legend><div className="gpu-choice-row">{[0,1].map(gpu=><label key={gpu}><input type="checkbox" checked={selectedGpus.includes(gpu)} onChange={()=>toggleGpu(gpu)}/> GPU_#{gpu}</label>)}</div><p className="field-help">두 GPU를 선택하면 같은 시간에 함께 예약합니다.</p></fieldset>
@@ -85,10 +91,10 @@ function Workspace({cohortId,manage}:{cohortId:string;manage:boolean}){
           <Button type="submit" disabled={!times||!selectedGpus.length}>{busy?'예약 중…':'GPU 예약 신청'}</Button>
         </fieldset></form>}
       </section>
-      <div className="gpu-overview-grid">{summary.map(item=><article className="stat-card" key={item.gpu}><Cpu size={18} aria-hidden="true"/><span>GPU_#{item.gpu}</span><strong>{item.count}개 시간대</strong><p>사용 예정 {Math.floor(item.minutes/60)}시간 {item.minutes%60}분</p></article>)}<section className="panel gpu-overview-note"><h2><CalendarDays size={19} aria-hidden="true"/> 전체 예약 현황</h2><p className="field-help">모든 날짜의 신청을 한 건씩 확인하고 삭제할 수 있습니다.</p><Button className="button-secondary" disabled={busy} onClick={reload}>새로고침</Button></section></div>
+      <div className="gpu-overview-grid">{summary.map(item=><article className="stat-card" key={item.gpu}><Cpu size={18} aria-hidden="true"/><span>GPU_#{item.gpu}</span><strong>{item.count}개 시간대</strong><p>사용 예정 {Math.floor(item.minutes/60)}시간 {item.minutes%60}분</p></article>)}</div>
     </div>
-    <section className="panel gpu-schedule-panel"><div className="section-heading"><h2>전체 예약 현황</h2><span className="field-help">모든 날짜 · 신청 1건당 목록 1건</span></div>{result?.revision!==revision?<p role="status">전체 예약을 불러오고 있습니다.</p>:result.error?<p className="form-error" role="alert">{result.error}</p>:!result.applications.length?<p className="empty-state">예약 신청이 없습니다.</p>:<div className="gpu-application-list">{result.applications.map(item=><article className="gpu-application" key={item.application_id}><div className="section-heading"><div><strong>{item.team_name}</strong><p className="field-help">{item.program_name}</p></div>{item.can_cancel&&<Button className="button-secondary" disabled={busy} onClick={()=>void cancel(item)}>신청 삭제</Button>}</div><p>{formatScheduleTime(item.starts_at)} ~ {formatScheduleTime(item.ends_at)} (KST)</p><p className="proposal-text">{item.purpose}</p>{manage&&item.requester_name&&<p className="field-help">신청: {item.requester_name}</p>}<ul>{item.segments.map((segment,index)=><li key={index}>{segment.gpu_ids.map(gpu=>`GPU_#${gpu}`).join(', ')} · {formatScheduleTime(segment.starts_at)} ~ {formatScheduleTime(segment.ends_at)}</li>)}</ul></article>)}</div>}</section>
-    <section className="panel gpu-schedule-panel"><div className="section-heading"><h2>{day} 시간대별 예약표</h2><span className="field-help">한국 시간(KST)</span></div>{result?.revision!==revision?<p role="status">예약표를 불러오고 있습니다.</p>:result.error?<p className="form-error" role="alert">{result.error}</p>:<GpuHourlyGrid day={day} rows={result.rows} manage={manage}/>}</section>
+    <section className="panel gpu-schedule-panel"><div className="section-heading gpu-list-heading"><div><h2>전체 예약 현황</h2><p className="field-help">선택 프로그램의 다른 팀 예약도 확인할 수 있습니다. 신청 1건당 목록 1건입니다.</p></div><div className="gpu-list-controls"><label htmlFor="gpu-list-day">조회 날짜</label><input id="gpu-list-day" type="date" value={listDay} onChange={event=>setListDay(event.target.value)}/><Button className="button-secondary" disabled={!listDay} onClick={()=>setListDay('')}>전체 날짜</Button><Button className="button-secondary" disabled={busy} onClick={reload}>새로고침</Button></div></div>{result?.revision!==revision||result?.viewDay!==scheduleDay?<p role="status">전체 예약을 불러오고 있습니다.</p>:result.error?<p className="form-error" role="alert">{result.error}</p>:!filteredApplications.length?<p className="empty-state">{listDay?'선택한 날짜의 예약 신청이 없습니다.':'예약 신청이 없습니다.'}</p>:<div className="gpu-application-list">{filteredApplications.map(item=><article className="gpu-application" key={item.application_id}><div className="gpu-application-main"><div className="gpu-application-time">{formatScheduleTime(item.starts_at)} ~ {formatScheduleTime(item.ends_at)}</div><div className="gpu-application-team"><strong>{item.team_name}</strong><span>{item.program_name}</span></div><div className="gpu-application-gpus">{[...new Set(item.segments.flatMap(segment=>segment.gpu_ids))].map(gpu=>`GPU_#${gpu}`).join(', ')}</div><div className="gpu-application-purpose">{item.purpose}{manage&&item.requester_name&&<span> · 신청: {item.requester_name}</span>}</div>{item.can_cancel&&<Button className="button-secondary" disabled={busy} onClick={()=>void cancel(item)}>신청 삭제</Button>}</div>{item.segments.length>1&&<details><summary>예약 구간 {item.segments.length}개 보기</summary><ul>{item.segments.map((segment,index)=><li key={index}>{segment.gpu_ids.map(gpu=>`GPU_#${gpu}`).join(', ')} · {formatScheduleTime(segment.starts_at)} ~ {formatScheduleTime(segment.ends_at)}</li>)}</ul></details>}</article>)}</div>}</section>
+    <section className="panel gpu-schedule-panel"><div className="section-heading"><h2>{scheduleDay} 시간대별 예약표</h2><span className="field-help">한국 시간(KST)</span></div>{result?.revision!==revision||result?.viewDay!==scheduleDay?<p role="status">예약표를 불러오고 있습니다.</p>:result.error?<p className="form-error" role="alert">{result.error}</p>:<GpuHourlyGrid day={scheduleDay} rows={result.rows} manage={manage}/>}</section>
     {blocker.state==='blocked'&&<div className="notice" role="alert"><p>{busy?'처리가 끝난 뒤 이동해 주세요.':'작성 중인 예약을 버리고 이동할까요?'}</p><div className="button-row"><Button disabled={busy} onClick={()=>blocker.proceed()}>이동</Button><Button className="button-secondary" onClick={()=>blocker.reset()}>계속 작성</Button></div></div>}
   </>
 }
