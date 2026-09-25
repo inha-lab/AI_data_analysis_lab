@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Link, NavLink, Outlet } from 'react-router-dom'
-import { CalendarDays, FileStack, LayoutDashboard, Layers3, LogOut, Megaphone, Users, UsersRound } from 'lucide-react'
+import { CalendarDays, FileStack, LayoutDashboard, Layers3, LogOut, Megaphone, UserRoundSearch, Users, UsersRound } from 'lucide-react'
 import { useAuth, roleLabels } from '@/features/auth/auth-context'
 import { Button } from '@/components/ui/button'
 
@@ -23,7 +23,7 @@ export function DashboardLayout() {
         {(profile?.role === 'professor' || profile?.role === 'student') && <NavLink to="/schedules"><CalendarDays size={18} aria-hidden="true" /> 프로그램 일정</NavLink>}
         {(profile?.role === 'professor' || profile?.role === 'student') && <NavLink to="/announcements"><Megaphone size={18} aria-hidden="true" /> 공지사항</NavLink>}
         {(profile?.role === 'professor' || profile?.role === 'student') && <NavLink to="/teams"><UsersRound size={18} aria-hidden="true" /> {profile.role === 'professor' ? '팀 관리' : '내 팀'}</NavLink>}
-        {profile?.role === 'professor' && <><NavLink to="/cohorts"><Layers3 size={18} aria-hidden="true" /> 프로그램 관리</NavLink><NavLink to="/participants"><Users size={18} aria-hidden="true" /> 참가자 관리</NavLink><NavLink to="/deliverables"><FileStack size={18} aria-hidden="true" /> 산출물 현황</NavLink></>}
+        {profile?.role === 'professor' && <><NavLink to="/cohorts"><Layers3 size={18} aria-hidden="true" /> 프로그램 관리</NavLink><NavLink to="/participants"><Users size={18} aria-hidden="true" /> 참가자 관리</NavLink><NavLink to="/deliverables"><FileStack size={18} aria-hidden="true" /> 산출물 현황</NavLink><NavLink to="/login-activity"><UserRoundSearch size={18} aria-hidden="true" /> 로그인 활동</NavLink></>}
       </nav>
       <div className="sidebar-note">공공데이터에서 시작하는<br />새로운 가능성.</div>
     </aside>

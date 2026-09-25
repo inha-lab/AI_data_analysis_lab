@@ -133,3 +133,7 @@ RLS와 `AD_save_report`·`AD_review_report` 함수가 현재 활성 팀원과 �
 ## 프로그램 공지사항 적용 기록 (2026-09-25)
 
 `migrations/20260925000900_ad_announcements.sql`을 롤백 검증 후 명시적으로 적용했습니다. `AD_announcements`는 프로그램별 제목·본문·중요 표시·작성자·시각을 보관합니다. 조회 RLS는 현재 교수와 해당 프로그램의 활성 학생 참가자로 제한합니다. 직접 쓰기를 막고 `AD_save_announcement()`·`AD_delete_announcement()`에서 교수 권한·입력·프로그램 일치·수정 버전을 검사합니다. `tests/ad_announcements_access.sql`은 작성·수정·삭제, 학생 프로그램 범위, 직접 쓰기·익명 차단을 검증하며 임시 자료를 롤백합니다. 공유 CLI migration history에는 등록하지 않았으므로 `db push`로 재적용하지 않습니다.
+
+## 로그인 활동 적용 기록 (2026-09-25)
+
+`migrations/20260925001000_ad_login_activity.sql`은 `AD_login_activities`와 기록·조회 함수를 추가합니다. 학생이 앱에서 명시적으로 로그인하면 `AD_record_login_activity()`가 Auth의 최근 로그인 시각을 대조하고 동일 계정·시각 중복을 막습니다. `AD_program_login_activity()`는 교수에게만 프로그램 참가자의 기록을 반환합니다. 기기·브라우저 분류만 저장하며 비밀번호·토큰·전체 User-Agent는 저장하지 않습니다. `tests/ad_login_activity_access.sql`로 최근 로그인, 중복, 프로그램 범위, 역할·익명 차단을 롤백 검증했습니다. Auth 감사 로그는 현재 비어 있으므로 기존 이력과 앱 밖 로그인은 포함하지 않으며 클라이언트 기록 요청 실패 가능성이 있습니다. 공유 CLI migration history에는 등록하지 않았으므로 `db push`로 재적용하지 않습니다.

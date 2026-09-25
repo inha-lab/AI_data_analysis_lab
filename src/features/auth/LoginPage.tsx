@@ -3,6 +3,7 @@ import { Link, Navigate, useLocation } from 'react-router-dom'
 import { supabase } from '@/lib/supabase'
 import { Button } from '@/components/ui/button'
 import { useAuth } from './auth-context'
+import { recordLoginActivity } from '@/features/login-activity/login-activity-api'
 
 export function LoginPage() {
   const { session, profile, loading, error, refreshProfile, signOut } = useAuth()
@@ -14,8 +15,8 @@ export function LoginPage() {
   if (!loading && profile) {
     if (profile.must_change_password) return <Navigate to="/change-password" replace />
     const requested = (location.state as { from?: string } | null)?.from
-    const canReturn = (profile.role === 'professor' && (requested === '/cohorts' || requested === '/participants' || requested === '/deliverables'))
-      || ((profile.role === 'professor' || profile.role === 'student') && (requested === '/schedules' || requested === '/teams' || /^\/teams\/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\/(proposal|reports|full-report|deliverables)$/i.test(requested ?? '')))
+    const canReturn = (profile.role === 'professor' && (requested === '/cohorts' || requested === '/participants' || requested === '/deliverables' || requested === '/login-activity'))
+      || ((profile.role === 'professor' || profile.role === 'student') && (requested === '/schedules' || requested === '/announcements' || requested === '/teams' || /^\/teams\/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\/(proposal|reports|full-report|deliverables)$/i.test(requested ?? '')))
     const target = canReturn && requested ? requested : '/dashboard'
     return <Navigate to={target} replace />
   }
@@ -28,6 +29,7 @@ export function LoginPage() {
       const { error: loginError } = await supabase.auth.signInWithPassword({ email: email.trim(), password })
       setPassword('')
       if (loginError) setMessage('로그인하지 못했습니다. 이메일과 비밀번호, 계정 상태를 확인해 주세요.')
+      else void recordLoginActivity().catch(() => {})
     } catch { setMessage('로그인 서버에 연결하지 못했습니다.') }
     finally { setBusy(false) }
   }
