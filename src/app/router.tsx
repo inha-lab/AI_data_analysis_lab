@@ -19,6 +19,7 @@ export const router = createHashRouter([
       { element: <RequireAuth roles={['professor', 'student']} />, children: [
         { path: '/schedules', lazy: async () => ({ Component: (await import('@/features/schedules/SchedulesPage')).SchedulesPage }) },
         { path: '/announcements', lazy: async () => ({ Component: (await import('@/features/announcements/AnnouncementsPage')).AnnouncementsPage }) },
+        { path: '/gpu', lazy: async () => ({ Component: (await import('@/features/gpu/GpuReservationsPage')).GpuReservationsPage }) },
         { path: '/teams', lazy: async () => ({ Component: (await import('@/features/teams/TeamsPage')).TeamsPage }) },
         { path: '/teams/:teamId/proposal', lazy: async () => ({ Component: (await import('@/features/proposals/ProposalPage')).ProposalPage }) },
         { path: '/teams/:teamId/reports', lazy: async () => ({ Component: (await import('@/features/reports/ReportPage')).ReportPage }) },

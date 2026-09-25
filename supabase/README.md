@@ -137,3 +137,7 @@ RLS와 `AD_save_report`·`AD_review_report` 함수가 현재 활성 팀원과 �
 ## 로그인 활동 적용 기록 (2026-09-25)
 
 `migrations/20260925001000_ad_login_activity.sql`은 `AD_login_activities`와 기록·조회 함수를 추가합니다. 학생이 앱에서 명시적으로 로그인하면 `AD_record_login_activity()`가 Auth의 최근 로그인 시각을 대조하고 동일 계정·시각 중복을 막습니다. `AD_program_login_activity()`는 교수에게만 프로그램 참가자의 기록을 반환합니다. 기기·브라우저 분류만 저장하며 비밀번호·토큰·전체 User-Agent는 저장하지 않습니다. `tests/ad_login_activity_access.sql`로 최근 로그인, 중복, 프로그램 범위, 역할·익명 차단을 롤백 검증했습니다. Auth 감사 로그는 현재 비어 있으므로 기존 이력과 앱 밖 로그인은 포함하지 않으며 클라이언트 기록 요청 실패 가능성이 있습니다. 공유 CLI migration history에는 등록하지 않았으므로 `db push`로 재적용하지 않습니다.
+
+## GPU 예약 적용 기록 (2026-09-25)
+
+`migrations/20260925001100_ad_gpu_reservations.sql`은 프로그램·팀에 연결된 예약, GPU 배열, KST 시작·종료 시각, 사용 목적, 신청자와 취소 상태를 저장합니다. 앱 테이블 직접 접근은 막고 `AD_gpu_day_schedule()`이 전체 GPU 점유 시간과 날짜별 목록을 반환합니다. 학생에게 다른 프로그램의 팀명·목적은 가립니다. `AD_save_gpu_reservation()`은 활성 소속 팀원만 실행하며 GPU별 advisory transaction lock을 0→1 순서로 잡아 겹침을 검사하고 두 GPU 신청을 한 행으로 저장합니다. `AD_cancel_gpu_reservation()`은 교수 또는 현재 소속 팀원에게만 허용합니다. `tests/ad_gpu_reservations_access.sql`로 자정 넘김, 부분 예약 방지, 다른 프로그램 정보 가림, 팀별 조회·취소 권한을 롤백 검증합니다. 공유 CLI migration history에는 등록하지 않았으므로 `db push`로 재적용하지 않습니다.
