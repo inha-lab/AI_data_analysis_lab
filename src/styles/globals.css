@@ -217,10 +217,8 @@ footer { margin-top: 40px; border-top: 1px solid #dce3eb; padding: 24px 0; color
 .deliverable-overview-toggle { display: flex; align-items: center; gap: 6px; font-size: 13px; white-space: nowrap; }
 @media (max-width: 760px) { .deliverable-group-items article { grid-template-columns: auto minmax(0,1fr); } .deliverable-group-items article > a { grid-column: 2; } }
 .gpu-main-grid { display: grid; grid-template-columns: minmax(320px,.95fr) minmax(320px,1.05fr); gap: 20px; align-items: start; }
-.gpu-request-panel h2,.gpu-overview-note h2 { display: flex; align-items: center; gap: 8px; }
-.gpu-overview-grid { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 16px; }
-.gpu-overview-grid .stat-card { min-width: 0; }
-.gpu-overview-note { grid-column: 1/-1; }
+.gpu-request-panel h2 { display: flex; align-items: center; gap: 8px; }
+.gpu-reservations-panel { min-width: 0; }
 .cohort-form .gpu-choice-fieldset { border: 1px solid #cbd8e3; border-radius: 9px; padding: 14px; margin-top: 18px; }
 .gpu-choice-fieldset legend { padding: 0 5px; font-size: 13px; font-weight: 600; }
 .gpu-choice-row { display: flex; gap: 10px; flex-wrap: wrap; }
@@ -238,6 +236,12 @@ footer { margin-top: 40px; border-top: 1px solid #dce3eb; padding: 24px 0; color
 .gpu-application-list { border-top: 1px solid #e5ebf1; }
 .gpu-application { border-bottom: 1px solid #e5ebf1; padding: 10px 0; overflow-wrap: anywhere; }
 .gpu-application-main { display: grid; grid-template-columns: minmax(200px,1.4fr) minmax(130px,1fr) minmax(95px,.7fr) minmax(150px,1.4fr) auto; align-items: center; gap: 12px; font-size: 13px; }
+.gpu-reservations-panel .gpu-application-main { grid-template-columns: minmax(0,1fr) auto; gap: 4px 12px; }
+.gpu-reservations-panel .gpu-application-time { grid-column: 1; grid-row: 1; }
+.gpu-reservations-panel .gpu-application-team { grid-column: 1; grid-row: 2; }
+.gpu-reservations-panel .gpu-application-gpus { grid-column: 2; grid-row: 2; text-align: right; }
+.gpu-reservations-panel .gpu-application-purpose { grid-column: 1/-1; grid-row: 3; }
+.gpu-reservations-panel .gpu-application-main .button { grid-column: 2; grid-row: 1; }
 .gpu-application-team span { display: block; color: #62768a; font-size: 11px; }
 .gpu-application-time,.gpu-application-gpus { color: #294b68; }
 .gpu-application-purpose { color: #52677b; }
@@ -246,6 +250,7 @@ footer { margin-top: 40px; border-top: 1px solid #dce3eb; padding: 24px 0; color
 .gpu-application summary { cursor: pointer; }
 .gpu-application ul { margin: 6px 0; padding-left: 20px; }
 @media (max-width: 900px) { .gpu-application-main { display: flex; flex-wrap: wrap; } .gpu-application-time,.gpu-application-purpose { flex-basis: 100%; } .gpu-application-main .button { margin-left: auto; } }
+@media (max-width: 850px) { .gpu-reservations-panel .gpu-application-main { display: grid; } }
 .gpu-table-scroll { overflow-x: auto; }
 .gpu-hour-grid { width: 100%; min-width: 760px; border-collapse: collapse; table-layout: fixed; }
 .gpu-hour-grid th,.gpu-hour-grid td { border-bottom: 1px solid #e5ebf1; padding: 11px; text-align: left; vertical-align: top; }
