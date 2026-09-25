@@ -15,7 +15,7 @@ function TeamCard({team,members,manage,editing,deleting,onEdit,onDelete}:{team:T
   return <article className="team-overview-card"><div className="team-overview-heading"><span className="badge">{teamStages[team.stage]}</span><span className="field-help">{members.length}명</span></div>
     <h2>{team.name}</h2><p className="team-overview-topic">{team.topic||'프로젝트 주제 미등록'}</p>
     <p className="team-overview-leader">팀장 <strong>{leader?.full_name||'미지정'}</strong></p>
-    <div className="team-overview-links"><Link to={`/teams/${team.id}/proposal`}>기획서 →</Link><Link to={`/teams/${team.id}/reports`}>보고서 →</Link><Link to={`/teams/${team.id}/full-report`}>전체리포트 →</Link></div>
+    <div className="team-overview-links"><Link to={`/teams/${team.id}/proposal`}>기획서 →</Link><Link to={`/teams/${team.id}/reports`}>보고서 →</Link><Link to={`/teams/${team.id}/deliverables`}>산출물 →</Link><Link to={`/teams/${team.id}/full-report`}>전체리포트 →</Link></div>
     <details className="team-overview-details"><summary>팀원·직무·링크 자세히</summary><p className="field-help">{jobSummary(members)}</p>
       {members.length?<ul className="team-roster">{members.map(member=><li key={member.participant_id}><strong>{member.full_name}</strong> {member.is_leader&&<span className="badge status-active">팀장</span>} {!member.is_active&&<span className="badge">비활성</span>}<span>{member.department} · {jobGroups[member.job_group]}</span></li>)}</ul>:<p className="field-help">배정된 팀원이 없습니다.</p>}
       <div className="button-row">{([['Notion',team.notion_url],['GitHub',team.github_url],['데모',team.demo_url]] as const).map(([label,value])=>{const url=safeTeamUrl(value);return url?<a key={label} href={url} target="_blank" rel="noopener noreferrer" className="text-link">{label} ↗</a>:null})}</div>

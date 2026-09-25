@@ -8,7 +8,7 @@
 - SQL 식별자 예시: `public."AD_profiles"`, `public."AD_teams"`
 - Supabase 클라이언트 테이블명 예시: `AD_profiles`, `AD_teams`
 
-`migrations/`는 스키마·RLS, `functions/`는 권한이 필요한 서버 작업을 위한 위치입니다. `AD_profiles`, `AD_cohorts`, `AD_participants`, `AD_schedules`, `AD_teams`, `AD_team_members`, `AD_proposals`, `AD_reports`, `AD_comments`와 역할·참여 기반 접근 제어를 적용했습니다. 계정 생성·연결과 최초 비밀번호 변경 함수를 배포했습니다. 산출물·평가 테이블은 후속 구현 대상입니다.
+`migrations/`는 스키마·RLS, `functions/`는 권한이 필요한 서버 작업을 위한 위치입니다. `AD_profiles`, `AD_cohorts`, `AD_participants`, `AD_schedules`, `AD_teams`, `AD_team_members`, `AD_proposals`, `AD_reports`, `AD_comments`, `AD_deliverables`와 역할·참여 기반 접근 제어를 적용했습니다. 계정 생성·연결과 최초 비밀번호 변경 함수를 배포했습니다. 평가 테이블은 후속 구현 대상입니다.
 
 ## 공유 프로젝트 변경 원칙
 
@@ -113,3 +113,9 @@ RLS와 `AD_save_report`·`AD_review_report` 함수가 현재 활성 팀원과 �
 `migrations/20260925000500_ad_team_full_report.sql`을 롤백 검증 후 명시적으로 적용했습니다. `AD_team_full_report()`는 현재 교수 또는 활성 소속 팀원 권한을 확인한 뒤 프로그램명·팀 정보·최소 필드 팀원 명단·기획서·전체 보고서를 하나의 DB 스냅샷에서 반환합니다. 이메일·전화번호·학번·다른 팀 자료는 포함하지 않습니다. 신규 테이블이나 기존 서비스 객체 변경은 없습니다.
 
 `tests/ad_team_full_report_access.sql`에서 자료 구성, 소속 팀 조회, 타 팀·수료자·익명 차단을 확인했으며 임시 Auth 사용자와 공유 트리거 생성 자료는 모두 롤백했습니다. 공유 CLI migration history에는 등록하지 않았으므로 재실행하거나 `db push`하지 않습니다.
+
+## 링크 산출물 적용 기록 (2026-09-25)
+
+`migrations/20260925000600_ad_deliverable_links.sql`을 전체 롤백 검증 후 명시적으로 적용했습니다. `AD_deliverables`는 팀·유형·제목·설명·검증된 http/https URL·최근 제출자/시각을 보관합니다. 팀 FK는 `ON DELETE RESTRICT`입니다. 직접 클라이언트 쓰기를 막고 RLS 조회 및 `AD_save_deliverable`·`AD_delete_deliverable`에서 현재 활성 팀원과 수정 버전을 검증합니다. 교수는 조회만 가능합니다. 파일 첨부를 위한 Storage 설정은 변경하지 않았습니다.
+
+`tests/ad_deliverable_links_access.sql`은 URL·유형 제약, 팀원 공동 수정·삭제, 다른 팀·교수·익명 차단과 동시 수정 충돌을 검증하며 임시 자료를 롤백합니다. 공유 CLI migration history에는 등록하지 않았으므로 재실행하거나 `db push`하지 않습니다.
