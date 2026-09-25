@@ -212,10 +212,13 @@ footer { margin-top: 40px; border-top: 1px solid #dce3eb; padding: 24px 0; color
 .student-team-roster h3 { margin: 0 0 12px; font-size: 16px; }
 .student-team-roster ul { display: grid; grid-template-columns: repeat(auto-fit,minmax(220px,1fr)); gap: 10px; list-style: none; padding: 0; margin: 0; }
 .student-team-roster li { display: flex; align-items: center; flex-wrap: wrap; gap: 7px; min-width: 0; padding: 12px; border: 1px solid #e5ebf1; border-radius: 8px; font-size: 13px; }
-.student-member-role { flex-basis: 100%; color: #52677b; }
-.student-role-editor { flex-basis: 100%; display: grid; gap: 8px; margin-top: 4px; }
-.student-role-editor label { font-weight: 600; }
-.student-role-editor input { width: 100%; min-height: 42px; }
+.student-member-role { flex-basis: 100%; display: flex; align-items: center; gap: 3px; color: #52677b; }
+.student-role-icon { display: inline-flex; align-items: center; justify-content: center; flex: none; width: 28px; height: 28px; padding: 0; border: 0; border-radius: 6px; background: transparent; color: #1269a6; cursor: pointer; }
+.student-role-icon:hover,.student-role-icon:focus-visible { background: #e8f2f9; }
+.student-role-icon:disabled { opacity: .45; cursor: wait; }
+.student-role-editor { flex-basis: 100%; display: flex; align-items: center; flex-wrap: wrap; gap: 4px; min-width: 0; }
+.student-role-editor input { flex: 1; width: 0; min-width: 0; min-height: 34px; padding: 5px 8px; }
+.student-role-editor .form-error { flex-basis: 100%; }
 @media (max-width: 1000px) { .student-team-nav { grid-template-columns: repeat(2,minmax(0,1fr)); } }
 @media (max-width: 520px) { .student-team-nav { grid-template-columns: 1fr; } .student-team-nav a { min-height: 0; } }
 .schedule-card h2 { font-size: 20px; overflow-wrap: anywhere; }
