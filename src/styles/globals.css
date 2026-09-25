@@ -208,6 +208,11 @@ footer { margin-top: 40px; border-top: 1px solid #dce3eb; padding: 24px 0; color
 .student-team-nav strong { display: flex; justify-content: space-between; gap: 8px; }
 .student-team-nav strong span { color: #1269a6; font-size: 15px; white-space: nowrap; }
 .student-team-nav span { font-size: 12px; color: #52677b; }
+.student-team-roster { border-top: 1px solid #e5ebf1; padding: 16px 0; }
+.student-team-roster h3 { margin: 0 0 12px; font-size: 16px; }
+.student-team-roster ul { display: grid; grid-template-columns: repeat(auto-fit,minmax(220px,1fr)); gap: 10px; list-style: none; padding: 0; margin: 0; }
+.student-team-roster li { display: flex; align-items: center; flex-wrap: wrap; gap: 7px; min-width: 0; padding: 12px; border: 1px solid #e5ebf1; border-radius: 8px; font-size: 13px; }
+.student-team-roster li > span:nth-of-type(2) { flex-basis: 100%; color: #52677b; }
 @media (max-width: 1000px) { .student-team-nav { grid-template-columns: repeat(2,minmax(0,1fr)); } }
 @media (max-width: 520px) { .student-team-nav { grid-template-columns: 1fr; } .student-team-nav a { min-height: 0; } }
 .schedule-card h2 { font-size: 20px; overflow-wrap: anywhere; }

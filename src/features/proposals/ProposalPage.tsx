@@ -87,7 +87,7 @@ function ProposalWorkspace({ teamId }: { teamId: string }) {
     {proposal?.reviewed_at && <section className="panel proposal-review"><h2>최근 교수 피드백 · {proposal.review_action === 'returned' ? '수정 요청' : '검토 완료'}</h2><p className="field-help">{proposal.reviewer_name} · {formatScheduleTime(proposal.reviewed_at)} (KST)</p><p className="proposal-text">{proposal.review_note || '별도 피드백 없이 검토를 완료했습니다.'}</p></section>}
     {edit ? <ProposalEditor teamId={team.id} teamName={team.name} proposal={proposal} onSaved={saved} reload={reload} />
       : proposal ? <section className="panel"><h2>{proposal.title}</h2>{proposalSections.map((section, index) => <section className="proposal-section" key={section.key}><h3>{index + 1}. {section.label}</h3><p className="proposal-text">{proposal[section.key] || '미작성'}</p></section>)}{notion && <a className="text-link" href={notion} target="_blank" rel="noopener noreferrer">Notion 보조 문서 ↗</a>}</section>
-        : <section className="panel empty-state"><h2>아직 작성된 기획서가 없습니다.</h2><p>소속 학생이 ‘내 팀’에서 기획서를 작성할 수 있습니다.</p></section>}
+        : <section className="panel empty-state"><h2>아직 작성된 기획서가 없습니다.</h2><p>소속 학생이 ‘워크스페이스’에서 기획서를 작성할 수 있습니다.</p></section>}
     {manage && proposal && proposal.status !== 'draft' && <ReviewPanel proposal={proposal} onSaved={saved} reload={reload} />}
     {proposal && <CommentsPanel teamId={team.id} />}
   </>
