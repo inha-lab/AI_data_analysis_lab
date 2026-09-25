@@ -9,6 +9,7 @@ import { listSchedules } from './schedule-api'
 import type { Schedule } from './schedule-model'
 import { ScheduleEditor } from './ScheduleEditor'
 import { ScheduleList } from './ScheduleList'
+import { ScheduleTimeline } from './ScheduleTimeline'
 
 function ScheduleWorkspace({ cohort, manage, editing, setEditing }: { cohort: Cohort; manage: boolean; editing: Schedule | 'new' | null; setEditing: (value: Schedule | 'new' | null) => void }) {
   const [revision, setRevision] = useState(0)
@@ -27,7 +28,8 @@ function ScheduleWorkspace({ cohort, manage, editing, setEditing }: { cohort: Co
       <Button className="button-secondary" onClick={() => setRevision(value => value + 1)} disabled={loading || Boolean(editing)}><RefreshCw size={16} aria-hidden="true" /> 새로고침</Button>
       {manage && <Button disabled={Boolean(editing)} onClick={() => { setNotice(''); setEditing('new') }}><Plus size={16} aria-hidden="true" /> 새 일정</Button>}</div></div>
     {notice && <p className="success-message" role="status">{notice}</p>}
-    <div className={editing ? 'cohort-workspace with-editor' : 'cohort-workspace'}><section className="panel" aria-label="프로그램 일정 목록">
+    {!loading && !result.error && <ScheduleTimeline items={result.rows.map(row => ({ ...row, program_name: cohort.name }))} />}
+    <div className={editing ? 'cohort-workspace with-editor schedule-workspace' : 'cohort-workspace schedule-workspace'}><section className="panel" aria-label="프로그램 일정 목록">
       {loading ? <p className="empty-state" role="status">일정을 불러오고 있습니다.</p> : result.error ? <p className="form-error" role="alert">{result.error}</p>
         : <ScheduleList items={result.rows.map(row => ({ ...row, program_name: cohort.name }))} actions={manage ? id => {
           const row = result.rows.find(item => item.id === id)!

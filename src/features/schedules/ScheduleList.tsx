@@ -4,7 +4,7 @@ import { formatScheduleTime, scheduleState, stageLabels, type ScheduleDisplay } 
 
 export function ScheduleList({ items, actions }: { items: ScheduleDisplay[]; actions?: (id: string) => ReactNode }) {
   const [stage, setStage] = useState('all')
-  const [period, setPeriod] = useState('upcoming')
+  const [period, setPeriod] = useState('all')
   const [now, setNow] = useState(Date.now)
   useEffect(() => { const timer = window.setInterval(() => setNow(Date.now()), 30000); return () => window.clearInterval(timer) }, [])
   const visible = items.filter(item => (stage === 'all' || item.stage === stage) && (period === 'all' || (Date.parse(item.ends_at) >= now && !item.is_cancelled)))

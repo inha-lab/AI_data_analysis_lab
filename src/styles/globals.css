@@ -144,6 +144,21 @@ footer { margin-top: 40px; border-top: 1px solid #dce3eb; padding: 24px 0; color
 .schedule-card h3 { margin: 12px 0; font-size: 18px; overflow-wrap: anywhere; }
 .schedule-card .button { padding: 6px 10px; font-size: 12px; }
 .schedule-time { color: #476078; font-size: 13px; line-height: 1.8; }
+.schedule-timeline-panel { margin-bottom: 20px; }
+.schedule-timeline-panel .section-heading { flex-wrap: wrap; }
+.schedule-timeline { display: flex; gap: 0; overflow-x: auto; list-style: none; margin: 20px 0 0; padding: 0 0 12px; }
+.schedule-timeline-item { position: relative; flex: 0 0 210px; min-width: 0; padding: 22px 14px 0 0; border-top: 2px solid #d0deea; }
+.schedule-timeline-item:last-child { flex-grow: 1; }
+.schedule-timeline-dot { position: absolute; top: -7px; left: 0; width: 12px; height: 12px; border-radius: 50%; background: #2883cc; border: 2px solid white; box-shadow: 0 0 0 1px #2883cc; }
+.schedule-timeline-item.is-cancelled { opacity: .6; }
+.schedule-timeline-item.is-cancelled .schedule-timeline-dot { background: #8b9bab; box-shadow: 0 0 0 1px #8b9bab; }
+.schedule-timeline-body { display: grid; gap: 4px; overflow-wrap: anywhere; }
+.schedule-timeline-body time { font-size: 12px; color: #476078; }
+.schedule-timeline-body strong { font-size: 14px; line-height: 1.4; }
+.schedule-timeline-body span { font-size: 12px; color: #62768a; }
+.schedule-workspace .schedule-list { grid-template-columns: repeat(2,minmax(0,1fr)); }
+.schedule-workspace.with-editor .schedule-list { grid-template-columns: 1fr; }
+@media (max-width: 760px) { .schedule-workspace .schedule-list { grid-template-columns: 1fr; } }
 .team-members-heading { font-size: 16px; margin: 28px 0 8px; }
 .team-candidates { max-height: 320px; overflow-y: auto; border: 1px solid #dce3eb; border-radius: 8px; margin-top: 12px; padding: 12px; }
 .cohort-form label.team-candidate { display: flex; gap: 10px; align-items: flex-start; margin: 0; padding: 10px 0; border-bottom: 1px solid #edf1f5; font-weight: 400; }
