@@ -137,6 +137,19 @@ footer { margin-top: 40px; border-top: 1px solid #dce3eb; padding: 24px 0; color
 .file-picker input { display: block; margin-top: 8px; font: inherit; padding: 8px; border: 1px solid #cbd8e3; border-radius: 6px; width: 100%; }
 .file-picker input::file-selector-button { background: #e9eff5; border: 0; border-radius: 5px; padding: 8px 12px; margin-right: 12px; cursor: pointer; }
 .membership-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 18px; }
+.student-program-grid { grid-template-columns: repeat(auto-fit,minmax(min(100%,420px),1fr)); align-items: start; }
+.student-program-card h2 { margin: 12px 0 4px; font-size: 22px; overflow-wrap: anywhere; }
+.student-program-card > .muted { margin: 0; }
+.student-program-section { border-top: 1px solid #e5ebf1; margin-top: 18px; padding-top: 14px; }
+.student-program-section h3 { margin: 0 0 10px; font-size: 15px; }
+.student-program-section .section-heading { align-items: baseline; }
+.student-team-name { margin: 4px 0; font-size: 18px; font-weight: 700; }
+.student-team-topic { margin: 0 0 16px; color: #52677b; font-size: 13px; overflow-wrap: anywhere; }
+.student-team-members,.student-recent-deliverables { list-style: none; padding: 0; margin: 0; display: grid; gap: 8px; }
+.student-team-members li,.student-recent-deliverables li { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; font-size: 13px; }
+.student-team-members li > span:last-child { color: #62768a; }
+.student-deliverable-count { margin: 0 0 10px; color: #52677b; font-size: 13px; }
+.student-deliverable-count strong { color: #102e4c; font-size: 22px; }
 .schedule-toolbar { margin: 18px 0; }
 .schedule-list { display: grid; gap: 16px; }
 .schedule-card { border: 1px solid #dce3eb; border-left: 4px solid #2883cc; border-radius: 10px; padding: 20px; background: white; min-width: 0; }
