@@ -1,6 +1,17 @@
 import { supabase } from '@/lib/supabase'
 import { normalizeTeam, validateTeam, type Team, type TeamCandidate, type TeamInput, type TeamMember } from './team-model'
 function client() { if (!supabase) throw new Error('데이터베이스 연결 설정이 필요합니다.'); return supabase }
+export type TeamDocumentCounts={proposal:number;reports:number;deliverables:number}
+export async function loadTeamDocumentCounts(teamId:string):Promise<TeamDocumentCounts>{
+  const db=client()
+  const [proposal,reports,deliverables]=await Promise.all([
+    db.from('AD_proposals').select('team_id',{count:'exact',head:true}).eq('team_id',teamId),
+    db.from('AD_reports').select('team_id',{count:'exact',head:true}).eq('team_id',teamId),
+    db.from('AD_deliverables').select('team_id',{count:'exact',head:true}).eq('team_id',teamId),
+  ])
+  if(proposal.error||reports.error||deliverables.error)throw new Error('팀 자료 건수를 불러오지 못했습니다.')
+  return {proposal:proposal.count??0,reports:reports.count??0,deliverables:deliverables.count??0}
+}
 function fail(code: string) {
   if (code === '23505') return new Error('같은 프로그램의 팀명이 중복되거나 참가자가 이미 다른 팀에 배정되어 있습니다.')
   if (code === '23503') return new Error('프로그램·참가 정보가 변경되었거나 팀에 소속 자료가 남아 있습니다. 다시 조회해 주세요.')
