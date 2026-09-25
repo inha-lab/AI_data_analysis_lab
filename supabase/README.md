@@ -145,3 +145,7 @@ RLS와 `AD_save_report`·`AD_review_report` 함수가 현재 활성 팀원과 �
 ## GPU 신청·관리 화면 확장 (2026-09-25)
 
 `migrations/20260925001200_ad_gpu_management.sql`은 기존 신청 함수에 교수의 팀 대리 신청을 허용하고 시작·종료를 정시로 제한합니다. GPU별 잠금·겹침 차단과 두 GPU 원자적 저장은 유지합니다. `AD_gpu_day_schedule_v2()`는 기존 프로그램 권한 검사를 거친 목록에 신청자 이름을 추가하되 교수에게만 표시합니다. `tests/ad_gpu_management_access.sql`은 교수 신청·충돌, 정시 제약, 학생의 신청자 이름 비노출과 타 팀·익명 차단을 롤백 검증합니다. 공유 CLI migration history에는 등록하지 않았으므로 `db push`로 재적용하지 않습니다.
+
+## GPU별·시간별 개별 취소 (2026-09-25)
+
+`migrations/20260925001300_ad_gpu_slot_cancellation.sql`은 `AD_cancel_gpu_reservation_slot(예약 ID, GPU 번호, KST 날짜, 시)`를 추가하고 기존 전체 예약 취소 함수의 일반 사용자 실행 권한을 제거합니다. 함수는 기존 예약을 취소 이력으로 남기고 선택한 GPU·1시간과 겹치지 않는 나머지를 최대 세 활성 구간으로 분할합니다. 원래 신청자·작성 시각·사용 목적을 유지하며 GPU별 잠금을 사용합니다. `tests/ad_gpu_slot_cancellation_access.sql`은 두 GPU·다시간 예약의 한 칸 취소, 나머지 GPU와 앞뒤 시간 보존, 오래된 ID·다른 팀·익명 차단을 롤백 검증합니다. 기존 GPU 회귀 테스트도 새 개별 취소 함수에 맞춰 갱신했습니다. 공유 CLI migration history에는 등록하지 않았으므로 `db push`로 재적용하지 않습니다.

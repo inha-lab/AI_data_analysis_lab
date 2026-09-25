@@ -22,7 +22,7 @@ export async function saveGpuReservation(input:ReservationInput){
   const {error}=await client().rpc('AD_save_gpu_reservation',{p_team:input.teamId,p_day:input.day,p_start:input.start,p_end:input.end,p_gpu_ids:gpuIds(input.choice),p_purpose:input.purpose.trim()})
   if(error)throw fail(error.code)
 }
-export async function cancelGpuReservation(id:string){
-  const {error}=await client().rpc('AD_cancel_gpu_reservation',{p_reservation:id})
-  if(error)throw fail(error.code)
+export async function cancelGpuReservationSlot(id:string,gpu:number,day:string,hour:number){
+  const {error}=await client().rpc('AD_cancel_gpu_reservation_slot',{p_reservation:id,p_gpu:gpu,p_day:day,p_hour:hour})
+  if(error)throw error.code==='23514'?new Error('해당 GPU·시간 예약이 변경되었습니다. 현황을 새로고침해 주세요.'):fail(error.code)
 }

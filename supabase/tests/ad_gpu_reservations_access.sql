@@ -28,13 +28,13 @@ set local role authenticated;
 do $$
 declare reservation uuid;
 begin
-  reservation:=public."AD_save_gpu_reservation"(current_setting('ad.gpu.team1')::uuid,current_date,'23:00','01:00',array[0]::smallint[],'Analysis');
+  reservation:=public."AD_save_gpu_reservation"(current_setting('ad.gpu.team1')::uuid,date '2099-01-03','23:00','01:00',array[0]::smallint[],'Analysis');
   perform set_config('ad.gpu.reservation1',reservation::text,true);
-  if not exists(select 1 from public."AD_gpu_day_schedule"(current_setting('ad.gpu.cohort')::uuid,current_date) where id=reservation and can_cancel and ends_at-starts_at=interval '2 hours') then raise exception 'Overnight reservation incorrect';end if;
-  if not exists(select 1 from public."AD_gpu_day_schedule"(current_setting('ad.gpu.cohort')::uuid,current_date+1) where id=reservation) then raise exception 'Overnight next-day view missing';end if;
-  begin perform public."AD_save_gpu_reservation"(current_setting('ad.gpu.team2')::uuid,current_date,'23:30','00:30',array[1]::smallint[],'Wrong team');raise exception 'Other team booked';exception when insufficient_privilege then null;end;
-  begin perform public."AD_save_gpu_reservation"(current_setting('ad.gpu.team1')::uuid,current_date,'23:30','00:30',array[0,1]::smallint[],'Conflict');raise exception 'Overlap allowed';exception when exclusion_violation then null;end;
-  begin perform public."AD_save_gpu_reservation"(current_setting('ad.gpu.team1')::uuid,current_date,'09:00','10:00',array[1,0]::smallint[],'Invalid order');raise exception 'Invalid GPU list allowed';exception when check_violation then null;end;
+  if not exists(select 1 from public."AD_gpu_day_schedule"(current_setting('ad.gpu.cohort')::uuid,date '2099-01-03') where id=reservation and can_cancel and ends_at-starts_at=interval '2 hours') then raise exception 'Overnight reservation incorrect';end if;
+  if not exists(select 1 from public."AD_gpu_day_schedule"(current_setting('ad.gpu.cohort')::uuid,date '2099-01-03'+1) where id=reservation) then raise exception 'Overnight next-day view missing';end if;
+  begin perform public."AD_save_gpu_reservation"(current_setting('ad.gpu.team2')::uuid,date '2099-01-03','23:30','00:30',array[1]::smallint[],'Wrong team');raise exception 'Other team booked';exception when insufficient_privilege then null;end;
+  begin perform public."AD_save_gpu_reservation"(current_setting('ad.gpu.team1')::uuid,date '2099-01-03','23:00','00:00',array[0,1]::smallint[],'Conflict');raise exception 'Overlap allowed';exception when exclusion_violation then null;end;
+  begin perform public."AD_save_gpu_reservation"(current_setting('ad.gpu.team1')::uuid,date '2099-01-03','09:00','10:00',array[1,0]::smallint[],'Invalid order');raise exception 'Invalid GPU list allowed';exception when check_violation then null;end;
   begin perform 1 from public."AD_gpu_reservations";raise exception 'Direct read allowed';exception when insufficient_privilege then null;end;
 end $$;
 reset role;
@@ -43,30 +43,35 @@ set local role authenticated;
 do $$
 declare reservation uuid;
 begin
-  if not exists(select 1 from public."AD_gpu_day_schedule"(current_setting('ad.gpu.cohort')::uuid,current_date) where id=current_setting('ad.gpu.reservation1')::uuid and not can_cancel) then raise exception 'Other team view or cancel flag incorrect';end if;
-  begin perform public."AD_cancel_gpu_reservation"(current_setting('ad.gpu.reservation1')::uuid);raise exception 'Other team cancelled';exception when insufficient_privilege then null;end;
-  reservation:=public."AD_save_gpu_reservation"(current_setting('ad.gpu.team2')::uuid,current_date,'23:30','00:30',array[1]::smallint[],'GPU 1');
+  if not exists(select 1 from public."AD_gpu_day_schedule"(current_setting('ad.gpu.cohort')::uuid,date '2099-01-03') where id=current_setting('ad.gpu.reservation1')::uuid and not can_cancel) then raise exception 'Other team view or cancel flag incorrect';end if;
+  begin perform public."AD_cancel_gpu_reservation_slot"(current_setting('ad.gpu.reservation1')::uuid,0::smallint,date '2099-01-03',23::smallint);raise exception 'Other team cancelled';exception when insufficient_privilege then null;end;
+  reservation:=public."AD_save_gpu_reservation"(current_setting('ad.gpu.team2')::uuid,date '2099-01-03','23:00','00:00',array[1]::smallint[],'GPU 1');
   perform set_config('ad.gpu.reservation2',reservation::text,true);
-  begin perform public."AD_save_gpu_reservation"(current_setting('ad.gpu.team2')::uuid,current_date,'23:30','00:30',array[0,1]::smallint[],'Both conflict');raise exception 'Partial GPU reservation allowed';exception when exclusion_violation then null;end;
-  if (select count(*) from public."AD_gpu_day_schedule"(current_setting('ad.gpu.cohort')::uuid,current_date))<>2 then raise exception 'Failed both reservation created partial row';end if;
-  perform public."AD_cancel_gpu_reservation"(reservation);
+  begin perform public."AD_save_gpu_reservation"(current_setting('ad.gpu.team2')::uuid,date '2099-01-03','23:00','00:00',array[0,1]::smallint[],'Both conflict');raise exception 'Partial GPU reservation allowed';exception when exclusion_violation then null;end;
+  if (select count(*) from public."AD_gpu_day_schedule"(current_setting('ad.gpu.cohort')::uuid,date '2099-01-03')
+    where team_id in (current_setting('ad.gpu.team1')::uuid,current_setting('ad.gpu.team2')::uuid))<>2 then raise exception 'Failed both reservation created partial row';end if;
+  perform public."AD_cancel_gpu_reservation_slot"(reservation,1::smallint,date '2099-01-03',23::smallint);
 end $$;
 reset role;
 do $$begin perform set_config('request.jwt.claim.sub',current_setting('ad.gpu.student1'),true);end $$;
 set local role authenticated;
 do $$
-declare reservation uuid;
+declare reservation uuid; remaining uuid;
 begin
-  perform public."AD_cancel_gpu_reservation"(current_setting('ad.gpu.reservation1')::uuid);
-  reservation:=public."AD_save_gpu_reservation"(current_setting('ad.gpu.team1')::uuid,current_date,'23:00','01:00',array[0,1]::smallint[],'Both GPUs');
-  if not exists(select 1 from public."AD_gpu_day_schedule"(current_setting('ad.gpu.cohort')::uuid,current_date) where id=reservation and gpu_ids=array[0,1]::smallint[]) then raise exception 'Both GPU booking failed';end if;
+  perform public."AD_cancel_gpu_reservation_slot"(current_setting('ad.gpu.reservation1')::uuid,0::smallint,date '2099-01-03',23::smallint);
+  select id into strict remaining from public."AD_gpu_day_schedule"(current_setting('ad.gpu.cohort')::uuid,date '2099-01-03'+1)
+    where team_id=current_setting('ad.gpu.team1')::uuid and gpu_ids=array[0]::smallint[];
+  perform public."AD_cancel_gpu_reservation_slot"(remaining,0::smallint,date '2099-01-03'+1,0::smallint);
+  reservation:=public."AD_save_gpu_reservation"(current_setting('ad.gpu.team1')::uuid,date '2099-01-03','23:00','01:00',array[0,1]::smallint[],'Both GPUs');
+  if not exists(select 1 from public."AD_gpu_day_schedule"(current_setting('ad.gpu.cohort')::uuid,date '2099-01-03') where id=reservation and gpu_ids=array[0,1]::smallint[]) then raise exception 'Both GPU booking failed';end if;
 end $$;
 reset role;
 do $$begin perform set_config('request.jwt.claim.sub',current_setting('ad.gpu.actor'),true);end $$;
 set local role authenticated;
 do $$begin
-  if (select count(*) from public."AD_gpu_day_schedule"(current_setting('ad.gpu.cohort')::uuid,current_date))<>1 then raise exception 'Professor schedule incorrect';end if;
-  begin perform public."AD_save_gpu_reservation"(current_setting('ad.gpu.team1')::uuid,current_date,'09:00','10:00',array[0]::smallint[],'Professor');raise exception 'Professor booked';exception when insufficient_privilege then null;end;
+  if (select count(*) from public."AD_gpu_day_schedule"(current_setting('ad.gpu.cohort')::uuid,date '2099-01-03')
+    where team_id in (current_setting('ad.gpu.team1')::uuid,current_setting('ad.gpu.team2')::uuid))<>1 then raise exception 'Professor schedule incorrect';end if;
+  perform public."AD_save_gpu_reservation"(current_setting('ad.gpu.team1')::uuid,date '2099-01-03','09:00','10:00',array[0]::smallint[],'Professor');
 end $$;
 reset role;
 do $$
@@ -75,12 +80,12 @@ begin
   insert into public."AD_cohorts"(name) values('AD_GPU_OTHER_PROGRAM_'||suffix) returning id into other_cohort;
   insert into public."AD_teams"(cohort_id,name) values(other_cohort,'Private GPU Team') returning id into other_team;
   insert into public."AD_gpu_reservations"(cohort_id,team_id,gpu_ids,starts_at,ends_at,purpose,requested_by)
-    values(other_cohort,other_team,array[0]::smallint[],(current_date+time '12:00') at time zone 'Asia/Seoul',(current_date+time '13:00') at time zone 'Asia/Seoul','Private purpose',current_setting('ad.gpu.actor')::uuid);
+    values(other_cohort,other_team,array[0]::smallint[],(date '2099-01-03'+time '12:00') at time zone 'Asia/Seoul',(date '2099-01-03'+time '13:00') at time zone 'Asia/Seoul','Private purpose',current_setting('ad.gpu.actor')::uuid);
 end $$;
 do $$begin perform set_config('request.jwt.claim.sub',current_setting('ad.gpu.student1'),true);end $$;
 set local role authenticated;
 do $$begin
-  if not exists(select 1 from public."AD_gpu_day_schedule"(current_setting('ad.gpu.cohort')::uuid,current_date)
+  if not exists(select 1 from public."AD_gpu_day_schedule"(current_setting('ad.gpu.cohort')::uuid,date '2099-01-03')
     where program_name='다른 프로그램' and team_name='다른 프로그램' and team_id is null and purpose='예약 중' and not can_cancel)
     then raise exception 'Cross-program availability or redaction failed';end if;
 end $$;
@@ -88,7 +93,7 @@ reset role;
 do $$begin perform set_config('request.jwt.claim.sub','',true);end $$;
 set local role anon;
 do $$begin
-  begin perform public."AD_gpu_day_schedule"(current_setting('ad.gpu.cohort')::uuid,current_date);raise exception 'Anonymous schedule';exception when insufficient_privilege then null;end;
+  begin perform public."AD_gpu_day_schedule"(current_setting('ad.gpu.cohort')::uuid,date '2099-01-03');raise exception 'Anonymous schedule';exception when insufficient_privilege then null;end;
 end $$;
 reset role;
 select 'AD GPU reservations overnight, atomic overlap, cancellation and roles passed; fixtures rolled back' as result;
