@@ -162,4 +162,6 @@ RLS와 `AD_save_report`·`AD_review_report` 함수가 현재 활성 팀원과 �
 
 `migrations/20260926000300_ad_monitoring_deliverables.sql`은 교수 전용 `AD_program_monitoring()`에 팀별 산출물 건수, 산출물 등록 팀 수, 전체 건수를 추가합니다. 기존 산출물 테이블을 읽기 전용으로 집계하며 변경하지 않습니다.
 
+`migrations/20260926000400_ad_monitoring_review_queue.sql`은 같은 집계에 상태가 `submitted`인 보고서의 전체·팀별 검토 대기 건수를 추가합니다. `tests/ad_monitoring_access.sql`이 집계와 학생·익명 접근 차단을 롤백 검증합니다.
+
 `migrations/20260926000100_ad_team_member_roles_fix.sql`은 최초 적용 후 발견된 역할 검증 함수의 변수명 충돌을 수정합니다. 이미 적용된 공유 DB에는 보정 마이그레이션도 적용했으며, 두 파일 모두 CLI migration history에 등록하지 않았습니다.

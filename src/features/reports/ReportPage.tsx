@@ -1,5 +1,5 @@
 import { useEffect, useState, type FormEvent } from 'react'
-import { Link, useBlocker, useParams } from 'react-router-dom'
+import { Link, useBlocker, useParams, useSearchParams } from 'react-router-dom'
 import { useAuth } from '@/features/auth/auth-context'
 import { Button } from '@/components/ui/button'
 import { formatScheduleTime } from '@/features/schedules/schedule-model'
@@ -67,12 +67,14 @@ function ReportReview({report,onSaved,onLockedChange,onCancel}:{report:Report;on
 }
 function ReportWorkspace({teamId}:{teamId:string}) {
   const {profile}=useAuth()
+  const [searchParams,setSearchParams]=useSearchParams()
   const manage=profile?.role==='professor'
   const [revision,setRevision]=useState(0)
   const [result,setResult]=useState<{revision:number;data:Awaited<ReturnType<typeof loadReports>>|null;error:string}|null>(null)
   const [selected,setSelected]=useState<string|null>(null)
   const [typeFilter,setTypeFilter]=useState<'all'|ReportType>('all')
-  const [statusFilter,setStatusFilter]=useState('all')
+  const requestedStatus=searchParams.get('status')
+  const statusFilter=requestedStatus==='draft'||requestedStatus==='submitted'||requestedStatus==='reviewed'?requestedStatus:'all'
   const [locked,setLocked]=useState(false)
   const [reviewing,setReviewing]=useState(false)
   const [notice,setNotice]=useState('')
@@ -99,7 +101,7 @@ function ReportWorkspace({teamId}:{teamId:string}) {
     {notice&&<p className="success-message" role="status">{notice}</p>}
     <section className="panel"><div className="section-heading"><h2>보고서 목록 · {reports.length}건</h2>{!manage&&<div className="button-row"><Button onClick={()=>choose('new-daily')}>일일 보고 작성</Button><Button className="button-secondary" onClick={()=>choose('new-weekly')}>주간 보고 작성</Button></div>}</div>
       <div className="list-toolbar schedule-toolbar"><select aria-label="보고 구분 필터" value={typeFilter} onChange={e=>setTypeFilter(e.target.value as 'all'|ReportType)}><option value="all">전체 구분</option><option value="daily">일일 보고</option><option value="weekly">주간 보고</option></select>
-        <select aria-label="보고 상태 필터" value={statusFilter} onChange={e=>setStatusFilter(e.target.value)}><option value="all">전체 상태</option><option value="draft">작성 중</option><option value="submitted">제출</option><option value="reviewed">검토 완료</option></select>
+        <select aria-label="보고 상태 필터" value={statusFilter} onChange={e=>{const value=e.target.value;setSearchParams(value==='all'?{}:{status:value})}}><option value="all">전체 상태</option><option value="draft">작성 중</option><option value="submitted">제출</option><option value="reviewed">검토 완료</option></select>
         <Button className="button-secondary" disabled={locked} onClick={reload}>새로고침</Button></div>
       {!list.length?<div className="empty-state"><h2>{reports.length?'필터에 맞는 보고서가 없습니다.':'아직 등록된 보고서가 없습니다.'}</h2></div>
         :<div className="schedule-list">{list.map(report=><article className="report-row" key={report.id}><div><span className="badge">{reportTypeLabels[report.report_type]} · {report.round_number}회차</span> <span className={`badge ${report.status==='reviewed'?'status-active':'status-draft'}`}>{reportStatusLabels[report.status]}</span><h3>{report.title}</h3><p className="field-help">작성일 {report.report_date} · 최종 변경 {report.updated_name} · {formatScheduleTime(report.updated_at)} (KST)</p></div><Button className="button-secondary" onClick={()=>choose(report.id)}>내용 {manage?'조회':'조회·수정'}</Button></article>)}</div>}
