@@ -24,6 +24,11 @@ export async function listAnnouncements(cohortId:string){
   }
   return rows
 }
+export async function listRecentAnnouncements(cohortId:string,limit=3){
+  const {data,error}=await client().from('AD_announcements').select('id,cohort_id,title,body,is_pinned,author_id,author_name,created_at,updated_at').eq('cohort_id',cohortId).order('is_pinned',{ascending:false}).order('created_at',{ascending:false}).order('id',{ascending:false}).limit(limit)
+  if(error)throw fail(error.code)
+  return data as Announcement[]
+}
 export async function saveAnnouncement(cohortId:string,input:AnnouncementInput,previous:Announcement|null){
   const validation=validateAnnouncement(input);if(validation)throw new Error(validation)
   const {error}=await client().rpc('AD_save_announcement',{p_cohort:cohortId,p_announcement:previous?.id??null,p_version:previous?.updated_at??null,p_title:input.title.trim(),p_body:input.body.trim(),p_pinned:input.is_pinned})

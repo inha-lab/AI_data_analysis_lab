@@ -157,6 +157,10 @@ footer { margin-top: 40px; border-top: 1px solid #dce3eb; padding: 24px 0; color
 .student-upcoming-schedules { display: grid; gap: 8px; list-style: none; padding: 0; margin: 0; }
 .student-upcoming-schedules li { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; font-size: 13px; }
 .student-upcoming-schedules li > span:last-child { margin-left: auto; color: #52677b; }
+.student-announcement-list { display: grid; gap: 8px; list-style: none; padding: 0; margin: 0; }
+.student-announcement-list li { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; font-size: 13px; }
+.student-announcement-time { margin-left: auto; color: #52677b; }
+.student-announcement-preview { flex-basis: 100%; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden; margin: 0; color: #52677b; white-space: pre-wrap; }
 @media(max-width:520px) { .student-work-summary { grid-template-columns: 1fr; } }
 .schedule-toolbar { margin: 18px 0; }
 .schedule-list { display: grid; gap: 16px; }
