@@ -166,4 +166,6 @@ RLS와 `AD_save_report`·`AD_review_report` 함수가 현재 활성 팀원과 �
 
 `migrations/20260926000500_ad_monitoring_review_items.sql`은 교수 전용 진행 현황 응답에 제출된 보고서의 검토 대기 목록을 오래된 제출 순으로 추가합니다. 응답에는 해당 보고서와 팀 식별자, 제목, 구분·회차, 제출 시각만 포함합니다.
 
+`migrations/20260926000600_ad_monitoring_proposal_queue.sql`은 제출된 기획서의 검토 대기 건수와 제목·팀·제출 시각 목록을 추가합니다. 초안과 검토 완료 기획서는 포함하지 않으며 교수 전용 접근 검사는 그대로 유지합니다.
+
 `migrations/20260926000100_ad_team_member_roles_fix.sql`은 최초 적용 후 발견된 역할 검증 함수의 변수명 충돌을 수정합니다. 이미 적용된 공유 DB에는 보정 마이그레이션도 적용했으며, 두 파일 모두 CLI migration history에 등록하지 않았습니다.

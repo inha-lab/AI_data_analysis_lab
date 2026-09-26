@@ -31,6 +31,7 @@ do $$
 declare result jsonb:=public."AD_program_monitoring"(current_setting('ad.monitor_cohort')::uuid);
 begin
   if (result->>'active_participants')::int<>1 or (result->>'team_count')::int<>2 or (result->>'proposal_submitted')::int<>1 then raise exception 'Summary incorrect: %',result;end if;
+  if (result->>'proposals_awaiting_review')::int<>1 or jsonb_array_length(result->'proposal_review_queue')<>1 or (result #>> '{proposal_review_queue,0,team_name}')<>'Alpha' or (result #>> '{proposal_review_queue,0,title}')<>'Proposal' then raise exception 'Proposal review queue incorrect: %',result;end if;
   if (result->>'deliverable_submitted_teams')::int<>1 or (result->>'deliverable_count')::int<>2 then raise exception 'Deliverable summary incorrect: %',result;end if;
   if (result->>'reports_awaiting_review')::int<>1 then raise exception 'Review queue total incorrect: %',result;end if;
   if jsonb_array_length(result->'review_queue')<>1 or (result #>> '{review_queue,0,team_name}')<>'Alpha' or (result #>> '{review_queue,0,title}')<>'Daily' or (result #>> '{review_queue,0,report_type}')<>'daily' then raise exception 'Review queue item incorrect: %',result;end if;
