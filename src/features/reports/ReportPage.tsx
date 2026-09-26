@@ -71,7 +71,7 @@ function ReportWorkspace({teamId}:{teamId:string}) {
   const manage=profile?.role==='professor'
   const [revision,setRevision]=useState(0)
   const [result,setResult]=useState<{revision:number;data:Awaited<ReturnType<typeof loadReports>>|null;error:string}|null>(null)
-  const [selected,setSelected]=useState<string|null>(null)
+  const [selected,setSelected]=useState<string|null>(()=>searchParams.get('report'))
   const [typeFilter,setTypeFilter]=useState<'all'|ReportType>('all')
   const requestedStatus=searchParams.get('status')
   const statusFilter=requestedStatus==='draft'||requestedStatus==='submitted'||requestedStatus==='reviewed'?requestedStatus:'all'

@@ -244,6 +244,10 @@ footer { margin-top: 40px; border-top: 1px solid #dce3eb; padding: 24px 0; color
 .monitoring-table th { color: #52677b; font-size: .85rem; }
 .monitoring-table small { display: block; color: #52677b; margin-top: .35rem; }
 .monitoring-rounds { display: grid; gap: .8rem; }
+.monitoring-review-queue { display: grid; gap: 0; list-style: none; padding: 0; margin: 0 0 24px; }
+.monitoring-review-queue li { display: flex; justify-content: space-between; gap: 12px; padding: 10px 0; border-bottom: 1px solid #e5ebf1; }
+.monitoring-review-queue li span { color: #52677b; font-size: 13px; text-align: right; }
+@media(max-width:760px) { .monitoring-review-queue li { flex-direction: column; gap: 3px; } .monitoring-review-queue li span { text-align: left; } }
 .monitoring-round { border: 1px solid #dce3eb; border-radius: 10px; padding: 1rem; }
 .monitoring-round > div { display: flex; justify-content: space-between; gap: 1rem; }
 .full-report { background: white; border: 1px solid #dce3eb; border-radius: 12px; padding: 2rem; max-width: 1000px; margin: 1.5rem auto; }

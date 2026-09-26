@@ -33,6 +33,7 @@ begin
   if (result->>'active_participants')::int<>1 or (result->>'team_count')::int<>2 or (result->>'proposal_submitted')::int<>1 then raise exception 'Summary incorrect: %',result;end if;
   if (result->>'deliverable_submitted_teams')::int<>1 or (result->>'deliverable_count')::int<>2 then raise exception 'Deliverable summary incorrect: %',result;end if;
   if (result->>'reports_awaiting_review')::int<>1 then raise exception 'Review queue total incorrect: %',result;end if;
+  if jsonb_array_length(result->'review_queue')<>1 or (result #>> '{review_queue,0,team_name}')<>'Alpha' or (result #>> '{review_queue,0,title}')<>'Daily' or (result #>> '{review_queue,0,report_type}')<>'daily' then raise exception 'Review queue item incorrect: %',result;end if;
   if jsonb_array_length(result->'teams')<>2 or jsonb_array_length(result->'rounds')<>1 then raise exception 'Team/round count incorrect: %',result;end if;
   if (result #>> '{rounds,0,submitted_teams}')::int<>1 or jsonb_array_length(result #> '{rounds,0,missing_teams}')<>1 or result #>> '{rounds,0,missing_teams,0,name}'<>'Beta' then raise exception 'Missing team calculation incorrect: %',result;end if;
   if (result #>> '{teams,0,reports_needing_attention}')::int<>1 then raise exception 'Issue count incorrect: %',result;end if;
