@@ -150,6 +150,11 @@ footer { margin-top: 40px; border-top: 1px solid #dce3eb; padding: 24px 0; color
 .student-team-members li > span:last-child { color: #62768a; }
 .student-deliverable-count { margin: 0 0 10px; color: #52677b; font-size: 13px; }
 .student-deliverable-count strong { color: #102e4c; font-size: 22px; }
+.student-work-summary { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 8px; }
+.student-work-summary a { display: grid; gap: 5px; min-width: 0; padding: 10px; border: 1px solid #cbdfea; border-radius: 8px; color: #1269a6; background: #f5faff; }
+.student-work-summary a:hover,.student-work-summary a:focus-visible { background: #e8f4fc; }
+.student-work-summary span { font-size: 12px; color: #52677b; overflow-wrap: anywhere; }
+@media(max-width:520px) { .student-work-summary { grid-template-columns: 1fr; } }
 .schedule-toolbar { margin: 18px 0; }
 .schedule-list { display: grid; gap: 16px; }
 .schedule-card { border: 1px solid #dce3eb; border-left: 4px solid #2883cc; border-radius: 10px; padding: 20px; background: white; min-width: 0; }
