@@ -4,6 +4,11 @@ export type GpuReservation={id:string;team_id:string|null;program_name:string;te
 export type GpuApplicationSegment={gpu_ids:number[];starts_at:string;ends_at:string}
 export type GpuApplication={application_id:string;team_id:string|null;program_name:string;team_name:string;purpose:string;requester_name:string|null;starts_at:string;ends_at:string;segments:GpuApplicationSegment[];can_cancel:boolean}
 export type TeamOption={id:string;name:string;topic:string}
+export function upcomingTeamApplications(applications:GpuApplication[],teamId:string,now=Date.now(),limit=3){
+  return applications.filter(item=>item.team_id===teamId&&Date.parse(item.ends_at)>now)
+    .sort((left,right)=>Math.max(Date.parse(left.starts_at),now)-Math.max(Date.parse(right.starts_at),now)||Date.parse(left.ends_at)-Date.parse(right.ends_at))
+    .slice(0,limit)
+}
 export function kstDay(date=new Date()){
   const parts=new Intl.DateTimeFormat('en-US',{timeZone:'Asia/Seoul',year:'numeric',month:'2-digit',day:'2-digit'}).formatToParts(date)
   const part=(name:string)=>parts.find(item=>item.type===name)?.value??''
