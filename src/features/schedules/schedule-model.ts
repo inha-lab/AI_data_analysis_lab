@@ -31,6 +31,11 @@ export function scheduleState(schedule: Pick<Schedule, 'starts_at' | 'ends_at' |
   if (now < Date.parse(schedule.starts_at) || schedule.kind === 'deadline') return '예정'
   return '진행 중'
 }
+export function upcomingSchedules(schedules: Schedule[], now = Date.now(), limit = 3): Schedule[] {
+  return schedules.filter(item => !item.is_cancelled && Date.parse(item.ends_at) >= now)
+    .sort((left, right) => Math.max(Date.parse(left.starts_at), now) - Math.max(Date.parse(right.starts_at), now) || Date.parse(left.ends_at) - Date.parse(right.ends_at))
+    .slice(0, limit)
+}
 export function formatScheduleTime(iso: string) {
   return new Intl.DateTimeFormat('ko-KR', { timeZone: 'Asia/Seoul', year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', hour12: false }).format(new Date(iso))
 }

@@ -154,6 +154,9 @@ footer { margin-top: 40px; border-top: 1px solid #dce3eb; padding: 24px 0; color
 .student-work-summary a { display: grid; gap: 5px; min-width: 0; padding: 10px; border: 1px solid #cbdfea; border-radius: 8px; color: #1269a6; background: #f5faff; }
 .student-work-summary a:hover,.student-work-summary a:focus-visible { background: #e8f4fc; }
 .student-work-summary span { font-size: 12px; color: #52677b; overflow-wrap: anywhere; }
+.student-upcoming-schedules { display: grid; gap: 8px; list-style: none; padding: 0; margin: 0; }
+.student-upcoming-schedules li { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; font-size: 13px; }
+.student-upcoming-schedules li > span:last-child { margin-left: auto; color: #52677b; }
 @media(max-width:520px) { .student-work-summary { grid-template-columns: 1fr; } }
 .schedule-toolbar { margin: 18px 0; }
 .schedule-list { display: grid; gap: 16px; }

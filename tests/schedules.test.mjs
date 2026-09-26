@@ -1,6 +1,6 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
-import { fromKstInput, toKstInput, validateSchedule, scheduleState, formatScheduleTime } from '../src/features/schedules/schedule-model.ts'
+import { fromKstInput, toKstInput, validateSchedule, scheduleState, formatScheduleTime, upcomingSchedules } from '../src/features/schedules/schedule-model.ts'
 const input = { title: 'Design review', description: '', stage: 'design', kind: 'event', starts_at: '2026-09-24T00:00:00Z', ends_at: '2026-09-24T01:00:00Z', is_public: false, is_cancelled: false }
 test('KST input and display do not depend on browser timezone and preserve date boundaries', () => {
   assert.equal(fromKstInput('2026-09-24T00:30'), '2026-09-23T15:30:00.000Z')
@@ -26,4 +26,16 @@ test('schedule state handles event boundaries, deadlines and cancellations', () 
   assert.equal(scheduleState(input, end + 1), '종료')
   assert.equal(scheduleState({ ...input, kind: 'deadline', ends_at: input.starts_at }, start + 1), '마감')
   assert.equal(scheduleState({ ...input, is_cancelled: true }, start), '취소')
+})
+test('dashboard keeps ongoing and upcoming schedules, omitting past and cancelled items', () => {
+  const now = Date.parse('2026-09-24T00:30:00Z')
+  const schedules = [
+    { ...input, id: 'future', starts_at: '2026-09-24T03:00:00Z', ends_at: '2026-09-24T04:00:00Z' },
+    { ...input, id: 'past', starts_at: '2026-09-23T00:00:00Z', ends_at: '2026-09-23T01:00:00Z' },
+    { ...input, id: 'cancelled', is_cancelled: true },
+    { ...input, id: 'ongoing' },
+    { ...input, id: 'deadline', kind: 'deadline', starts_at: '2026-09-24T02:00:00Z', ends_at: '2026-09-24T02:00:00Z' },
+  ]
+  assert.deepEqual(upcomingSchedules(schedules, now).map(item => item.id), ['ongoing', 'deadline', 'future'])
+  assert.deepEqual(upcomingSchedules(schedules, now, 2).map(item => item.id), ['ongoing', 'deadline'])
 })
