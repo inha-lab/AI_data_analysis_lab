@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
-import { Plus, RefreshCw } from 'lucide-react'
+import { Plus, RefreshCw, Search } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { useCohorts } from '@/features/cohorts/use-cohorts'
 import type { Cohort } from '@/features/cohorts/cohort-model'
@@ -17,11 +17,12 @@ function ParticipantWorkspace({ cohort, onEditingChange }: { cohort: Cohort; onE
   function updateEditor(value: Participant | 'new' | null) { setEditor(value); onEditingChange(Boolean(value)) }
   const [operationBusy, setOperationBusy] = useState(false)
   function operation(value: boolean) { setOperationBusy(value); onEditingChange(value) }
-  const [search, setSearch] = useState('')
+  const [searchInput, setSearchInput] = useState('')
+  const [searchKeyword, setSearchKeyword] = useState('')
   const [status, setStatus] = useState('active')
   const [sort, setSort] = useState<{ key: SortKey; asc: boolean }>({ key: 'full_name', asc: true })
   const [notice, setNotice] = useState('')
-  const query = search.toLowerCase().trim()
+  const query = searchKeyword.toLowerCase()
   const visible = participants.filter(item => (status === 'all' || item.status === status) && [item.full_name, item.student_number, item.email, item.department].some(value => value.toLowerCase().includes(query)))
     .sort((left, right) => (sort.asc ? 1 : -1) * left[sort.key].localeCompare(right[sort.key], 'ko', { numeric: true }))
   function saved(value: Participant) { updateEditor(null); setNotice(`${value.full_name} 님의 참가 정보를 저장했습니다.`); reload() }
@@ -34,9 +35,10 @@ function ParticipantWorkspace({ cohort, onEditingChange }: { cohort: Cohort; onE
     <AccountProvisioning participants={participants} onChanged={reload} onBusy={operation} locked={Boolean(editor) || operationBusy || loading || Boolean(error)} />
     <ExcelImport cohortId={cohort.id} cohortName={cohort.name} existing={participants} onChanged={reload} onBusy={operation} locked={Boolean(editor) || operationBusy || loading || Boolean(error)} />
     <section className="panel participants-panel" aria-label="참가자 목록"><div className="list-toolbar">
-      <div><label className="sr-only" htmlFor="participant-search">참가자 검색</label><input id="participant-search" type="search" placeholder="이름 · 학번 · 이메일 · 학과 검색" value={search} onChange={event => setSearch(event.target.value)} /></div>
+      <form className="participant-search-form" role="search" onSubmit={event=>{event.preventDefault();setSearchKeyword(searchInput.trim())}}><label className="sr-only" htmlFor="participant-search">참가자 검색</label><input id="participant-search" type="search" placeholder="이름 · 학번 · 이메일 · 학과 검색" value={searchInput} onChange={event => setSearchInput(event.target.value)} /><Button type="submit"><Search size={16} aria-hidden="true" /> 검색</Button></form>
       <label className="sr-only" htmlFor="participant-filter">참여 상태</label><select id="participant-filter" value={status} onChange={event => setStatus(event.target.value)}>{Object.entries(participantStatusLabels).map(([value,label])=><option key={value} value={value}>{label}</option>)}<option value="all">전체 상태</option></select>
       <Button className="button-secondary" onClick={reload} disabled={loading || operationBusy} aria-label="참가자 목록 새로고침"><RefreshCw size={16} aria-hidden="true" /></Button></div>
+      {!loading&&!error&&<p className="field-help" role="status">전체 {participants.length}명 · 표시 {visible.length}명{searchKeyword&&` · 검색어: ${searchKeyword}`}</p>}
       {loading ? <p className="empty-state" role="status">참가자를 불러오고 있습니다.</p> : error ? <div className="empty-state" role="alert"><p>{error}</p><Button onClick={reload}>다시 시도</Button></div>
         : !visible.length ? <div className="empty-state"><h2>{participants.length ? '검색 결과가 없습니다.' : '등록된 참가자가 없습니다.'}</h2><p>{participants.length ? '검색어나 참여 상태를 변경해 보세요.' : '선발된 참가자의 정보를 등록해 주세요.'}</p></div>
         : <div className="table-scroll"><table className="data-table"><caption className="sr-only">{cohort.name} 참가자 {visible.length}명</caption><thead><tr><th scope="col">번호</th>
