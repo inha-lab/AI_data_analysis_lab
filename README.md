@@ -22,6 +22,7 @@ Supabase 연결 준비 시 `.env.example`을 `.env.local`로 복사하고 설정
 - `supabase/migrations/`: DB 및 RLS 변경 SQL과 적용 기록
 - `supabase/functions/`: 계정 생성·연결, 최초 비밀번호 변경 서버 함수
 - `.github/workflows/ci.yml`: lint와 빌드 검증
+- `.github/workflows/deploy-pages.yml`: `main` 브랜치 GitHub Pages 자동 배포
 
 ## 현재 범위
 
@@ -40,7 +41,7 @@ Supabase 연결 준비 시 `.env.example`을 `.env.local`로 복사하고 설정
 
 학생 대시보드의 나의 프로그램 카드는 팀·팀원·자료 제출·GPU 예약 정보에 집중하도록 중요·최근 공지와 다가오는 일정·마감 요약을 표시하지 않습니다. 공지사항과 프로그램 일정은 각각 사이드바 메뉴에서 확인합니다.
 
-GitHub Pages 경로는 `/AI_data_analysis_lab/`입니다. 초기 골격은 새로고침을 지원하기 위해 해시 라우팅(`#`)을 사용하며, 명세서의 일반 경로 복원 방식은 후속 구현 대상입니다.
+GitHub Pages 공개 주소는 `https://inha-lab.github.io/AI_data_analysis_lab/`입니다. `main` 브랜치에 푸시하면 GitHub Actions가 Vite 앱을 빌드해 자동 배포합니다. 저장소 Actions secret `VITE_SUPABASE_ANON_KEY`가 필요하며 프로젝트 URL과 `/AI_data_analysis_lab/` 기본 경로는 워크플로에 설정되어 있습니다. 해시 라우팅(`#`)을 사용하므로 Pages에서 보호 화면을 새로고침해도 경로 오류가 발생하지 않습니다.
 
 상세 요구사항: [개발 명세서](INHA_AI_data_analysis_lab.md)
 
