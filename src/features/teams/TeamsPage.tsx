@@ -6,7 +6,7 @@ import { useCohorts } from '@/features/cohorts/use-cohorts'
 import type { Cohort } from '@/features/cohorts/cohort-model'
 import { Button } from '@/components/ui/button'
 import { deleteEmptyTeam, loadTeamDocumentCounts, loadTeams, updateTeamMemberRole, type TeamDocumentCounts } from './team-api'
-import { jobSummary, safeTeamUrl, teamStages, type Team, type TeamMember } from './team-model'
+import { safeTeamUrl, teamStages, type Team, type TeamMember } from './team-model'
 import { TeamEditor } from './TeamEditor'
 
 function RoleEditor({teamId,member,canEdit,onSaved}:{teamId:string;member:TeamMember;canEdit:boolean;onSaved:()=>void}) {
@@ -27,13 +27,13 @@ function RoleEditor({teamId,member,canEdit,onSaved}:{teamId:string;member:TeamMe
 function TeamCard({team,members,manage,readOnly,counts,editing,deleting,myParticipantId,onRoleSaved,onEdit,onDelete}:{team:Team;members:TeamMember[];manage:boolean;readOnly:boolean;counts:TeamDocumentCounts|null|undefined;editing:boolean;deleting:boolean;myParticipantId:string|null;onRoleSaved:()=>void;onEdit:()=>void;onDelete:()=>void}){
   const leader=members.find(item=>item.is_leader)
   const canEditAll=leader?.participant_id===myParticipantId
-  return <article className={manage?'team-overview-card admin-team-card':'team-overview-card student-team-card'}><div className="team-overview-heading"><span className="badge">{teamStages[team.stage]}</span><span className="field-help">{members.length}명</span></div>
-    <h2>{team.name}</h2><p className="team-overview-topic">{team.topic||'프로젝트 주제 미등록'}</p>
+  return <article className={manage?'team-overview-card admin-team-card':'team-overview-card student-team-card'}><div className="team-overview-heading"><span className="badge">{teamStages[team.stage]}</span>{!manage&&<span className="field-help">{members.length}명</span>}</div>
+    <h2>{team.name}{manage&&<span className="team-member-count">{members.length}명</span>}</h2><p className="team-overview-topic">{team.topic||'프로젝트 주제 미등록'}</p>
     <p className="team-overview-leader">팀장 <strong>{leader?.full_name||'미지정'}</strong></p>
     {manage?<div className="team-overview-links"><Link to={`/teams/${team.id}/proposal`}>기획서 →</Link><Link to={`/teams/${team.id}/reports`}>보고서 →</Link><Link to={`/teams/${team.id}/deliverables`}>산출물 →</Link><Link to={`/teams/${team.id}/full-report`}>전체리포트 →</Link></div>:<nav className="student-team-nav" aria-label={`${team.name} 작업 바로가기`}><Link to={`/teams/${team.id}/proposal`}><strong>기획서 <span>{counts?`${counts.proposal}건`:'—건'}</span></strong><span>작성·제출·검토 확인</span></Link><Link to={`/teams/${team.id}/reports`}><strong>보고서 <span>{counts?`${counts.reports}건`:'—건'}</span></strong><span>일일·주간 보고</span></Link><Link to={`/teams/${team.id}/deliverables`}><strong>산출물 <span>{counts?`${counts.deliverables}건`:'—건'}</span></strong><span>링크 자료 제출·조회</span></Link><Link to={`/teams/${team.id}/full-report`}><strong>전체리포트 →</strong><span>팀 자료 통합 보기</span></Link></nav>}
+    {manage&&<section className="admin-team-roster" aria-label={`${team.name} 팀원 정보`}><h3>팀원 정보</h3>{members.length?<ul>{members.map(member=><li key={member.participant_id}><strong>{member.full_name}{member.is_leader&&<span className="badge status-active">팀장</span>}</strong><span>{member.department}</span><span>{member.grade}</span><span>역할: {member.role_title||'미지정'}{!member.is_active?' · 비활성':''}</span></li>)}</ul>:<p className="field-help">배정된 팀원이 없습니다.</p>}</section>}
     {!manage&&<section className="student-team-roster" aria-label="팀원 역할"><h3>팀원 역할 · {members.length}명</h3>{members.length?<ul>{members.map(member=><li key={member.participant_id}><strong>{member.full_name}</strong><span className={member.is_leader?'badge status-active':'badge'}>{member.is_leader?'팀장':'팀원'}</span>{!member.is_active&&<span className="badge">비활성</span>}<RoleEditor teamId={team.id} member={member} canEdit={Boolean(!readOnly&&myParticipantId&&(canEditAll||myParticipantId===member.participant_id))} onSaved={onRoleSaved}/></li>)}</ul>:<p className="field-help">배정된 팀원이 없습니다.</p>}</section>}
-    <details className="team-overview-details"><summary>{manage?'팀원·직무·링크 자세히':'외부 링크 자세히'}</summary>{manage&&<p className="field-help">{jobSummary(members)}</p>}
-      {manage&&(members.length?<ul className="team-roster">{members.map(member=><li key={member.participant_id}><strong>{member.full_name}</strong> {member.is_leader&&<span className="badge status-active">팀장</span>} {!member.is_active&&<span className="badge">비활성</span>}<span>{member.department} · {member.grade} · 역할: {member.role_title||'미지정'}</span></li>)}</ul>:<p className="field-help">배정된 팀원이 없습니다.</p>)}
+    <details className="team-overview-details"><summary>외부 링크 자세히</summary>
       <div className="button-row">{([['Notion',team.notion_url],['GitHub',team.github_url],['데모',team.demo_url]] as const).map(([label,value])=>{const url=safeTeamUrl(value);return url?<a key={label} href={url} target="_blank" rel="noopener noreferrer" className="text-link">{label} ↗</a>:null})}</div>
     </details>
     <div className="team-overview-actions">{!readOnly&&<Button className="button-secondary" disabled={editing||deleting} onClick={onEdit}>{manage?'팀 수정':'프로젝트 수정'}</Button>}{manage&&!members.length&&<Button className="button-secondary" disabled={editing||deleting} onClick={onDelete}>빈 팀 삭제</Button>}</div>
