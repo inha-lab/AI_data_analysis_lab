@@ -4,13 +4,31 @@ export const deliverableCategories = {
 } as const
 export type DeliverableCategory=keyof typeof deliverableCategories
 export interface DeliverableInput {category:DeliverableCategory;title:string;description:string;url:string}
-export interface Deliverable extends DeliverableInput {id:string;team_id:string;submitted_by:string;submitted_name:string;submitted_at:string;updated_at:string}
+export interface Deliverable extends DeliverableInput {id:string;team_id:string;file_path:string|null;file_name:string|null;file_size:number|null;file_type:string|null;submitted_by:string;submitted_name:string;submitted_at:string;updated_at:string}
+export const deliverableFileLimit=20*1024*1024
+export const deliverableFileAccept='.pdf,.pptx,.zip'
+const fileTypes:Record<string,string[]>= {
+  pdf:['application/pdf'],
+  pptx:['application/vnd.openxmlformats-officedocument.presentationml.presentation'],
+  zip:['application/zip','application/x-zip-compressed'],
+}
 export const emptyDeliverable:DeliverableInput={category:'data_source',title:'',description:'',url:''}
 export function deliverableValues(input:DeliverableInput):DeliverableInput{return {category:input.category,title:input.title.trim(),description:input.description,url:safeTeamUrl(input.url)??input.url}}
-export function validateDeliverable(input:DeliverableInput):string|null{
+export function validateDeliverable(input:DeliverableInput,hasFile=false):string|null{
   if(!Object.hasOwn(deliverableCategories,input.category))return '산출물 유형을 선택해 주세요.'
   if(!input.title.trim()||input.title.trim().length>120)return '제목은 1~120자로 입력해 주세요.'
   if(input.description.length>4000)return '설명은 4,000자 이내로 입력해 주세요.'
-  if(!input.url.trim()||safeTeamUrl(input.url)===null)return '계정 정보가 없는 http/https URL을 입력해 주세요.'
+  if(!hasFile&& !input.url.trim())return '자료 URL을 입력하거나 파일을 선택해 주세요.'
+  if(input.url.trim()&&safeTeamUrl(input.url)===null)return '계정 정보가 없는 http/https URL을 입력해 주세요.'
   return null
 }
+export function deliverableFileExtension(name:string){return name.split('.').pop()?.toLowerCase()??''}
+export function deliverableFileContentType(name:string){const extension=deliverableFileExtension(name);return fileTypes[extension]?.[0]??''}
+export function validateDeliverableFile(file:{name:string;size:number;type:string}):string|null{
+  const extension=deliverableFileExtension(file.name)
+  if(!fileTypes[extension]||!fileTypes[extension].includes(file.type))return 'PDF, PPTX, ZIP 파일만 업로드할 수 있습니다.'
+  if(file.size<1)return '빈 파일은 업로드할 수 없습니다.'
+  if(file.size>deliverableFileLimit)return '파일은 20MB 이하만 업로드할 수 있습니다.'
+  return null
+}
+export function formatFileSize(size:number){return size>=1024*1024?`${(size/(1024*1024)).toFixed(1)}MB`:`${Math.ceil(size/1024)}KB`}

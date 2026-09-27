@@ -151,6 +151,8 @@ footer { margin-top: 40px; border-top: 1px solid #dce3eb; padding: 24px 0; color
 .credential-notice h2, .credential-notice p { margin: 0 0 7px; }
 .credential-notice code { display: inline-block; padding: 9px 12px; margin: 5px 8px 0 0; border-radius: 6px; background: white; color: #102e4c; word-break: break-all; }
 .credential-notice .button { padding: 8px 11px; font-size: 12px; }
+.deliverable-file-info { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; margin: 8px 0; color: #294b68; font-size: 13px; }
+.deliverable-file-info span { color: #62768a; }
 @media (max-width: 900px) { .admin-account-grid { grid-template-columns: 1fr; } }
 .account-panel h2 { font-size: 18px; margin: 0; }
 .account-panel .section-heading { flex-wrap: wrap; }
