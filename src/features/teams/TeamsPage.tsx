@@ -1,6 +1,6 @@
 import { useEffect, useState, type FormEvent } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
-import { Check, Pencil, Plus, RefreshCw, X } from 'lucide-react'
+import { Check, Pencil, Plus, RefreshCw, Search, X } from 'lucide-react'
 import { isManager, useAuth } from '@/features/auth/auth-context'
 import { useCohorts } from '@/features/cohorts/use-cohorts'
 import type { Cohort } from '@/features/cohorts/cohort-model'
@@ -47,7 +47,8 @@ function TeamWorkspace({ cohort, manage, editing, setEditing, deleting, setDelet
   const [result, setResult] = useState<({ revision: number; error: string; counts:Record<string,TeamDocumentCounts|null> } & Awaited<ReturnType<typeof loadTeams>>) | null>(null)
   const [notice, setNotice] = useState('')
   const [actionError, setActionError] = useState('')
-  const [search, setSearch] = useState('')
+  const [searchInput, setSearchInput] = useState('')
+  const [searchKeyword, setSearchKeyword] = useState('')
   const [stage, setStage] = useState('all')
   useEffect(() => {
     let active = true
@@ -74,7 +75,7 @@ function TeamWorkspace({ cohort, manage, editing, setEditing, deleting, setDelet
     members.push(member)
     rosterByTeam.set(member.team_id,members)
   }
-  const visible=(result?.teams??[]).filter(team=>`${team.name} ${team.topic} ${(rosterByTeam.get(team.id)??[]).map(member=>member.full_name).join(' ')}`.toLowerCase().includes(search.trim().toLowerCase())&&(stage==='all'||team.stage===stage)).sort((left,right)=>left.name.localeCompare(right.name,'ko',{numeric:true}))
+  const visible=(result?.teams??[]).filter(team=>`${team.name} ${team.topic} ${(rosterByTeam.get(team.id)??[]).map(member=>member.full_name).join(' ')}`.toLowerCase().includes(searchKeyword.toLowerCase())&&(stage==='all'||team.stage===stage)).sort((left,right)=>left.name.localeCompare(right.name,'ko',{numeric:true}))
   return <>
     <div className="participant-summary"><p><strong>{cohort.name}</strong> · {result?.teams.length ?? 0}개 팀</p><div className="button-row"><Button className="button-secondary" disabled={loading || Boolean(editing) || deleting} onClick={() => { setActionError(''); setRevision(value => value + 1) }}><RefreshCw size={16} aria-hidden="true" /> 새로고침</Button>
       {manage && <Button disabled={loading || Boolean(result?.error) || Boolean(editing) || deleting} onClick={() => { setNotice(''); setEditing('new') }}><Plus size={16} aria-hidden="true" /> 새 팀</Button>}</div></div>
@@ -82,7 +83,7 @@ function TeamWorkspace({ cohort, manage, editing, setEditing, deleting, setDelet
     <div className={editing ? 'cohort-workspace with-editor' : 'cohort-workspace'}><section className={manage?'panel team-list-panel':'panel team-list-panel student-team-panel'} aria-label={manage?'팀 목록':'워크스페이스'}>
       {loading ? <p className="empty-state" role="status">팀 정보를 불러오고 있습니다.</p> : result.error ? <p className="form-error" role="alert">{result.error}</p> : <>
         {manage && <p className="field-help">배정 대기 {result.candidates.filter(item => item.eligibility === 'ready' && !item.team_id).length}명 · 계정 연결 필요 {result.candidates.filter(item => item.eligibility === 'unlinked').length}명 · <Link to={`/participants?cohort=${cohort.id}`} className="text-link">참가자 관리 →</Link></p>}
-        {manage&&<><div className="list-toolbar schedule-toolbar"><div><input aria-label="팀명·주제·팀원 검색" placeholder="팀명·주제·팀원 검색" type="search" value={search} onChange={e => setSearch(e.target.value)} /></div><select aria-label="프로젝트 단계 필터" value={stage} onChange={e => setStage(e.target.value)}><option value="all">모든 단계</option>{Object.entries(teamStages).map(([key, label]) => <option key={key} value={key}>{label}</option>)}</select></div><p className="field-help" role="status">전체 {result.teams.length}개 팀 · 표시 {visible.length}개 팀</p></>}
+        {manage&&<><div className="list-toolbar schedule-toolbar"><form className="team-search-form" role="search" onSubmit={event=>{event.preventDefault();setSearchKeyword(searchInput.trim())}}><input aria-label="팀명·주제·팀원 검색" placeholder="팀명·주제·팀원 검색" type="search" value={searchInput} onChange={e => setSearchInput(e.target.value)} /><Button type="submit"><Search size={16} aria-hidden="true" /> 검색</Button></form><select aria-label="프로젝트 단계 필터" value={stage} onChange={e => setStage(e.target.value)}><option value="all">모든 단계</option>{Object.entries(teamStages).map(([key, label]) => <option key={key} value={key}>{label}</option>)}</select></div><p className="field-help" role="status">전체 {result.teams.length}개 팀 · 표시 {visible.length}개 팀{searchKeyword&&` · 검색어: ${searchKeyword}`}</p></>}
         {!visible.length ? <div className="empty-state"><h2>{result.teams.length ? '검색 결과가 없습니다.' : manage ? '등록된 팀이 없습니다.' : '배정된 팀이 없습니다.'}</h2><p>{manage ? '참가자 계정을 연결한 뒤 팀을 만들고 팀원을 배정하세요.' : '팀 배정은 운영 담당자에게 문의해 주세요.'}</p></div>
           : <div className={manage?'team-overview-grid':'team-overview-grid student-team-grid'}>{visible.map(team=><TeamCard key={team.id} team={team} members={rosterByTeam.get(team.id)??[]} manage={manage} readOnly={!manage&&cohort.status==='completed'} counts={result.counts[team.id]} editing={Boolean(editing)} deleting={deleting} myParticipantId={result.my_participant_id} onRoleSaved={()=>{setNotice('팀원 역할을 저장했습니다.');setRevision(value=>value+1)}} onEdit={()=>{setNotice('');setEditing(team)}} onDelete={()=>void remove(team)}/>)}</div>}
       </>}

@@ -92,6 +92,9 @@ footer { margin-top: 40px; border-top: 1px solid #dce3eb; padding: 24px 0; color
 .list-toolbar { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
 .list-toolbar > div { flex: 1; min-width: 130px; }
 .list-toolbar .button { padding: 12px; }
+.team-search-form { display: flex; flex: 1; gap: 8px; min-width: 240px; }
+.team-search-form input { flex: 1; }
+.team-search-form .button { flex-shrink: 0; }
 .cohort-form fieldset { border: 0; padding: 0; margin: 0; min-width: 0; }
 .cohort-form label { display: block; font-size: 13px; font-weight: 600; margin: 18px 0 8px; }
 .cohort-form input, .cohort-form select, .cohort-form textarea, .list-toolbar input, .list-toolbar select { width: 100%; min-width: 0; padding: 10px 12px; border: 1px solid #cbd8e3; border-radius: 7px; font: inherit; font-size: 14px; background: white; }
@@ -243,6 +246,7 @@ footer { margin-top: 40px; border-top: 1px solid #dce3eb; padding: 24px 0; color
 .admin-team-roster li span { min-width: 0; overflow-wrap: anywhere; }
 @media (max-width: 1050px) { .admin-team-card { display: flex; } .admin-team-card .team-overview-links,.admin-team-card .team-overview-details { border-top: 1px solid #e5ebf1; } .admin-team-card .team-overview-links { padding: 12px 0; } .admin-team-card .team-overview-details { padding: 10px 0; } .admin-team-card .team-overview-actions { justify-content: flex-start; } }
 @media (max-width: 680px) { .admin-team-roster li { grid-template-columns: minmax(100px,1fr) minmax(120px,1fr); } }
+@media (max-width: 520px) { .team-search-form { min-width: 100%; } }
 .with-editor .team-overview-grid { grid-template-columns: 1fr; }
 .team-overview-grid.student-team-grid { grid-template-columns: 1fr; }
 .student-team-card { padding: 24px; }
