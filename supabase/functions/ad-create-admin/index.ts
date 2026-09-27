@@ -1,10 +1,27 @@
-import { assertAdminAccountAvailable, normalizeAdmin, generateTemporaryPassword } from '../_shared/admin.ts'
+import { assertAdminAccountAvailable, normalizeAdmin, normalizeAdminTarget, generateTemporaryPassword } from '../_shared/admin.ts'
 import { PublicError } from '../_shared/provision.ts'
 import { authenticate, body, handle, json } from '../_shared/http.ts'
 
 Deno.serve(handle(async request => {
-  const { admin } = await authenticate(request, 'professor')
-  const input = normalizeAdmin(await body(request))
+  const { admin, user } = await authenticate(request, 'professor')
+  const payload = await body(request)
+  if (payload.action === 'update' || payload.action === 'delete') {
+    const target = normalizeAdminTarget(payload)
+    if (target.id === user.id) throw new PublicError('현재 로그인한 교수 관리자 본인의 권한은 여기에서 변경할 수 없습니다.', 409)
+    const { data: current, error: currentError } = await admin.from('AD_profiles').select('id,display_name,phone,role,is_active,created_at').eq('id', target.id).in('role', ['professor', 'admin']).maybeSingle()
+    if (currentError) throw new PublicError('관리자 정보를 확인하지 못했습니다.', 502)
+    if (!current) throw new PublicError('관리자 정보를 찾을 수 없습니다.', 404)
+    if (payload.action === 'delete') {
+      const { error } = await admin.from('AD_profiles').update({ is_active: false, updated_at: new Date().toISOString() }).eq('id', target.id)
+      if (error) throw new PublicError('관리자 권한을 삭제하지 못했습니다.', 502)
+      return json({ success: true })
+    }
+    const input = normalizeAdmin({ ...payload, action: 'create' })
+    const { error } = await admin.from('AD_profiles').update({ display_name: input.displayName, phone: input.phone, role: input.role, is_active: target.isActive, updated_at: new Date().toISOString() }).eq('id', target.id)
+    if (error) throw new PublicError('관리자 정보를 수정하지 못했습니다.', 502)
+    return json({ admin: { ...current, display_name: input.displayName, phone: input.phone, role: input.role, is_active: target.isActive, email: input.email } })
+  }
+  const input = normalizeAdmin(payload)
   const { data: existing, error: lookupError } = await admin.rpc('AD_find_auth_user', { p_email: input.email })
   if (lookupError) throw lookupError
   if (existing) {

@@ -20,6 +20,18 @@ export async function createAdminAccount(input: AdminInput): Promise<CreatedAdmi
   return invokeFunction<CreatedAdmin>('ad-create-admin', { action: 'create', email: input.email.trim().toLowerCase(), role: input.role, ...value })
 }
 
+export async function updateAdminAccount(id: string, input: AdminInput & { isActive: boolean }): Promise<AdminAccount> {
+  const validation = validateAdminInput(input)
+  if (validation) throw new Error(validation)
+  const value = normalizeProfileInput(input)
+  const result = await invokeFunction<{ admin: AdminAccount }>('ad-create-admin', { action: 'update', id, isActive: input.isActive, email: input.email.trim().toLowerCase(), role: input.role, ...value })
+  return result.admin
+}
+
+export async function deleteAdminAccount(id: string): Promise<void> {
+  await invokeFunction<{ success: boolean }>('ad-create-admin', { action: 'delete', id })
+}
+
 export interface MyAcademicProfile { department: string; grade: string; job_group: 'sw_engineering' | 'sw_development' | 'ai_development' | 'other'; job_group_other: string | null }
 export async function getMyAcademicProfile(): Promise<MyAcademicProfile | null> {
   const { data, error } = await client().rpc('AD_my_academic_profile')

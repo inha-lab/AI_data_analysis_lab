@@ -24,4 +24,11 @@ export function assertAdminAccountAvailable(profile: ExistingAdminProfile | null
   throw new PublicError('이미 이 서비스의 다른 역할로 등록된 사용자입니다. 기존 역할을 먼저 확인해 주세요.', 409)
 }
 
+export function normalizeAdminTarget(input: { id?: unknown; isActive?: unknown }) {
+  const id = typeof input.id === 'string' ? input.id.trim() : ''
+  if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(id)) throw new PublicError('관리자 식별 정보가 올바르지 않습니다.')
+  if (input.isActive !== undefined && typeof input.isActive !== 'boolean') throw new PublicError('관리자 상태가 올바르지 않습니다.')
+  return { id, isActive: input.isActive === true }
+}
+
 export { generateTemporaryPassword }

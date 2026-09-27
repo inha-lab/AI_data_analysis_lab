@@ -189,3 +189,5 @@ RLS와 `AD_save_report`·`AD_review_report` 함수가 현재 활성 팀원과 �
 `migrations/20260927000900_ad_full_report_member_grade.sql`은 `AD_team_full_report_v2()`의 팀원 정보에 참가자 학년을 추가합니다. 기존 팀 접근 권한 검사를 그대로 사용하고 `AD_participants`의 학년만 응답에 병합합니다.
 
 `ad-create-admin` 함수는 이메일에 해당하는 Auth 계정이 이미 있어도 `AD_profiles`가 없는 공유 계정이면 새 계정을 만들지 않고 관리자 프로필을 연결합니다. 이 경우 기존 비밀번호를 유지하며, 이미 앱 역할이 있는 계정은 역할을 자동 변경하지 않습니다.
+
+같은 함수의 `update` 작업은 교수 관리자만 다른 관리자의 이름·전화번호·역할·활성 상태를 변경하며, `delete` 작업은 Auth 계정을 지우지 않고 앱 관리자 프로필을 비활성화합니다. 자기 자신의 권한 변경과 삭제는 서버에서 차단합니다.

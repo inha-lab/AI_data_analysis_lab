@@ -143,6 +143,10 @@ footer { margin-top: 40px; border-top: 1px solid #dce3eb; padding: 24px 0; color
 .admin-list article { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; padding: 17px 0; border-bottom: 1px solid #e5ebf1; }
 .admin-list article:last-child { border-bottom: 0; }
 .admin-list p, .admin-list small { display: block; margin: 4px 0 0; color: #62768a; overflow-wrap: anywhere; }
+.admin-list-actions { display: flex; align-items: center; justify-content: flex-end; flex-wrap: wrap; gap: 7px; }
+.admin-list-actions .button { padding: 7px 10px; font-size: 12px; }
+.cohort-form label.admin-active-toggle { display: flex; align-items: center; gap: 8px; }
+.cohort-form .admin-active-toggle input { width: 18px; height: 18px; }
 .credential-notice { display: flex; gap: 14px; align-items: flex-start; background: #edf8f4; }
 .credential-notice h2, .credential-notice p { margin: 0 0 7px; }
 .credential-notice code { display: inline-block; padding: 9px 12px; margin: 5px 8px 0 0; border-radius: 6px; background: white; color: #102e4c; word-break: break-all; }
