@@ -1,7 +1,7 @@
 import { loadEnv } from 'vite'
 const env = loadEnv('development', process.cwd(), 'VITE_')
 if (env.VITE_SUPABASE_URL !== 'https://pyiltnkahsdscuotlenw.supabase.co') throw new Error('Unexpected project')
-for (const name of ['ad-provision-account', 'ad-change-password']) {
+for (const name of ['ad-provision-account', 'ad-change-password', 'ad-create-admin']) {
   for (const [label, method, authorization, expected] of [
     ['preflight', 'OPTIONS', null, 200], ['method', 'GET', null, 405],
     ['missing-auth', 'POST', null, 401], ['invalid-auth', 'POST', 'Bearer invalid-token', 401],

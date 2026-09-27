@@ -11,7 +11,7 @@
     "typecheck": "tsc -b",
     "check:db": "node scripts/check-supabase.mjs",
     "test": "node --experimental-strip-types --test tests/*.test.mjs",
-    "check:functions": "deno check supabase/functions/ad-provision-account/index.ts supabase/functions/ad-change-password/index.ts",
+    "check:functions": "deno check supabase/functions/ad-provision-account/index.ts supabase/functions/ad-change-password/index.ts supabase/functions/ad-create-admin/index.ts",
     "check:function-auth": "node scripts/check-functions.mjs"
   },
   "engines": {

@@ -16,6 +16,7 @@ export const router = createHashRouter([
     { path: '/change-password', lazy: async () => ({ Component: (await import('@/features/auth/ChangePasswordPage')).ChangePasswordPage }) },
     { element: <DashboardLayout />, children: [
       { path: '/dashboard', lazy: async () => ({ Component: (await import('@/features/monitoring/DashboardPage')).DashboardPage }) },
+      { path: '/my-page', lazy: async () => ({ Component: (await import('@/features/account/MyPage')).MyPage }) },
       { element: <RequireAuth roles={['professor', 'student']} />, children: [
         { path: '/schedules', lazy: async () => ({ Component: (await import('@/features/schedules/SchedulesPage')).SchedulesPage }) },
         { path: '/announcements', lazy: async () => ({ Component: (await import('@/features/announcements/AnnouncementsPage')).AnnouncementsPage }) },
@@ -31,6 +32,7 @@ export const router = createHashRouter([
         { path: '/participants', lazy: async () => ({ Component: (await import('@/features/participants/ParticipantsPage')).ParticipantsPage }) },
         { path: '/deliverables', lazy: async () => ({ Component: (await import('@/features/deliverables/ProgramDeliverablesPage')).ProgramDeliverablesPage }) },
         { path: '/login-activity', lazy: async () => ({ Component: (await import('@/features/login-activity/LoginActivityPage')).LoginActivityPage }) },
+        { path: '/admins', lazy: async () => ({ Component: (await import('@/features/account/AdminAccountsPage')).AdminAccountsPage }) },
       ] },
     ] },
   ] },

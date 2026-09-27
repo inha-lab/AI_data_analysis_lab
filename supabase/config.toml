@@ -7,3 +7,6 @@ verify_jwt = false
 
 [functions.ad-change-password]
 verify_jwt = false
+
+[functions.ad-create-admin]
+verify_jwt = false
