@@ -44,3 +44,10 @@ export function normalizeParticipant(input: ParticipantInput): ParticipantInput 
     grade: input.grade.trim(), phone: input.phone.trim(), job_group_other: input.job_group === 'other' ? input.job_group_other?.trim() : null }
 }
 export function jobGroupLabel(input: Pick<ParticipantInput, 'job_group' | 'job_group_other'>) { return input.job_group === 'other' ? input.job_group_other || '기타' : jobGroups[input.job_group] }
+export function validateBulkParticipantStatus(ids:string[],status:string):string|null{
+  if(!ids.length)return '상태를 변경할 참가자를 선택해 주세요.'
+  if(ids.length>500)return '한 번에 최대 500명까지 변경할 수 있습니다.'
+  if(new Set(ids).size!==ids.length||ids.some(id=>!/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(id)))return '선택한 참가자 정보를 확인해 주세요.'
+  if(!Object.hasOwn(participantStatusLabels,status))return '변경할 참여 상태를 선택해 주세요.'
+  return null
+}

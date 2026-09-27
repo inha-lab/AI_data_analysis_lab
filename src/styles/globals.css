@@ -133,6 +133,11 @@ footer { margin-top: 40px; border-top: 1px solid #dce3eb; padding: 24px 0; color
 .data-table td { padding: 16px 12px; border-bottom: 1px solid #e5ebf1; white-space: nowrap; }
 .data-table .name-cell { font-weight: 650; }
 .data-table .button { padding: 6px 10px; font-size: 12px; }
+.data-table input[type="checkbox"] { width: 17px; height: 17px; }
+.participant-bulk-actions { display: flex; align-items: center; flex-wrap: wrap; gap: 9px; margin: 12px 0; padding: 12px; border: 1px solid #cbdfea; border-radius: 8px; background: #f3f8fc; }
+.participant-bulk-actions strong { margin-right: auto; color: #18344e; }
+.participant-bulk-actions select { min-width: 150px; padding: 9px 11px; border: 1px solid #cbd8e3; border-radius: 7px; background: white; font: inherit; }
+.participant-bulk-actions .button { padding: 9px 12px; font-size: 13px; }
 .account-status { display: block; font-size: 11px; color: #62768a; margin-top: 6px; }
 @media (max-width: 760px) { .cohort-selector { align-items: stretch; flex-direction: column; gap: 8px; } .cohort-selector select { min-width: 0; } .participant-summary { flex-direction: column; align-items: flex-start; } .workspace-sidebar nav { flex-wrap: wrap; } }
 

@@ -1,5 +1,5 @@
 import { supabase } from '@/lib/supabase'
-import { normalizeParticipant, validateParticipant, type Participant, type ParticipantInput } from './participant-model'
+import { normalizeParticipant, validateBulkParticipantStatus, validateParticipant, type Participant, type ParticipantInput, type ParticipantStatus } from './participant-model'
 const columns = 'id,cohort_id,profile_id,full_name,email,department,student_number,grade,phone,job_group,job_group_other,status,created_at,updated_at'
 function client() {
   if (!supabase) throw new Error('데이터베이스 연결 설정이 필요합니다.')
@@ -31,4 +31,11 @@ export async function saveParticipant(cohortId: string, input: ParticipantInput,
   if (error) throw new Error(errorMessage(error.code))
   if (!data) throw new Error('다른 사용자가 수정했거나 권한이 변경되었습니다. 목록을 새로고침한 뒤 다시 시도해 주세요.')
   return data as Participant
+}
+export async function bulkUpdateParticipantStatus(cohortId:string,participantIds:string[],status:ParticipantStatus):Promise<number>{
+  const validation=validateBulkParticipantStatus(participantIds,status)
+  if(validation)throw new Error(validation)
+  const {data,error}=await client().rpc('AD_bulk_update_participant_status',{p_cohort:cohortId,p_participants:participantIds,p_status:status})
+  if(error)throw new Error(errorMessage(error.code))
+  return data as number
 }
