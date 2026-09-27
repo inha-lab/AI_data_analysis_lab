@@ -36,6 +36,7 @@ export function DashboardLayout() {
       <header className="workspace-topbar"><div><span className="badge">{profile && roleLabels[profile.role]}</span><Link className="account-name" to="/my-page">{profile?.display_name || session?.user.email}</Link></div>
         <Button className="button-secondary" onClick={() => void logout()} disabled={busy}><LogOut size={16} aria-hidden="true" /> 로그아웃</Button>
       </header>
+      {profile?.must_change_password && <div className="password-setup-banner" role="alert"><span>임시 비밀번호를 사용 중입니다. 등록·수정 작업 전에 새 비밀번호로 변경해 주세요.</span><Link className="button" to="/change-password">비밀번호 변경</Link></div>}
       {error && <p className="notice" role="alert">{error}</p>}
       <main className="workspace-content"><Outlet /></main>
     </div>

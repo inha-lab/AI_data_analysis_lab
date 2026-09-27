@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { ArrowUpRight, CalendarDays, Layers3 } from 'lucide-react'
 import { StudentDashboard } from './StudentDashboard'
@@ -38,4 +39,3 @@ export function DashboardPage() {
   if (profile?.role === 'student') return <StudentDashboard />
   return <><div className="page-heading"><div><p className="eyebrow">MY PROGRAM</p><h1>{profile ? roleLabels[profile.role] : ''} 대시보드</h1></div></div><section className="panel empty-state"><h2>프로그램 참여가 확인되었습니다.</h2><p>소속 프로그램과 팀 연결 화면을 준비하고 있습니다.</p></section></>
 }
-import { useState } from 'react'
