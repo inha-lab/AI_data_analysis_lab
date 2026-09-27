@@ -3,7 +3,7 @@ import { PublicError } from './provision.ts'
 
 export const cors = { 'Access-Control-Allow-Origin': '*', 'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type', 'Access-Control-Allow-Methods': 'POST, OPTIONS' }
 export function json(body: unknown, status = 200) { return new Response(JSON.stringify(body), { status, headers: { ...cors, 'Content-Type': 'application/json', 'Cache-Control': 'no-store' } }) }
-export async function authenticate(request: Request, professorOnly: boolean) {
+export async function authenticate(request: Request, required: false | 'manager' | 'professor') {
   const url = Deno.env.get('SUPABASE_URL')!
   const secret = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
   const authorization = request.headers.get('Authorization') ?? ''
@@ -13,7 +13,8 @@ export async function authenticate(request: Request, professorOnly: boolean) {
   if (error || !data.user) throw new PublicError('로그인이 만료되었습니다. 다시 로그인해 주세요.', 401)
   const { data: profile, error: profileError } = await admin.from('AD_profiles').select('role,is_active,must_change_password').eq('id', data.user.id).maybeSingle()
   if (profileError) throw new PublicError('권한 확인에 실패했습니다.', 503)
-  if (!profile?.is_active || (professorOnly && (profile.role !== 'professor' || profile.must_change_password))) throw new PublicError('이 작업을 수행할 권한이 없습니다.', 403)
+  const permitted = required === false || (required === 'professor' ? profile?.role === 'professor' : profile?.role === 'professor' || profile?.role === 'admin')
+  if (!profile?.is_active || !permitted || (required !== false && profile.must_change_password)) throw new PublicError('이 작업을 수행할 권한이 없습니다.', 403)
   return { admin, user: data.user, profile }
 }
 export async function body(request: Request): Promise<Record<string, unknown>> {

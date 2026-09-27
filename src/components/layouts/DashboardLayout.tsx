@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Link, NavLink, Outlet } from 'react-router-dom'
 import { CalendarDays, CircleUserRound, Cpu, FileStack, LayoutDashboard, Layers3, LogOut, Megaphone, ShieldCheck, UserRoundSearch, Users, UsersRound } from 'lucide-react'
-import { useAuth, roleLabels } from '@/features/auth/auth-context'
+import { isManager, useAuth, roleLabels } from '@/features/auth/auth-context'
 import { Button } from '@/components/ui/button'
 
 export function DashboardLayout() {
@@ -20,11 +20,11 @@ export function DashboardLayout() {
       <p className="nav-caption">프로그램 운영</p>
       <nav aria-label="관리 메뉴">
         <NavLink to="/dashboard"><LayoutDashboard size={18} aria-hidden="true" /> 대시보드</NavLink>
-        {(profile?.role === 'professor' || profile?.role === 'student') && <NavLink to="/schedules"><CalendarDays size={18} aria-hidden="true" /> 프로그램 일정</NavLink>}
-        {(profile?.role === 'professor' || profile?.role === 'student') && <NavLink to="/announcements"><Megaphone size={18} aria-hidden="true" /> 공지사항</NavLink>}
-        {(profile?.role === 'professor' || profile?.role === 'student') && <NavLink to="/gpu"><Cpu size={18} aria-hidden="true" /> GPU 서버 사용 신청</NavLink>}
-        {(profile?.role === 'professor' || profile?.role === 'student') && <NavLink to="/teams"><UsersRound size={18} aria-hidden="true" /> {profile.role === 'professor' ? '팀 관리' : '워크스페이스'}</NavLink>}
-        {profile?.role === 'professor' && <><NavLink to="/cohorts"><Layers3 size={18} aria-hidden="true" /> 프로그램 관리</NavLink><NavLink to="/participants"><Users size={18} aria-hidden="true" /> 참가자 관리</NavLink><NavLink to="/deliverables"><FileStack size={18} aria-hidden="true" /> 산출물 현황</NavLink><NavLink to="/login-activity"><UserRoundSearch size={18} aria-hidden="true" /> 로그인 활동</NavLink><NavLink to="/admins"><ShieldCheck size={18} aria-hidden="true" /> 관리자 관리</NavLink></>}
+        {(isManager(profile?.role) || profile?.role === 'student') && <NavLink to="/schedules"><CalendarDays size={18} aria-hidden="true" /> 프로그램 일정</NavLink>}
+        {(isManager(profile?.role) || profile?.role === 'student') && <NavLink to="/announcements"><Megaphone size={18} aria-hidden="true" /> 공지사항</NavLink>}
+        {(isManager(profile?.role) || profile?.role === 'student') && <NavLink to="/gpu"><Cpu size={18} aria-hidden="true" /> GPU 서버 사용 신청</NavLink>}
+        {(isManager(profile?.role) || profile?.role === 'student') && <NavLink to="/teams"><UsersRound size={18} aria-hidden="true" /> {isManager(profile.role) ? '팀 관리' : '워크스페이스'}</NavLink>}
+        {isManager(profile?.role) && <><NavLink to="/cohorts"><Layers3 size={18} aria-hidden="true" /> 프로그램 관리</NavLink><NavLink to="/participants"><Users size={18} aria-hidden="true" /> 참가자 관리</NavLink><NavLink to="/deliverables"><FileStack size={18} aria-hidden="true" /> 산출물 현황</NavLink><NavLink to="/login-activity"><UserRoundSearch size={18} aria-hidden="true" /> 로그인 활동</NavLink>{profile?.role === 'professor' && <NavLink to="/admins"><ShieldCheck size={18} aria-hidden="true" /> 관리자 관리</NavLink>}</>}
         <NavLink to="/my-page"><CircleUserRound size={18} aria-hidden="true" /> 마이페이지</NavLink>
       </nav>
       <div className="sidebar-note">공공데이터에서 시작하는<br />새로운 가능성.</div>

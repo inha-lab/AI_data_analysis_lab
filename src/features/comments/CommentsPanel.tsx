@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Button } from '@/components/ui/button'
-import { useAuth } from '@/features/auth/auth-context'
+import { isManager, useAuth } from '@/features/auth/auth-context'
 import { formatScheduleTime } from '@/features/schedules/schedule-model'
 import { supabase } from '@/lib/supabase'
 
@@ -13,7 +13,7 @@ function errorMessage(code:string) {
 }
 export function CommentsPanel({teamId,reportId,deliverableId}:{teamId:string;reportId?:string;deliverableId?:string}) {
   const {profile}=useAuth()
-  const manage=profile?.role==='professor'
+  const manage=isManager(profile?.role)
   const [comments,setComments]=useState<Comment[]>([])
   const [revision,setRevision]=useState(0)
   const [loading,setLoading]=useState(true)

@@ -27,3 +27,8 @@ test('only supported job groups and participation statuses are accepted', () => 
   assert.equal(validateParticipant({ ...valid, status: 'completed' }), null)
   assert.equal(validateParticipant({ ...valid, status: 'dropout' }), null)
 })
+
+test('other job group requires a manual label', () => {
+  assert.match(validateParticipant({ ...valid, job_group: 'other', job_group_other: '' }), /기타 희망 직무/)
+  assert.equal(validateParticipant({ ...valid, job_group: 'other', job_group_other: '데이터 기획' }), null)
+})

@@ -17,7 +17,7 @@ export const router = createHashRouter([
     { element: <DashboardLayout />, children: [
       { path: '/dashboard', lazy: async () => ({ Component: (await import('@/features/monitoring/DashboardPage')).DashboardPage }) },
       { path: '/my-page', lazy: async () => ({ Component: (await import('@/features/account/MyPage')).MyPage }) },
-      { element: <RequireAuth roles={['professor', 'student']} />, children: [
+      { element: <RequireAuth roles={['professor', 'admin', 'student']} />, children: [
         { path: '/schedules', lazy: async () => ({ Component: (await import('@/features/schedules/SchedulesPage')).SchedulesPage }) },
         { path: '/announcements', lazy: async () => ({ Component: (await import('@/features/announcements/AnnouncementsPage')).AnnouncementsPage }) },
         { path: '/gpu', lazy: async () => ({ Component: (await import('@/features/gpu/GpuReservationsPage')).GpuReservationsPage }) },
@@ -27,13 +27,13 @@ export const router = createHashRouter([
         { path: '/teams/:teamId/full-report', lazy: async () => ({ Component: (await import('@/features/full-report/FullReportPage')).FullReportPage }) },
         { path: '/teams/:teamId/deliverables', lazy: async () => ({ Component: (await import('@/features/deliverables/DeliverablesPage')).DeliverablesPage }) },
       ] },
-      { element: <RequireAuth roles={['professor']} />, children: [
+      { element: <RequireAuth roles={['professor', 'admin']} />, children: [
         { path: '/cohorts', lazy: async () => ({ Component: (await import('@/features/cohorts/CohortsPage')).CohortsPage }) },
         { path: '/participants', lazy: async () => ({ Component: (await import('@/features/participants/ParticipantsPage')).ParticipantsPage }) },
         { path: '/deliverables', lazy: async () => ({ Component: (await import('@/features/deliverables/ProgramDeliverablesPage')).ProgramDeliverablesPage }) },
         { path: '/login-activity', lazy: async () => ({ Component: (await import('@/features/login-activity/LoginActivityPage')).LoginActivityPage }) },
-        { path: '/admins', lazy: async () => ({ Component: (await import('@/features/account/AdminAccountsPage')).AdminAccountsPage }) },
       ] },
+      { element: <RequireAuth roles={['professor']} />, children: [{ path: '/admins', lazy: async () => ({ Component: (await import('@/features/account/AdminAccountsPage')).AdminAccountsPage }) }] },
     ] },
   ] },
 ])

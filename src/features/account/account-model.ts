@@ -1,5 +1,5 @@
 export interface ProfileInput { displayName: string; phone: string }
-export interface AdminInput extends ProfileInput { email: string }
+export interface AdminInput extends ProfileInput { email: string; role: 'professor' | 'admin' }
 
 export function normalizeProfileInput(input: ProfileInput): ProfileInput {
   return { displayName: input.displayName.trim(), phone: input.phone.trim() }
@@ -18,5 +18,6 @@ export function validateAdminInput(input: AdminInput): string {
   if (profileError) return profileError
   const email = input.email.trim().toLowerCase()
   if (email.length > 254 || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return '이메일 주소를 정확히 입력해 주세요.'
+  if (input.role !== 'professor' && input.role !== 'admin') return '관리자 역할을 선택해 주세요.'
   return ''
 }

@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
 import { Plus, RefreshCw } from 'lucide-react'
-import { useAuth } from '@/features/auth/auth-context'
+import { isManager, useAuth } from '@/features/auth/auth-context'
 import { useCohorts } from '@/features/cohorts/use-cohorts'
 import type { Cohort } from '@/features/cohorts/cohort-model'
 import { Button } from '@/components/ui/button'
@@ -42,7 +42,7 @@ function ScheduleWorkspace({ cohort, manage, editing, setEditing, selectedId }: 
 }
 export function SchedulesPage() {
   const { profile } = useAuth()
-  const manage = profile?.role === 'professor'
+  const manage = isManager(profile?.role)
   const { cohorts, loading, error, reload } = useCohorts()
   const [params, setParams] = useSearchParams()
   const [editing, setEditing] = useState<Schedule | 'new' | null>(null)

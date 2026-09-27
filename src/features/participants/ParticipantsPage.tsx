@@ -8,7 +8,7 @@ import { useParticipants } from './use-participants'
 import { ExcelImport } from './ExcelImport'
 import { AccountProvisioning } from './AccountProvisioning'
 import { ParticipantEditor } from './ParticipantEditor'
-import { jobGroups, participantStatusLabels, type Participant, type ParticipantStatus } from './participant-model'
+import { jobGroupLabel, participantStatusLabels, type Participant, type ParticipantStatus } from './participant-model'
 
 type SortKey = 'full_name' | 'student_number' | 'department' | 'email'
 function ParticipantWorkspace({ cohort, onEditingChange }: { cohort: Cohort; onEditingChange: (editing: boolean) => void }) {
@@ -44,7 +44,7 @@ function ParticipantWorkspace({ cohort, onEditingChange }: { cohort: Cohort; onE
             ? <th key={key} scope="col">{label}</th>
             : <th key={key} scope="col" aria-sort={sort.key === key ? sort.asc ? 'ascending' : 'descending' : 'none'}><button type="button" onClick={() => sortBy(key)}>{label} {sort.key === key ? sort.asc ? '↑' : '↓' : '↕'}</button></th>)}
           <th scope="col">희망 직무</th><th scope="col">참여 / 계정</th><th scope="col">관리</th></tr></thead>
-          <tbody>{visible.map((item, index) => <tr key={item.id}><td>{index + 1}</td><td className="name-cell">{item.full_name}</td><td>{item.student_number}</td><td>{item.department}</td><td>{item.grade}</td><td>{item.email}</td><td>{item.phone}</td><td>{jobGroups[item.job_group]}</td><td><span className={`badge ${item.status === 'active' ? 'status-active' : 'status-completed'}`}>{participantStatusLabels[item.status]}</span><span className="account-status">{item.profile_id ? '계정 연결됨' : '계정 연결 대기'}</span></td><td><Button className="button-secondary" disabled={Boolean(editor) || operationBusy} onClick={() => { updateEditor(item); setNotice('') }} aria-label={`${item.full_name} 정보 수정`}>수정</Button></td></tr>)}</tbody></table></div>}
+          <tbody>{visible.map((item, index) => <tr key={item.id}><td>{index + 1}</td><td className="name-cell">{item.full_name}</td><td>{item.student_number}</td><td>{item.department}</td><td>{item.grade}</td><td>{item.email}</td><td>{item.phone}</td><td>{jobGroupLabel(item)}</td><td><span className={`badge ${item.status === 'active' ? 'status-active' : 'status-completed'}`}>{participantStatusLabels[item.status]}</span><span className="account-status">{item.profile_id ? '계정 연결됨' : '계정 연결 대기'}</span></td><td><Button className="button-secondary" disabled={Boolean(editor) || operationBusy} onClick={() => { updateEditor(item); setNotice('') }} aria-label={`${item.full_name} 정보 수정`}>수정</Button></td></tr>)}</tbody></table></div>}
     </section>
   </>
 }

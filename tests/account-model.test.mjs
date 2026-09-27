@@ -11,6 +11,6 @@ test('validates profile name and phone', () => {
   assert.match(validateProfileInput({ displayName: '홍길동', phone: '123' }), /전화번호/)
 })
 test('validates administrator email', () => {
-  assert.equal(validateAdminInput({ displayName: '관리자', phone: '010-1234-5678', email: 'admin@inha.ac.kr' }), '')
-  assert.match(validateAdminInput({ displayName: '관리자', phone: '010-1234-5678', email: 'invalid' }), /이메일/)
+  assert.equal(validateAdminInput({ displayName: '관리자', phone: '010-1234-5678', email: 'admin@inha.ac.kr', role: 'admin' }), '')
+  assert.match(validateAdminInput({ displayName: '관리자', phone: '010-1234-5678', email: 'invalid', role: 'admin' }), /이메일/)
 })

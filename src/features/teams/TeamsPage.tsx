@@ -1,7 +1,7 @@
 import { useEffect, useState, type FormEvent } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
 import { Check, Pencil, Plus, RefreshCw, X } from 'lucide-react'
-import { useAuth } from '@/features/auth/auth-context'
+import { isManager, useAuth } from '@/features/auth/auth-context'
 import { useCohorts } from '@/features/cohorts/use-cohorts'
 import type { Cohort } from '@/features/cohorts/cohort-model'
 import { Button } from '@/components/ui/button'
@@ -93,7 +93,7 @@ function TeamWorkspace({ cohort, manage, editing, setEditing, deleting, setDelet
 }
 export function TeamsPage() {
   const { profile } = useAuth()
-  const manage = profile?.role === 'professor'
+  const manage = isManager(profile?.role)
   const { cohorts, loading, error, reload } = useCohorts()
   const [params, setParams] = useSearchParams()
   const [editing, setEditing] = useState<Team | 'new' | null>(null)

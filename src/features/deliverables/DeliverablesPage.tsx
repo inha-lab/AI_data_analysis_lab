@@ -1,7 +1,7 @@
 import { useEffect,useState,type FormEvent } from 'react'
 import { Link,useBlocker,useParams,useSearchParams } from 'react-router-dom'
 import { Button } from '@/components/ui/button'
-import { useAuth } from '@/features/auth/auth-context'
+import { isManager, useAuth } from '@/features/auth/auth-context'
 import { CommentsPanel } from '@/features/comments/CommentsPanel'
 import { formatScheduleTime } from '@/features/schedules/schedule-model'
 import { safeTeamUrl } from '@/features/teams/team-model'
@@ -10,7 +10,7 @@ import { deliverableCategories,emptyDeliverable,validateDeliverable,type Deliver
 
 function Workspace({teamId,selectedId}:{teamId:string;selectedId:string|null}){
   const {profile}=useAuth()
-  const manage=profile?.role==='professor'
+  const manage=isManager(profile?.role)
   const [revision,setRevision]=useState(0)
   const [result,setResult]=useState<{revision:number;data:Awaited<ReturnType<typeof loadDeliverables>>|null;error:string}|null>(null)
   const [editing,setEditing]=useState<string|null>(null)

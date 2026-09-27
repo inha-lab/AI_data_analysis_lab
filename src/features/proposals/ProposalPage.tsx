@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Link, useBlocker, useParams } from 'react-router-dom'
-import { useAuth } from '@/features/auth/auth-context'
+import { isManager, useAuth } from '@/features/auth/auth-context'
 import { Button } from '@/components/ui/button'
 import { safeTeamUrl } from '@/features/teams/team-model'
 import { formatScheduleTime } from '@/features/schedules/schedule-model'
@@ -59,7 +59,7 @@ function ReviewPanel({ proposal, onSaved, reload }: { proposal: Proposal; onSave
 }
 function ProposalWorkspace({ teamId }: { teamId: string }) {
   const { profile } = useAuth()
-  const manage = profile?.role === 'professor'
+  const manage = isManager(profile?.role)
   const [revision, setRevision] = useState(0)
   const [result, setResult] = useState<{ revision: number; data: Awaited<ReturnType<typeof loadProposal>> | null; error: string } | null>(null)
   const [notice, setNotice] = useState('')

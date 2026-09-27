@@ -1,7 +1,7 @@
 import { useEffect,useState,type FormEvent } from 'react'
 import { Link,useBlocker,useSearchParams } from 'react-router-dom'
 import { Button } from '@/components/ui/button'
-import { useAuth } from '@/features/auth/auth-context'
+import { isManager, useAuth } from '@/features/auth/auth-context'
 import { useCohorts } from '@/features/cohorts/use-cohorts'
 import { formatScheduleTime } from '@/features/schedules/schedule-model'
 import { deleteAnnouncement,listAnnouncements,saveAnnouncement,type Announcement,type AnnouncementInput } from './announcement-api'
@@ -43,7 +43,7 @@ function Workspace({cohortId,manage,selectedId}:{cohortId:string;manage:boolean;
   </>
 }
 export function AnnouncementsPage(){
-  const {profile}=useAuth();const manage=profile?.role==='professor'
+  const {profile}=useAuth();const manage=isManager(profile?.role)
   const {cohorts,loading,error,reload}=useCohorts()
   const [params,setParams]=useSearchParams()
   const requested=params.get('cohort')

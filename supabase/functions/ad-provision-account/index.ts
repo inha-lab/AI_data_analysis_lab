@@ -2,7 +2,7 @@ import { authenticate, body, handle, json } from '../_shared/http.ts'
 import { provisionAccount, PublicError, type ProvisionGateway, type AccountRecord } from '../_shared/provision.ts'
 
 Deno.serve(handle(async request => {
-  const { admin, user } = await authenticate(request, true)
+  const { admin, user } = await authenticate(request, 'manager')
   const input = await body(request)
   if (typeof input.participantId !== 'string' || typeof input.action !== 'string') throw new PublicError('참가자와 작업을 지정해 주세요.')
   const accountRecord = (account: { id: string; banned_until?: string; app_metadata: Record<string, unknown> }): AccountRecord => ({

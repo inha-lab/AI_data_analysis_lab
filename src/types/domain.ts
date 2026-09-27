@@ -1,4 +1,4 @@
-export type UserRole = 'professor' | 'consultant' | 'researcher' | 'student'
+export type UserRole = 'professor' | 'admin' | 'consultant' | 'researcher' | 'student'
 export type ProjectStage = 'planning' | 'design' | 'implementation' | 'presentation' | 'review'
 export type SubmissionStatus = 'draft' | 'submitted' | 'reviewed'
 

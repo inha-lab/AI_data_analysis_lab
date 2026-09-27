@@ -2,7 +2,7 @@ import { useEffect,useState,type FormEvent } from 'react'
 import { Link,useBlocker,useSearchParams } from 'react-router-dom'
 import { Cpu } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { useAuth } from '@/features/auth/auth-context'
+import { isManager, useAuth } from '@/features/auth/auth-context'
 import { useCohorts } from '@/features/cohorts/use-cohorts'
 import { formatScheduleTime } from '@/features/schedules/schedule-model'
 import { cancelGpuApplication,listGpuApplications,listGpuDay,listGpuTeams,saveGpuReservation } from './gpu-api'
@@ -94,7 +94,7 @@ function Workspace({cohortId,manage,selectedApplicationId}:{cohortId:string;mana
   </>
 }
 export function GpuReservationsPage(){
-  const {profile}=useAuth();const manage=profile?.role==='professor'
+  const {profile}=useAuth();const manage=isManager(profile?.role)
   const {cohorts,loading,error,reload}=useCohorts()
   const [params,setParams]=useSearchParams()
   const requested=params.get('cohort')

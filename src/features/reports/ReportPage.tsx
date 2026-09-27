@@ -1,6 +1,6 @@
 import { useEffect, useState, type FormEvent } from 'react'
 import { Link, useBlocker, useParams, useSearchParams } from 'react-router-dom'
-import { useAuth } from '@/features/auth/auth-context'
+import { isManager, useAuth } from '@/features/auth/auth-context'
 import { Button } from '@/components/ui/button'
 import { formatScheduleTime } from '@/features/schedules/schedule-model'
 import { CommentsPanel } from '@/features/comments/CommentsPanel'
@@ -68,7 +68,7 @@ function ReportReview({report,onSaved,onLockedChange,onCancel}:{report:Report;on
 function ReportWorkspace({teamId}:{teamId:string}) {
   const {profile}=useAuth()
   const [searchParams,setSearchParams]=useSearchParams()
-  const manage=profile?.role==='professor'
+  const manage=isManager(profile?.role)
   const [revision,setRevision]=useState(0)
   const [result,setResult]=useState<{revision:number;data:Awaited<ReturnType<typeof loadReports>>|null;error:string}|null>(null)
   const [selected,setSelected]=useState<string|null>(()=>searchParams.get('report'))

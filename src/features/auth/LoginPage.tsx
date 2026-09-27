@@ -2,7 +2,7 @@ import { useState, type FormEvent } from 'react'
 import { Link, Navigate, useLocation } from 'react-router-dom'
 import { supabase } from '@/lib/supabase'
 import { Button } from '@/components/ui/button'
-import { useAuth } from './auth-context'
+import { isManager, useAuth } from './auth-context'
 import { recordLoginActivity } from '@/features/login-activity/login-activity-api'
 
 export function LoginPage() {
@@ -15,8 +15,8 @@ export function LoginPage() {
   if (!loading && profile) {
     if (profile.must_change_password) return <Navigate to="/change-password" replace />
     const requested = (location.state as { from?: string } | null)?.from
-    const canReturn = requested === '/my-page' || (profile.role === 'professor' && (requested === '/cohorts' || requested === '/participants' || requested === '/deliverables' || requested === '/login-activity' || requested === '/admins'))
-      || ((profile.role === 'professor' || profile.role === 'student') && (requested === '/schedules' || requested === '/announcements' || requested === '/gpu' || requested === '/teams' || /^\/teams\/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\/(proposal|reports|full-report|deliverables)$/i.test(requested ?? '')))
+    const canReturn = requested === '/my-page' || (isManager(profile.role) && (requested === '/cohorts' || requested === '/participants' || requested === '/deliverables' || requested === '/login-activity')) || (profile.role === 'professor' && requested === '/admins')
+      || ((isManager(profile.role) || profile.role === 'student') && (requested === '/schedules' || requested === '/announcements' || requested === '/gpu' || requested === '/teams' || /^\/teams\/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\/(proposal|reports|full-report|deliverables)$/i.test(requested ?? '')))
     const target = canReturn && requested ? requested : '/dashboard'
     return <Navigate to={target} replace />
   }
