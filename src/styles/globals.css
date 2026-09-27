@@ -165,6 +165,7 @@ footer { margin-top: 40px; border-top: 1px solid #dce3eb; padding: 24px 0; color
 .schedule-toolbar { margin: 18px 0; }
 .schedule-list { display: grid; gap: 16px; }
 .schedule-card { border: 1px solid #dce3eb; border-left: 4px solid #2883cc; border-radius: 10px; padding: 20px; background: white; min-width: 0; }
+.schedule-selected { border-color: #1269a6; box-shadow: 0 0 0 3px rgba(40,131,204,.14); }
 .schedule-card-heading { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; }
 .schedule-card h3 { margin: 12px 0; font-size: 18px; overflow-wrap: anywhere; }
 .schedule-card .button { padding: 6px 10px; font-size: 12px; }
