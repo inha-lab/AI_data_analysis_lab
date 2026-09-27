@@ -249,6 +249,7 @@ footer { margin-top: 40px; border-top: 1px solid #dce3eb; padding: 24px 0; color
 .comment-list { display: grid; gap: 1rem; margin: 1rem 0; }
 .announcement-filter { display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; font-size: 14px; }
 .announcement-filter input { width: auto; }
+.announcement-selected { border-color: #2883cc; box-shadow: 0 0 0 3px rgba(40,131,204,.14); }
 .comment-item { border: 1px solid #dce3eb; border-radius: 12px; padding: 1rem; }
 .comment-item .section-heading { margin-bottom: .5rem; }
 .monitoring-panel .stats-grid { margin: 1.5rem 0; }
