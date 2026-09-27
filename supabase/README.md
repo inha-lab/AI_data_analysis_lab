@@ -185,3 +185,5 @@ RLS와 `AD_save_report`·`AD_review_report` 함수가 현재 활성 팀원과 �
 `migrations/20260926000600_ad_monitoring_proposal_queue.sql`은 제출된 기획서의 검토 대기 건수와 제목·팀·제출 시각 목록을 추가합니다. 초안과 검토 완료 기획서는 포함하지 않으며 교수 전용 접근 검사는 그대로 유지합니다.
 
 `migrations/20260926000100_ad_team_member_roles_fix.sql`은 최초 적용 후 발견된 역할 검증 함수의 변수명 충돌을 수정합니다. 이미 적용된 공유 DB에는 보정 마이그레이션도 적용했으며, 두 파일 모두 CLI migration history에 등록하지 않았습니다.
+
+`migrations/20260927000900_ad_full_report_member_grade.sql`은 `AD_team_full_report_v2()`의 팀원 정보에 참가자 학년을 추가합니다. 기존 팀 접근 권한 검사를 그대로 사용하고 `AD_participants`의 학년만 응답에 병합합니다.
