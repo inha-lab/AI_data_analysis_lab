@@ -226,6 +226,15 @@ footer { margin-top: 40px; border-top: 1px solid #dce3eb; padding: 24px 0; color
 .team-overview-details .team-roster { margin: 12px 0; }
 .team-overview-actions { display: flex; flex-wrap: wrap; gap: 8px; padding-top: 12px; }
 .team-overview-actions .button { padding: 7px 11px; font-size: 12px; }
+.admin-team-card { display: grid; grid-template-columns: minmax(170px,.7fr) minmax(280px,1.5fr) minmax(250px,1fr); grid-template-areas: "heading topic links" "title topic links" "leader details actions"; column-gap: 24px; align-items: start; }
+.admin-team-card .team-overview-heading { grid-area: heading; }
+.admin-team-card h2 { grid-area: title; margin-bottom: 4px; }
+.admin-team-card .team-overview-topic { grid-area: topic; align-self: center; min-height: 0; margin: 0; -webkit-line-clamp: 3; }
+.admin-team-card .team-overview-leader { grid-area: leader; margin: 0; }
+.admin-team-card .team-overview-links { grid-area: links; align-self: center; border-top: 0; padding: 0; }
+.admin-team-card .team-overview-details { grid-area: details; border-top: 0; padding: 8px 0 0; }
+.admin-team-card .team-overview-actions { grid-area: actions; align-self: end; justify-content: flex-end; padding-top: 8px; }
+@media (max-width: 1050px) { .admin-team-card { display: flex; } .admin-team-card .team-overview-links,.admin-team-card .team-overview-details { border-top: 1px solid #e5ebf1; } .admin-team-card .team-overview-links { padding: 12px 0; } .admin-team-card .team-overview-details { padding: 10px 0; } .admin-team-card .team-overview-actions { justify-content: flex-start; } }
 .with-editor .team-overview-grid { grid-template-columns: 1fr; }
 .team-overview-grid.student-team-grid { grid-template-columns: 1fr; }
 .student-team-card { padding: 24px; }
