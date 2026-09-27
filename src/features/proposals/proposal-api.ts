@@ -20,9 +20,10 @@ export async function loadProposal(teamId: string) {
   if (team.error) throw fail(team.error.code)
   if (proposal.error) throw fail(proposal.error.code)
   if (!team.data) throw new Error('팀이 없거나 현재 소속 팀에 접근할 수 없습니다.')
-  const roster = await db.rpc('AD_team_roster', { p_cohort: team.data.cohort_id })
+  const [roster,cohort] = await Promise.all([db.rpc('AD_team_roster', { p_cohort: team.data.cohort_id }),db.from('AD_cohorts').select('status').eq('id',team.data.cohort_id).single()])
   if (roster.error) throw fail(roster.error.code)
-  return { team: team.data, proposal: proposal.data as Proposal | null, roster: (roster.data as TeamMember[]).filter(row => row.team_id === teamId) }
+  if (cohort.error) throw fail(cohort.error.code)
+  return { team: team.data, cohortStatus:cohort.data.status as 'active'|'completed', proposal: proposal.data as Proposal | null, roster: (roster.data as TeamMember[]).filter(row => row.team_id === teamId) }
 }
 export async function saveProposal(teamId: string, input: ProposalInput, submit: boolean, previous: Proposal | null) {
   const validation = validateProposal(input, submit)

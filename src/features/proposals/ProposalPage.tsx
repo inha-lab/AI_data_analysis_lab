@@ -74,12 +74,12 @@ function ProposalWorkspace({ teamId }: { teamId: string }) {
   }, [teamId, revision])
   if (result?.revision !== revision) return <p className="empty-state" role="status">기획서를 불러오고 있습니다.</p>
   if (!result.data) return <div className="notice" role="alert"><p>{result.error}</p><div className="button-row"><Button onClick={reload}>다시 시도</Button><Link className="text-link" to="/teams">팀 목록으로 →</Link></div></div>
-  const { team, roster, proposal } = result.data
-  const edit = !manage && (!proposal || proposal.status === 'draft')
+  const { team, roster, proposal, cohortStatus } = result.data
+  const edit = !manage && cohortStatus === 'active' && (!proposal || proposal.status === 'draft')
   const notion = proposal ? safeTeamUrl(proposal.notion_url) : null
   return <>
     <div className="page-heading"><div><p className="eyebrow">PROJECT PROPOSAL</p><h1>프로젝트 기획서</h1><p className="muted">{team.name} · {roster.map(member => `${member.full_name}${member.is_leader ? ' (팀장)' : ''}`).join(', ') || '팀원 미배정'}</p></div><Link to={`/teams?cohort=${team.cohort_id}`} className="text-link">팀 목록으로 →</Link></div>
-    {notice && <p className="success-message" role="status">{notice}</p>}
+    {notice && <p className="success-message" role="status">{notice}</p>}{!manage&&cohortStatus==='completed'&&<p className="notice">종료된 프로그램입니다. 기획서는 조회만 할 수 있습니다.</p>}
     <section className="notice"><span className={`badge ${proposal?.status === 'reviewed' ? 'status-active' : 'status-draft'}`}>{proposal ? proposalStatusLabels[proposal.status] : '미작성'}</span>
       {proposal && <><p>최종 변경: {proposal.updated_name} · {formatScheduleTime(proposal.updated_at)} (KST)</p>{proposal.submitted_at && <p>최근 제출: {proposal.submitted_name} · {formatScheduleTime(proposal.submitted_at)} (KST)</p>}</>}
       {manage ? <p>팀원이 작성한 기획서를 확인하고 제출된 자료에 검토 결과를 남기세요.</p> : !edit && <p>제출된 기획서입니다. 교수의 수정 요청 후 다시 작성할 수 있습니다.</p>}

@@ -20,7 +20,9 @@ export async function loadReports(teamId: string) {
   if (team.error) throw fail(team.error.code)
   if (reports.error) throw fail(reports.error.code)
   if (!team.data) throw new Error('팀이 없거나 현재 소속 팀에 접근할 수 없습니다.')
-  return {team:team.data,reports:reports.data as Report[]}
+  const cohort=await db.from('AD_cohorts').select('status').eq('id',team.data.cohort_id).single()
+  if(cohort.error)throw fail(cohort.error.code)
+  return {team:team.data,cohortStatus:cohort.data.status as 'active'|'completed',reports:reports.data as Report[]}
 }
 export async function saveReport(teamId:string,input:ReportInput,submit:boolean,previous:Report|null):Promise<string> {
   const validation=validateReport(input,submit)

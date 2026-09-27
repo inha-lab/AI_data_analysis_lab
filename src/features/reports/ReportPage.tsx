@@ -91,15 +91,15 @@ function ReportWorkspace({teamId}:{teamId:string}) {
   function saved(id:string,message:string){setNotice(message);setSelected(id);setReviewing(false);reload()}
   if (result?.revision!==revision) return <p className="empty-state" role="status">보고서를 불러오고 있습니다.</p>
   if (!result.data) return <div className="notice" role="alert"><p>{result.error}</p><div className="button-row"><Button onClick={reload}>다시 시도</Button><Link className="text-link" to="/teams">팀 목록으로 →</Link></div></div>
-  const {team,reports}=result.data
+  const {team,reports,cohortStatus}=result.data
   const current=reports.find(report=>report.id===selected)??null
   const newType=selected==='new-daily'?'daily':selected==='new-weekly'?'weekly':null
-  const editable=!manage && (Boolean(newType)||Boolean(current&&current.status!=='reviewed'))
+  const editable=!manage && cohortStatus==='active' && (Boolean(newType)||Boolean(current&&current.status!=='reviewed'))
   const list=reports.filter(report=>(typeFilter==='all'||report.report_type===typeFilter)&&(statusFilter==='all'||(statusFilter==='returned'?report.status==='draft'&&report.review_action==='returned':report.status===statusFilter)))
   return <>
     <div className="page-heading"><div><p className="eyebrow">TEAM REPORTS</p><h1>{team.name} 보고서</h1><p className="muted">일일·주간 진행 내용과 제출·검토 현황을 관리합니다.</p></div><Link to={`/teams?cohort=${team.cohort_id}`} className="text-link">팀 목록으로 →</Link></div>
     {notice&&<p className="success-message" role="status">{notice}</p>}
-    <section className="panel"><div className="section-heading"><h2>보고서 목록 · {reports.length}건</h2>{!manage&&<div className="button-row"><Button onClick={()=>choose('new-daily')}>일일 보고 작성</Button><Button className="button-secondary" onClick={()=>choose('new-weekly')}>주간 보고 작성</Button></div>}</div>
+    {!manage&&cohortStatus==='completed'&&<p className="notice">종료된 프로그램입니다. 보고서는 조회만 할 수 있습니다.</p>}<section className="panel"><div className="section-heading"><h2>보고서 목록 · {reports.length}건</h2>{!manage&&cohortStatus==='active'&&<div className="button-row"><Button onClick={()=>choose('new-daily')}>일일 보고 작성</Button><Button className="button-secondary" onClick={()=>choose('new-weekly')}>주간 보고 작성</Button></div>}</div>
       <div className="list-toolbar schedule-toolbar"><select aria-label="보고 구분 필터" value={typeFilter} onChange={e=>setTypeFilter(e.target.value as 'all'|ReportType)}><option value="all">전체 구분</option><option value="daily">일일 보고</option><option value="weekly">주간 보고</option></select>
         <select aria-label="보고 상태 필터" value={statusFilter} onChange={e=>{const value=e.target.value;setSearchParams(value==='all'?{}:{status:value})}}><option value="all">전체 상태</option><option value="returned">수정 요청</option><option value="draft">작성 중</option><option value="submitted">제출</option><option value="reviewed">검토 완료</option></select>
         <Button className="button-secondary" disabled={locked} onClick={reload}>새로고침</Button></div>

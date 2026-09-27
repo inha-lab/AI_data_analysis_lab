@@ -31,6 +31,7 @@ export function CohortEditor({ cohort, onSaved, onCancel }: { cohort?: Cohort; o
       <label htmlFor="cohort-status">운영 상태</label><select id="cohort-status" value={status} onChange={event => setStatus(event.target.value as CohortStatus)}>
         {Object.entries(cohortStatusLabels).map(([value, label]) => <option key={value} value={value}>{label}</option>)}
       </select>
+      <p className="field-help">준비 중은 학생에게 공개하지 않습니다. 운영 중은 모든 참여 기능을 열고, 종료는 기존 자료 조회만 허용합니다.</p>
       <label htmlFor="cohort-description">프로그램 소개</label><textarea id="cohort-description" rows={4} maxLength={2000} value={description} onChange={event => setDescription(event.target.value)} placeholder="운영 목적이나 안내사항을 입력하세요." />
       {error && <p className="form-error" role="alert">{error}</p>}
       <div className="button-row"><Button type="submit">{busy ? '저장 중…' : cohort ? '변경 저장' : '프로그램 생성'}</Button><Button className="button-secondary" onClick={onCancel}>취소</Button></div>

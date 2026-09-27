@@ -13,6 +13,8 @@ export async function loadDeliverables(teamId:string){
   const team=await db.from('AD_teams').select('id,cohort_id,name').eq('id',teamId).maybeSingle()
   if(team.error)throw fail(team.error.code)
   if(!team.data)throw new Error('팀이 없거나 현재 소속 팀에 접근할 수 없습니다.')
+  const cohort=await db.from('AD_cohorts').select('status').eq('id',team.data.cohort_id).single()
+  if(cohort.error)throw fail(cohort.error.code)
   const items:Deliverable[]=[]
   for(let start=0;;start+=1000){
     const response=await db.from('AD_deliverables').select('id,team_id,category,title,description,url,submitted_by,submitted_name,submitted_at,updated_at').eq('team_id',teamId).order('submitted_at',{ascending:false}).order('id',{ascending:false}).range(start,start+999)
@@ -21,7 +23,7 @@ export async function loadDeliverables(teamId:string){
     items.push(...page)
     if(page.length<1000)break
   }
-  return {team:team.data,items}
+  return {team:team.data,cohortStatus:cohort.data.status as 'active'|'completed',items}
 }
 export async function saveDeliverable(teamId:string,input:DeliverableInput,previous:Deliverable|null){
   const validation=validateDeliverable(input)

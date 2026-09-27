@@ -11,7 +11,7 @@ import { kstDay,reservationTimes,type GpuApplication,type GpuChoice,type GpuRese
 
 const hours=Array.from({length:24},(_,hour)=>`${String(hour).padStart(2,'0')}:00`)
 
-function Workspace({cohortId,manage,selectedApplicationId}:{cohortId:string;manage:boolean;selectedApplicationId:string|null}){
+function Workspace({cohortId,manage,writable,selectedApplicationId}:{cohortId:string;manage:boolean;writable:boolean;selectedApplicationId:string|null}){
   const [day,setDay]=useState(kstDay)
   const [listDay,setListDay]=useState('')
   const scheduleDay=listDay||day
@@ -76,7 +76,7 @@ function Workspace({cohortId,manage,selectedApplicationId}:{cohortId:string;mana
     {notice&&<p className="success-message" role="status">{notice}</p>}{error&&<p className="form-error" role="alert">{error}</p>}
     <div className="gpu-main-grid">
       <section className="panel gpu-request-panel"><div className="section-heading"><h2><Cpu size={19} aria-hidden="true"/> 예약 신청</h2></div>
-        {result?.revision!==revision||result?.viewDay!==scheduleDay?<p role="status">팀과 예약 현황을 불러오고 있습니다.</p>:result.error?<p className="form-error" role="alert">{result.error}</p>:!result.teams.length?<p className="empty-state">{manage?'이 프로그램에 팀을 먼저 등록해 주세요.':'팀 배정 후 GPU 서버 예약을 신청할 수 있습니다.'}</p>:<form className="cohort-form" onSubmit={event=>void submit(event)}><fieldset disabled={busy}>
+        {!writable?<p className="empty-state">종료된 프로그램은 예약 현황만 조회할 수 있습니다.</p>:result?.revision!==revision||result?.viewDay!==scheduleDay?<p role="status">팀과 예약 현황을 불러오고 있습니다.</p>:result.error?<p className="form-error" role="alert">{result.error}</p>:!result.teams.length?<p className="empty-state">{manage?'이 프로그램에 팀을 먼저 등록해 주세요.':'팀 배정 후 GPU 서버 예약을 신청할 수 있습니다.'}</p>:<form className="cohort-form" onSubmit={event=>void submit(event)}><fieldset disabled={busy}>
           <label htmlFor="gpu-team">팀</label><select id="gpu-team" value={selectedTeam} disabled={!manage&&result.teams.length===1} onChange={event=>{setTeamId(event.target.value);setDirty(true)}}>{result.teams.map(team=><option key={team.id} value={team.id}>{team.name} · {team.topic||'프로젝트 미정'}</option>)}</select>
           <label htmlFor="gpu-day">예약일 (KST)</label><input id="gpu-day" type="date" required value={day} onChange={event=>{setDay(event.target.value);setDirty(true)}}/>
           <div className="date-fields"><div><label htmlFor="gpu-start">시작 시간</label><select id="gpu-start" value={start} onChange={event=>{setStart(event.target.value);setDirty(true)}}>{hours.map(hour=><option key={hour}>{hour}</option>)}</select></div><div><label htmlFor="gpu-end">종료 시간</label><select id="gpu-end" value={end} onChange={event=>{setEnd(event.target.value);setDirty(true)}}>{hours.map(hour=><option key={hour}>{hour}</option>)}</select></div></div>
@@ -101,6 +101,6 @@ export function GpuReservationsPage(){
   const selectedApplication=params.get('application')
   const selected=requested?cohorts.find(item=>item.id===requested):cohorts.find(item=>item.status==='active')??cohorts[0]
   return <><div className="page-heading"><div><p className="eyebrow">GPU SERVER</p><h1>GPU 서버 사용 신청</h1><p className="muted">GPU_#0, GPU_#1을 정시 단위로 예약하고 팀별 사용 현황을 확인합니다.</p></div></div>
-    {loading?<p role="status">프로그램을 불러오고 있습니다.</p>:error?<div className="notice" role="alert"><p>{error}</p><Button onClick={reload}>다시 시도</Button></div>:!cohorts.length?<section className="panel empty-state"><h2>{manage?'먼저 프로그램을 등록해 주세요.':'참여 중인 프로그램이 없습니다.'}</h2>{manage&&<Link className="button" to="/cohorts?new=1">프로그램 등록</Link>}</section>:<><div className="cohort-selector"><label htmlFor="gpu-cohort">프로그램 선택</label><select id="gpu-cohort" value={selected?.id??''} onChange={event=>setParams({cohort:event.target.value})}>{cohorts.map(item=><option key={item.id} value={item.id}>{item.name}</option>)}</select></div>{selected?<Workspace key={selected.id} cohortId={selected.id} manage={manage} selectedApplicationId={selectedApplication}/>:<p role="alert">요청한 프로그램을 찾을 수 없습니다.</p>}</>}
+    {loading?<p role="status">프로그램을 불러오고 있습니다.</p>:error?<div className="notice" role="alert"><p>{error}</p><Button onClick={reload}>다시 시도</Button></div>:!cohorts.length?<section className="panel empty-state"><h2>{manage?'먼저 프로그램을 등록해 주세요.':'참여 중인 프로그램이 없습니다.'}</h2>{manage&&<Link className="button" to="/cohorts?new=1">프로그램 등록</Link>}</section>:<><div className="cohort-selector"><label htmlFor="gpu-cohort">프로그램 선택</label><select id="gpu-cohort" value={selected?.id??''} onChange={event=>setParams({cohort:event.target.value})}>{cohorts.map(item=><option key={item.id} value={item.id}>{item.name}</option>)}</select></div>{selected?<Workspace key={selected.id} cohortId={selected.id} manage={manage} writable={manage||selected.status==='active'} selectedApplicationId={selectedApplication}/>:<p role="alert">요청한 프로그램을 찾을 수 없습니다.</p>}</>}
   </>
 }
