@@ -3,7 +3,7 @@ export const teamStages = { planning: '기획', design: '설계', implementation
 export interface TeamProject { topic: string; stage: keyof typeof teamStages; notion_url: string; github_url: string; demo_url: string }
 export interface TeamInput extends TeamProject { name: string }
 export interface Team extends TeamInput { id: string; cohort_id: string; updated_at: string }
-export interface TeamMember { team_id: string; participant_id: string; full_name: string; department: string; job_group: JobGroup; is_leader: boolean; is_active: boolean; role_title: string }
+export interface TeamMember { team_id: string; participant_id: string; full_name: string; department: string; grade: string; job_group: JobGroup; is_leader: boolean; is_active: boolean; role_title: string }
 export const eligibilityLabels = { ready: '배정 가능', unlinked: '계정 연결 필요', inactive_participant: '참가 비활성', inactive_profile: '계정 비활성', wrong_role: '학생 계정 필요' } as const
 export interface TeamCandidate { participant_id: string; full_name: string; department: string; job_group: JobGroup; team_id: string | null; eligibility: keyof typeof eligibilityLabels }
 export const emptyTeam: TeamInput = { name: '', topic: '', stage: 'planning', notion_url: '', github_url: '', demo_url: '' }
