@@ -1,6 +1,6 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
-import { assertAdminAccountAvailable, normalizeAdmin, normalizeAdminTarget } from '../supabase/functions/_shared/admin.ts'
+import { assertAdminAccountAvailable, normalizeAdmin, normalizeAdminTarget, temporaryPasswordFromPhone } from '../supabase/functions/_shared/admin.ts'
 
 test('normalizes administrator input and fixes the supported action', () => {
   assert.deepEqual(normalizeAdmin({ action: 'create', email: ' Admin@Inha.ac.kr ', displayName: ' 관리자 ', phone: ' 010-1234-5678 ', role: 'admin' }), { email: 'admin@inha.ac.kr', displayName: '관리자', phone: '010-1234-5678', role: 'admin' })
@@ -10,6 +10,11 @@ test('validates administrator update targets and active state', () => {
   assert.deepEqual(normalizeAdminTarget({ id: 'facb33f3-cb7a-4d56-b123-fe9507fd38ec', isActive: true }), { id: 'facb33f3-cb7a-4d56-b123-fe9507fd38ec', isActive: true })
   assert.throws(() => normalizeAdminTarget({ id: 'invalid', isActive: true }), /식별/)
   assert.throws(() => normalizeAdminTarget({ id: 'facb33f3-cb7a-4d56-b123-fe9507fd38ec', isActive: 'yes' }), /상태/)
+})
+test('builds an eight digit temporary password from a Korean mobile number', () => {
+  assert.equal(temporaryPasswordFromPhone('010-8722-7922'), '87227922')
+  assert.equal(temporaryPasswordFromPhone('010 1234 5678'), '12345678')
+  assert.throws(() => temporaryPasswordFromPhone('02-1234-5678'), /010/)
 })
 test('existing authentication accounts can be linked only when this app has no profile', () => {
   assert.doesNotThrow(() => assertAdminAccountAvailable(null))

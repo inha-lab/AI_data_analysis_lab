@@ -32,6 +32,11 @@ export async function deleteAdminAccount(id: string): Promise<void> {
   await invokeFunction<{ success: boolean }>('ad-create-admin', { action: 'delete', id })
 }
 
+export async function resetAdminPassword(id: string): Promise<string> {
+  const result = await invokeFunction<{ temporaryPassword: string }>('ad-create-admin', { action: 'reset_password', id })
+  return result.temporaryPassword
+}
+
 export interface MyAcademicProfile { department: string; grade: string; job_group: 'sw_engineering' | 'sw_development' | 'ai_development' | 'other'; job_group_other: string | null }
 export async function getMyAcademicProfile(): Promise<MyAcademicProfile | null> {
   const { data, error } = await client().rpc('AD_my_academic_profile')

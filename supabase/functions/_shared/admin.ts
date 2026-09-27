@@ -31,4 +31,10 @@ export function normalizeAdminTarget(input: { id?: unknown; isActive?: unknown }
   return { id, isActive: input.isActive === true }
 }
 
+export function temporaryPasswordFromPhone(phone: string | null) {
+  const digits = (phone ?? '').replace(/\D/g, '')
+  if (!/^010\d{8}$/.test(digits)) throw new PublicError('전화번호가 010-XXXX-XXXX 형식이어야 비밀번호를 초기화할 수 있습니다.', 409)
+  return digits.slice(3)
+}
+
 export { generateTemporaryPassword }
