@@ -308,6 +308,7 @@ footer { margin-top: 40px; border-top: 1px solid #dce3eb; padding: 24px 0; color
 .gpu-list-controls .button { padding: 9px 12px; font-size: 12px; }
 .gpu-application-list { border-top: 1px solid #e5ebf1; }
 .gpu-application { border-bottom: 1px solid #e5ebf1; padding: 10px 0; overflow-wrap: anywhere; }
+.gpu-application-selected { margin: 0 -8px; padding: 10px 8px; border-radius: 7px; background: #eef7fd; box-shadow: 0 0 0 2px rgba(40,131,204,.18); }
 .gpu-application-main { display: grid; grid-template-columns: minmax(200px,1.4fr) minmax(130px,1fr) minmax(95px,.7fr) minmax(150px,1.4fr) auto; align-items: center; gap: 12px; font-size: 13px; }
 .gpu-reservations-panel .gpu-application-main { grid-template-columns: minmax(0,1fr) auto; gap: 4px 12px; }
 .gpu-reservations-panel .gpu-application-time { grid-column: 1; grid-row: 1; }
