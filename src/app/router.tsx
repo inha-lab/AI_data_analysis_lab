@@ -13,8 +13,8 @@ export const router = createHashRouter([
     { path: '*', element: <NotFoundPage /> },
   ] },
   { element: <RequireAuth />, children: [
-    { path: '/change-password', lazy: async () => ({ Component: (await import('@/features/auth/ChangePasswordPage')).ChangePasswordPage }) },
     { element: <DashboardLayout />, children: [
+      { path: '/change-password', lazy: async () => ({ Component: (await import('@/features/auth/ChangePasswordPage')).ChangePasswordPage }) },
       { path: '/dashboard', lazy: async () => ({ Component: (await import('@/features/monitoring/DashboardPage')).DashboardPage }) },
       { path: '/my-page', lazy: async () => ({ Component: (await import('@/features/account/MyPage')).MyPage }) },
       { element: <RequireAuth roles={['professor', 'admin', 'student']} />, children: [
