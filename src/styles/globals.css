@@ -275,6 +275,7 @@ footer { margin-top: 40px; border-top: 1px solid #dce3eb; padding: 24px 0; color
 @media print { .workspace-sidebar,.workspace-topbar,.report-actions { display: none !important; } .workspace { display: block; } .workspace-content { max-width: none; padding: 0; } .full-report { border: 0; max-width: none; margin: 0; padding: 0; } .full-report-entry { break-inside: auto; } }
 .deliverable-list { display: grid; gap: 12px; margin-top: 18px; }
 .deliverable-row { display: flex; align-items: start; justify-content: space-between; gap: 20px; border: 1px solid #dce3eb; border-radius: 10px; padding: 18px; }
+.deliverable-selected .deliverable-row { border-color: #1269a6; box-shadow: 0 0 0 3px rgba(40,131,204,.14); }
 .deliverable-row h3 { margin: 10px 0 5px; }
 .deliverable-row .proposal-text { margin: 0; }
 .deliverable-row .button-row { justify-content: flex-end; align-items: center; flex-shrink: 0; }
