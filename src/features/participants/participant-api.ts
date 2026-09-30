@@ -1,4 +1,5 @@
 import { supabase } from '@/lib/supabase'
+import { invokeFunction } from '@/lib/functions'
 import { normalizeParticipant, validateBulkParticipantStatus, validateParticipant, type Participant, type ParticipantInput, type ParticipantStatus } from './participant-model'
 const columns = 'id,cohort_id,profile_id,full_name,email,department,student_number,grade,gender,phone,job_group,job_group_other,status,created_at,updated_at'
 function client() {
@@ -40,10 +41,5 @@ export async function bulkUpdateParticipantStatus(cohortId:string,participantIds
   return data as number
 }
 export async function deleteParticipant(participant:Participant):Promise<void>{
-  const {error}=await client().rpc('AD_delete_participant',{p_participant:participant.id,p_version:participant.updated_at})
-  if(error){
-    if(error.code==='23503')throw new Error('팀에 배정된 참가자는 팀에서 먼저 해제해 주세요.')
-    if(error.code==='40001')throw new Error('참가자 정보가 변경되었습니다. 새로고침 후 다시 시도해 주세요.')
-    throw new Error(errorMessage(error.code))
-  }
+  await invokeFunction<{success:boolean}>('ad-delete-participant',{participantId:participant.id,version:participant.updated_at})
 }

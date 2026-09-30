@@ -1,6 +1,6 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
-import { normalizeParticipant, validateBulkParticipantStatus, validateParticipant } from '../src/features/participants/participant-model.ts'
+import { formatContact, normalizeParticipant, validateBulkParticipantStatus, validateParticipant } from '../src/features/participants/participant-model.ts'
 
 const valid = { full_name: 'Test Student', email: 'student@example.test', department: 'Data Science', student_number: '00123456', grade: '3', gender: 'male', phone: '010-0000-0000', job_group: 'ai_development', status: 'active' }
 test('normalization preserves leading zeros and normalizes email', () => {
@@ -9,6 +9,7 @@ test('normalization preserves leading zeros and normalizes email', () => {
   assert.equal(result.student_number, '00123456')
   assert.equal(validateParticipant(result), null)
 })
+test('formats an unseparated Korean mobile contact',()=>assert.equal(formatContact('01096503328'),'010-9650-3328'))
 test('required academic fields and valid contact information are enforced', () => {
   for (const field of ['full_name', 'department', 'student_number', 'grade']) {
     assert.ok(validateParticipant({ ...valid, [field]: '  ' }))

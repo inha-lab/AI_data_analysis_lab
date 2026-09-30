@@ -42,7 +42,7 @@ function ParticipantWorkspace({ cohort, onEditingChange }: { cohort: Cohort; onE
     finally{operation(false)}
   }
   async function removeParticipant(item:Participant){
-    if(!window.confirm(`${item.full_name} 참가자를 삭제할까요? 프로그램 참가 정보만 삭제되며 로그인 계정은 유지됩니다.`))return
+    if(!window.confirm(`${item.full_name} 참가자를 삭제할까요? 연결된 로그인 계정도 함께 삭제되며 복구할 수 없습니다.`))return
     operation(true);setActionError('');setNotice('')
     try{await deleteParticipant(item);setSelectedIds(current=>{const next=new Set(current);next.delete(item.id);return next});setNotice(`${item.full_name} 참가자를 삭제했습니다.`);reload()}
     catch(cause){setActionError(cause instanceof Error?cause.message:'참가자를 삭제하지 못했습니다.')}

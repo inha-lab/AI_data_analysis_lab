@@ -26,6 +26,10 @@ export interface Participant extends ParticipantInput {
   created_at: string
   updated_at: string
 }
+export function formatContact(value:string):string{
+  const text=value.trim(),digits=text.replace(/\D/g,'')
+  return /^010\d{8}$/.test(digits)?`${digits.slice(0,3)}-${digits.slice(3,7)}-${digits.slice(7)}`:text
+}
 export function validateParticipant(input: ParticipantInput): string | null {
   const required = [
     ['이름', input.full_name, 80], ['학과', input.department, 100],
@@ -45,7 +49,7 @@ export function validateParticipant(input: ParticipantInput): string | null {
 export function normalizeParticipant(input: ParticipantInput): ParticipantInput {
   return { ...input, full_name: input.full_name.trim(), email: input.email.trim().toLowerCase(),
     department: input.department.trim(), student_number: input.student_number.trim(),
-    grade: input.grade.trim(), phone: input.phone.trim(), job_group_other: input.job_group === 'other' ? input.job_group_other?.trim() : null }
+    grade: input.grade.trim(), phone: formatContact(input.phone), job_group_other: input.job_group === 'other' ? input.job_group_other?.trim() : null }
 }
 export function jobGroupLabel(input: Pick<ParticipantInput, 'job_group' | 'job_group_other'>) { return input.job_group === 'other' ? input.job_group_other || '기타' : jobGroups[input.job_group] }
 export function validateBulkParticipantStatus(ids:string[],status:string):string|null{

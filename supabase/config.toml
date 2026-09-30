@@ -10,3 +10,6 @@ verify_jwt = false
 
 [functions.ad-create-admin]
 verify_jwt = false
+
+[functions.ad-delete-participant]
+verify_jwt = false

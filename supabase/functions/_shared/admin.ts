@@ -3,6 +3,7 @@ import { generateTemporaryPassword, PublicError } from './provision.ts'
 export interface AdminInput { action?: unknown; email?: unknown; displayName?: unknown; phone?: unknown; role?: unknown }
 export interface NormalizedAdmin { email: string; displayName: string; phone: string; role: 'professor' | 'admin' }
 export interface ExistingAdminProfile { role: string; is_active: boolean }
+function formatContact(value: string) { const digits=value.replace(/\D/g,''); return /^010\d{8}$/.test(digits)?`${digits.slice(0,3)}-${digits.slice(3,7)}-${digits.slice(7)}`:value }
 
 export function normalizeAdmin(input: AdminInput): NormalizedAdmin {
   if (input.action !== 'create') throw new PublicError('요청 형식이 올바르지 않습니다.')
@@ -15,7 +16,7 @@ export function normalizeAdmin(input: AdminInput): NormalizedAdmin {
   const digits = phone.replace(/\D/g, '')
   if (!/^[0-9+()\-\s]+$/.test(phone) || digits.length < 9 || digits.length > 15) throw new PublicError('연락처를 정확히 입력해 주세요.')
   if (role !== 'professor' && role !== 'admin') throw new PublicError('관리자 역할을 선택해 주세요.')
-  return { email, displayName, phone, role }
+  return { email, displayName, phone: formatContact(phone), role }
 }
 
 export function assertAdminAccountAvailable(profile: ExistingAdminProfile | null) {

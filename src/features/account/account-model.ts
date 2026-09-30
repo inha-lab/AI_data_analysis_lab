@@ -1,8 +1,9 @@
 export interface ProfileInput { displayName: string; phone: string }
 export interface AdminInput extends ProfileInput { email: string; role: 'professor' | 'admin' }
+export function formatContact(value:string):string { const text=value.trim(),digits=text.replace(/\D/g,''); return /^010\d{8}$/.test(digits)?`${digits.slice(0,3)}-${digits.slice(3,7)}-${digits.slice(7)}`:text }
 
 export function normalizeProfileInput(input: ProfileInput): ProfileInput {
-  return { displayName: input.displayName.trim(), phone: input.phone.trim() }
+  return { displayName: input.displayName.trim(), phone: formatContact(input.phone) }
 }
 
 export function validateProfileInput(input: ProfileInput): string {
