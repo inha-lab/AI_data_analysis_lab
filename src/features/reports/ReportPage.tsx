@@ -32,7 +32,7 @@ function ReportEditor({teamId,previous,initial,onSaved,onCancel}:{teamId:string;
       <label htmlFor="report-title">제목</label><input id="report-title" required maxLength={120} value={input.title} onChange={e=>change('title',e.target.value)} />
       {reportFields.map(field=><div key={field.key}><label htmlFor={`report-${field.key}`}>{field.label}{['progress_summary','completed_work','next_plan'].includes(field.key)?' · 제출 시 필수':''}</label><p id={`report-help-${field.key}`} className="field-help">{field.help}</p><textarea id={`report-${field.key}`} aria-describedby={`report-help-${field.key}`} rows={5} maxLength={8000} value={input[field.key]} onChange={e=>change(field.key,e.target.value)} /><p className="field-help">{input[field.key].length.toLocaleString()} / 8,000자</p></div>)}
       {error && <p className="form-error" role="alert">{error}</p>}
-      <div className="button-row">{previous?<Button type="submit">{busy?'수정 중…':'수정'}</Button>:<><Button type="submit">{busy?'저장 중…':'임시 저장'}</Button><Button onClick={()=>void save(true)}>보고서 제출</Button></>}<Button className="button-secondary" disabled={busy} onClick={()=>{if(!dirty||window.confirm('수정 중인 내용을 버리고 조회 화면으로 돌아갈까요?'))onCancel()}}>취소</Button></div>
+      <div className="button-row">{previous?<Button type="submit">{busy?'저장 중…':'저장'}</Button>:<><Button type="submit">{busy?'저장 중…':'임시 저장'}</Button><Button onClick={()=>void save(true)}>보고서 제출</Button></>}<Button className="button-secondary" disabled={busy} onClick={()=>{if(!dirty||window.confirm('수정 중인 내용을 버리고 조회 화면으로 돌아갈까요?'))onCancel()}}>취소</Button></div>
   </fieldset></form>
   </section>
 }
