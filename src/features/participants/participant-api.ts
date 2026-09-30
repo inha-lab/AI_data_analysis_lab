@@ -23,12 +23,17 @@ export async function saveParticipant(cohortId: string, input: ParticipantInput,
   const validation = validateParticipant(input)
   if (validation) throw new Error(validation)
   if (previous && previous.cohort_id !== cohortId) throw new Error('선택한 프로그램과 참가자 정보가 일치하지 않습니다.')
-  const table = client().from('AD_participants')
   const values = normalizeParticipant(input)
   const request = previous
-    ? table.update(values).eq('cohort_id', cohortId).eq('id', previous.id).eq('updated_at', previous.updated_at)
-    : table.insert({ ...values, cohort_id: cohortId })
-  const { data, error } = await request.select(columns).maybeSingle()
+    ? client().from('AD_participants').update(values).eq('cohort_id', cohortId).eq('id', previous.id).eq('updated_at', previous.updated_at).select(columns).maybeSingle()
+    : client().rpc('AD_create_participant', {
+      p_cohort: cohortId, p_full_name: values.full_name, p_email: values.email,
+      p_department: values.department, p_student_number: values.student_number,
+      p_grade: values.grade, p_gender: values.gender, p_phone: values.phone,
+      p_job_group: values.job_group, p_job_group_other: values.job_group_other ?? null,
+      p_status: values.status,
+    }).select(columns).maybeSingle()
+  const { data, error } = await request
   if (error) throw new Error(errorMessage(error.code))
   if (!data) throw new Error('다른 사용자가 수정했거나 권한이 변경되었습니다. 목록을 새로고침한 뒤 다시 시도해 주세요.')
   return data as Participant
