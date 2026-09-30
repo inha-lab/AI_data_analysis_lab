@@ -20,9 +20,25 @@ test('blank desired job imports as unspecified',()=>{
   const blankJob=[...row];blankJob[8]=''
   assert.equal(previewImport([[...importHeaders],blankJob],[],'기수1')[0].input.job_group,'unspecified')
 })
-test('numeric identifiers, formulas and cohort mismatches cannot be imported', () => {
-  assert.equal(previewImport([[...importHeaders], row.map((value, index) => index === 4 ? 123456 : value)], [], '기수1')[0].status, 'invalid')
+test('numeric identifiers are converted and the missing 010 prefix is restored', () => {
+  const numeric = row.map((value, index) => index === 4 ? 12345678 : index === 7 ? 1096503328 : value)
+  const [result] = previewImport([[...importHeaders], numeric], [], '기수1')
+  assert.equal(result.status, 'ready')
+  assert.equal(result.input.student_number, '12345678')
+  assert.equal(result.input.phone, '010-9650-3328')
+})
+test('hyperlinks and rich text use their displayed text', () => {
+  const formatted = [...row]
+  formatted[1] = { richText: [{ text: 'Test ' }, { text: 'Student' }] }
+  formatted[2] = { text: 'STUDENT@example.test', hyperlink: 'mailto:STUDENT@example.test' }
+  const [result] = previewImport([[...importHeaders], formatted], [], '기수1')
+  assert.equal(result.status, 'ready')
+  assert.equal(result.input.full_name, 'Test Student')
+  assert.equal(result.input.email, 'student@example.test')
+})
+test('formulas, dates and cohort mismatches cannot be imported', () => {
   assert.equal(previewImport([[...importHeaders], row.map((value, index) => index === 1 ? { formula: '1+1' } : value)], [], '기수1')[0].status, 'invalid')
+  assert.equal(previewImport([[...importHeaders], row.map((value, index) => index === 1 ? new Date('2026-09-30') : value)], [], '기수1')[0].status, 'invalid')
   assert.equal(previewImport([[...importHeaders, '기수'], [...row, '다른 기수']], [], '기수1')[0].status, 'invalid')
 })
 test('program headers support legacy files and reject mismatched or ambiguous destinations', () => {
