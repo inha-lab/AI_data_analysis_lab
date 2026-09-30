@@ -8,6 +8,7 @@ export function ExcelImport({ cohortId, cohortName, existing, onChanged, onBusy,
   const [rows, setRows] = useState<ImportRow[]>([])
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState('')
+  const [notice, setNotice] = useState('')
   async function downloadTemplate() {
     setError('')
     try {
@@ -30,7 +31,7 @@ export function ExcelImport({ cohortId, cohortName, existing, onChanged, onBusy,
   async function readFile(event: ChangeEvent<HTMLInputElement>) {
     const file = event.target.files?.[0]; event.target.value = ''
     if (!file) return
-    setRows([]); setError('')
+    setRows([]); setError(''); setNotice('')
     if (!file.name.toLowerCase().endsWith('.xlsx') || file.size > 2 * 1024 * 1024) { setError('2MB 이하의 .xlsx 파일을 선택해 주세요.'); return }
     setBusy(true); onBusy(true)
     try {
@@ -47,22 +48,29 @@ export function ExcelImport({ cohortId, cohortName, existing, onChanged, onBusy,
   }
   async function save() {
     setBusy(true); onBusy(true); setError('')
-    for (const row of rows.filter(item => item.status === 'ready' || item.status === 'failed')) {
+    const targets = rows.filter(item => item.status === 'ready' || item.status === 'failed')
+    let savedCount = 0
+    let failedCount = 0
+    for (const row of targets) {
       try {
         await saveParticipant(cohortId, row.input)
+        savedCount += 1
         setRows(current => current.map(item => item.rowNumber === row.rowNumber ? { ...item, status: 'saved', message: '등록 완료' } : item))
-      } catch (cause) { setRows(current => current.map(item => item.rowNumber === row.rowNumber ? { ...item, status: 'failed', message: cause instanceof Error ? cause.message : '등록 실패' } : item)) }
+      } catch (cause) { failedCount += 1; setRows(current => current.map(item => item.rowNumber === row.rowNumber ? { ...item, status: 'failed', message: cause instanceof Error ? cause.message : '등록 실패' } : item)) }
     }
+    setNotice(failedCount ? `${savedCount}명 등록 완료 · ${failedCount}명 등록 실패` : `${savedCount}명의 참가자 등록을 완료했습니다.`)
+    if (!failedCount) setRows([])
     setBusy(false); onBusy(false); onChanged()
+    if (savedCount) window.setTimeout(() => document.querySelector('.participants-panel')?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 100)
   }
   const ready = rows.filter(row => row.status === 'ready' || row.status === 'failed').length
   return <section className="panel account-panel"><div className="section-heading"><h2>엑셀 일괄 등록</h2><Button className="button-secondary" onClick={() => void downloadTemplate()} disabled={busy || locked}>양식 다운로드</Button></div>
     <p className="field-help">.xlsx · 최대 500행 · 2MB. 미리보기 후 정상 행만 등록합니다. 기존 참가자 정보는 덮어쓰지 않습니다.</p>
     <label className="file-picker">파일 선택<input type="file" accept=".xlsx" onChange={event => void readFile(event)} disabled={busy || locked} /></label>
-    {error && <p role="alert" className="form-error">{error}</p>}
-    {rows.length > 0 && <><p role="status">전체 {rows.length}행 · 등록 완료 {rows.filter(row => row.status === 'saved').length}행 · 오류 {rows.filter(row => row.status === 'invalid' || row.status === 'failed').length}행 · 건너뜀 {rows.filter(row => row.status === 'skip').length}행</p>
+    {error && <p role="alert" className="form-error">{error}</p>}{notice && <p role="status" className="success-message">{notice}</p>}
+    {rows.length > 0 && <><div className="import-action-summary" role="status"><div><strong>파일 확인 완료 · 아직 참가자 목록에 등록되지 않았습니다.</strong><p className="field-help">전체 {rows.length}행 · 등록 예정 {ready}행 · 오류 {rows.filter(row => row.status === 'invalid' || row.status === 'failed').length}행 · 건너뜀 {rows.filter(row => row.status === 'skip').length}행</p></div><Button disabled={busy || locked || !ready} onClick={() => void save()}>{busy ? '등록 중…' : `참가자 등록 (${ready}명)`}</Button></div>
       <div className="import-preview table-scroll"><table className="data-table"><thead><tr><th>행</th><th>이름</th><th>이메일</th><th>학번</th><th>성별</th><th>검증 결과</th></tr></thead><tbody>{rows.map(row => <tr key={row.rowNumber}><td>{row.rowNumber}</td><td>{row.input.full_name}</td><td>{row.input.email}</td><td>{row.input.student_number}</td><td>{genderLabels[row.input.gender]}</td><td className="result-message">{row.message}</td></tr>)}</tbody></table></div>
-      <Button disabled={busy || locked || !ready} onClick={() => void save()}>{busy ? '처리 중…' : `등록 / 실패 재시도 (${ready}행)`}</Button>
+      {rows.some(row => row.status === 'failed') && <Button disabled={busy || locked || !ready} onClick={() => void save()}>{busy ? '재시도 중…' : `등록 실패 재시도 (${ready}명)`}</Button>}
     </>}
   </section>
 }

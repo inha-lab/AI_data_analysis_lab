@@ -167,6 +167,10 @@ footer { margin-top: 40px; border-top: 1px solid #dce3eb; padding: 24px 0; color
 .account-panel .button-row { margin-top: 18px; }
 .account-panel .result-message { white-space: normal; min-width: 240px; max-width: 420px; }
 .import-preview { max-height: 350px; margin-bottom: 18px; }
+.import-action-summary { display: flex; align-items: center; justify-content: space-between; gap: 18px; margin-top: 18px; padding: 16px 18px; border: 1px solid #b8d8cc; border-radius: 10px; background: #eef8f4; }
+.import-action-summary p { margin: 4px 0 0; }
+.import-action-summary .button { flex: 0 0 auto; }
+@media (max-width: 720px) { .import-action-summary { align-items: stretch; flex-direction: column; } }
 .file-picker { display: block; margin-top: 18px; font-size: 13px; }
 .file-picker input { display: block; margin-top: 8px; font: inherit; padding: 8px; border: 1px solid #cbd8e3; border-radius: 6px; width: 100%; }
 .file-picker input::file-selector-button { background: #e9eff5; border: 0; border-radius: 5px; padding: 8px 12px; margin-right: 12px; cursor: pointer; }
