@@ -263,6 +263,14 @@ footer { margin-top: 40px; border-top: 1px solid #dce3eb; padding: 24px 0; color
 @media (max-width: 680px) { .admin-team-roster li { grid-template-columns: minmax(100px,1fr) minmax(120px,1fr); } }
 @media (max-width: 520px) { .team-search-form,.participant-search-form { min-width: 100%; } }
 .with-editor .team-overview-grid { grid-template-columns: 1fr; }
+.with-editor .admin-team-card { display: flex; }
+.with-editor .team-document-menu,
+.with-editor .admin-team-card .team-overview-details { border-top: 1px solid #e5ebf1; }
+.with-editor .team-document-menu { padding: 12px 0; }
+.with-editor .admin-team-card .team-overview-details { padding: 10px 0; }
+.with-editor .admin-team-card .team-overview-actions { justify-content: flex-start; }
+.with-editor .admin-team-roster li { grid-template-columns: minmax(90px,.8fr) minmax(110px,1fr) 48px minmax(110px,1fr); }
+@media (max-width: 1250px) { .with-editor .admin-team-roster li { grid-template-columns: minmax(100px,1fr) minmax(120px,1fr); } }
 .team-overview-grid.student-team-grid { grid-template-columns: 1fr; }
 .student-team-card { padding: 24px; }
 .student-team-card h2 { font-size: 24px; }
