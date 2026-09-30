@@ -45,9 +45,9 @@ export function TeamEditor({ cohortId, team, roster, candidates, manage, onSaved
     finally { setBusy(false) }
   }
   const visible = candidates.filter(item => `${item.full_name} ${item.department}`.toLowerCase().includes(search.trim().toLowerCase()))
-  return <section className="panel editor-panel"><h2>{manage ? team ? '팀 정보·구성 수정' : '새 팀 만들기' : '우리 팀 프로젝트 수정'}</h2>
+  return <section className="panel editor-panel"><h2>{manage ? team ? '팀 정보·구성 수정' : '새 팀 만들기' : '우리 팀 정보 수정'}</h2>
     <form className="cohort-form" onSubmit={submit}><fieldset disabled={busy}>
-      <label htmlFor="team-name">팀명</label><input id="team-name" value={input.name} required maxLength={80} readOnly={!manage} onChange={e => change('name', e.target.value)} autoFocus={manage} />
+      <label htmlFor="team-name">팀명</label><input id="team-name" value={input.name} required maxLength={80} onChange={e => change('name', e.target.value)} autoFocus />
       <label htmlFor="team-topic">프로젝트 주제</label><textarea id="team-topic" value={input.topic} rows={4} maxLength={2000} onChange={e => change('topic', e.target.value)} />
       <label htmlFor="team-stage">진행 단계</label><select id="team-stage" value={input.stage} onChange={e => change('stage', e.target.value as TeamInput['stage'])}>{Object.entries(teamStages).map(([key, label]) => <option key={key} value={key}>{label}</option>)}</select>
       {(['notion_url', 'github_url', 'demo_url'] as const).map((key, index) => <div key={key}><label htmlFor={`team-${key}`}>{['Notion', 'GitHub', '데모'][index]} URL</label><input id={`team-${key}`} type="url" maxLength={2000} value={input[key]} placeholder="https://" onChange={e => change(key, e.target.value)} /></div>)}

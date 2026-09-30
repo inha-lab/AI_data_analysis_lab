@@ -43,7 +43,7 @@ export async function updateTeamProject(input: TeamInput, previous: Team) {
   const validation = validateTeam(input)
   if (validation) throw new Error(validation)
   const normalized = normalizeTeam(input)
-  const values = { topic: normalized.topic, stage: normalized.stage, notion_url: normalized.notion_url, github_url: normalized.github_url, demo_url: normalized.demo_url }
+  const values = { name: normalized.name, topic: normalized.topic, stage: normalized.stage, notion_url: normalized.notion_url, github_url: normalized.github_url, demo_url: normalized.demo_url }
   const { error } = await client().rpc('AD_update_team_project', { p_team: previous.id, p_version: previous.updated_at, p_values: values })
   if (error) throw fail(error.code)
 }
