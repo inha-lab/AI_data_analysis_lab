@@ -6,6 +6,8 @@ export interface ProvisionGateway {
   findAccount: (email: string) => Promise<AccountRecord | null>
   profile: (id: string) => Promise<AppProfile | null>
   createAccount: (email: string, password: string) => Promise<AccountRecord>
+  resetPassword: (userId: string, password: string) => Promise<void>
+  requirePasswordChange: (userId: string) => Promise<void>
   link: (participant: ParticipantRecord, userId: string, actorId: string) => Promise<void>
 }
 export class PublicError extends Error {
@@ -22,7 +24,7 @@ export function participantTemporaryPasswordFromPhone(phone: string): string {
   return digits.slice(3)
 }
 export async function provisionAccount(gateway: ProvisionGateway, actorId: string, participantId: string, action: string) {
-  if (!/^[0-9a-f-]{36}$/i.test(participantId) || action !== 'provision') throw new PublicError('요청 형식이 올바르지 않습니다.')
+  if (!/^[0-9a-f-]{36}$/i.test(participantId) || !['provision', 'reset_temporary'].includes(action)) throw new PublicError('요청 형식이 올바르지 않습니다.')
   const participant = await gateway.participant(participantId)
   if (!participant || participant.status !== 'active') throw new PublicError('활성 참가자만 계정을 연결할 수 있습니다.')
   let account = await gateway.findAccount(participant.email)
@@ -30,6 +32,13 @@ export async function provisionAccount(gateway: ProvisionGateway, actorId: strin
   if (participant.profile_id && account?.id !== participant.profile_id) throw new PublicError('참가자와 인증 계정이 일치하지 않습니다.', 409)
   const profile = account ? await gateway.profile(account.id) : null
   if (profile && (profile.role !== 'student' || !profile.is_active)) throw new PublicError('기존 앱 역할 또는 비활성 계정을 자동 변경할 수 없습니다.', 409)
+  if (action === 'reset_temporary') {
+    if (!participant.profile_id || !account || account.id !== participant.profile_id || !profile) throw new PublicError('연결된 학생 계정을 확인할 수 없습니다.', 409)
+    const temporaryPassword = participantTemporaryPasswordFromPhone(participant.phone)
+    await gateway.resetPassword(account.id, temporaryPassword)
+    await gateway.requirePasswordChange(account.id)
+    return { participantId, status: 'reset', temporaryPassword, message: '연락처 뒤 8자리로 초기화했습니다. 다음 로그인에서 비밀번호를 변경해야 합니다.' }
+  }
   let temporaryPassword: string | null = null
   let created = false
   if (!account) {

@@ -10,6 +10,7 @@ export function AccountProvisioning({ participants, onChanged, onBusy, locked }:
   const [results, setResults] = useState<Result[]>([])
   const [visible, setVisible] = useState(false)
   const pending = participants.filter(item => item.status === 'active' && !item.profile_id)
+  const connected = participants.filter(item => item.status === 'active' && item.profile_id)
   const hasPasswords = results.some(item => item.temporaryPassword)
   const blocker = useBlocker(hasPasswords || busy)
   useEffect(() => {
@@ -37,7 +38,21 @@ export function AccountProvisioning({ participants, onChanged, onBusy, locked }:
     }
     setBusy(false); onBusy(false); onChanged()
   }
-  return <section className="panel account-panel"><div className="section-heading"><div><h2>로그인 계정 연결</h2><p className="muted">활성 참가자 중 계정 연결 대기 {pending.length}명</p></div><Button disabled={locked || busy || !pending.length} onClick={() => void provision()}>{busy ? `처리 중 · ${results.length}/${pending.length}` : '대기 계정 일괄 처리'}</Button></div>
+  async function resetConnectedPasswords() {
+    if (!connected.length || !window.confirm(`연결된 활성 참가자 ${connected.length}명의 비밀번호를 연락처 뒤 8자리로 초기화할까요? 다음 로그인에서 비밀번호를 변경해야 합니다.`)) return
+    if (hasPasswords && !window.confirm('앞서 표시된 임시 비밀번호 결과를 확인했나요? 새 결과로 교체됩니다.')) return
+    setBusy(true); onBusy(true); setResults([]); setVisible(false)
+    for (const participant of connected) {
+      let result: Result
+      try {
+        const response = await invokeFunction<Omit<Result, 'email'>>('ad-provision-account', { participantId: participant.id, action: 'reset_temporary' })
+        result = { ...response, email: participant.email }
+      } catch (cause) { result = { participantId: participant.id, status: 'error', temporaryPassword: null, message: cause instanceof Error ? cause.message : '초기화에 실패했습니다.', email: participant.email } }
+      setResults(current => [...current, result])
+    }
+    setBusy(false); onBusy(false); onChanged()
+  }
+  return <section className="panel account-panel"><div className="section-heading"><div><h2>로그인 계정 연결</h2><p className="muted">계정 연결 대기 {pending.length}명 · 연결 완료 {connected.length}명</p></div><div className="button-row"><Button disabled={locked || busy || !pending.length} onClick={() => void provision()}>{busy ? '처리 중…' : '대기 계정 일괄 처리'}</Button><Button className="button-secondary" disabled={locked || busy || !connected.length} onClick={() => void resetConnectedPasswords()}>연결 계정 비밀번호 일괄 초기화</Button></div></div>
     <p className="field-help">새 참가자 계정의 임시 비밀번호는 연락처에서 010을 제외한 숫자 8자리입니다. 기존 계정은 기존 비밀번호를 사용합니다. 이메일은 자동 발송하지 않습니다.</p>
     {results.length > 0 && <><div className="button-row"><Button className="button-secondary" onClick={() => setVisible(value => !value)}>{visible ? '임시 비밀번호 숨기기' : '임시 비밀번호 보기'}</Button><Button className="button-secondary" disabled={busy} onClick={() => { if (!hasPasswords || window.confirm('임시 비밀번호를 안전하게 전달·보관했나요? 화면에서 지우면 다시 표시할 수 없습니다.')) setResults([]) }}>결과 지우기</Button></div>
       <div className="table-scroll"><table className="data-table"><thead><tr><th>이메일</th><th>결과</th><th>임시 비밀번호</th></tr></thead><tbody>{results.map(result => <tr key={result.participantId}><td>{result.email}</td><td className="result-message">{result.message}</td><td>{result.temporaryPassword ? <code>{visible ? result.temporaryPassword : '••••••••'}</code> : '—'}</td></tr>)}</tbody></table></div>

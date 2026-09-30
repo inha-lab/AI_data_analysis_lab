@@ -10,6 +10,8 @@ function setup(overrides = {}) {
     findAccount: async () => null,
     profile: async () => null,
     createAccount: async (_email, password) => { calls.push({ operation: 'create', password }); return { id: 'new', banned: false, managed: true } },
+    resetPassword: async (id, password) => { calls.push({ operation: 'reset', id, password }) },
+    requirePasswordChange: async id => { calls.push({ operation: 'require-change', id }) },
     link: async (_participant, id) => { calls.push({ operation: 'link', id }) },
     ...overrides,
   }
@@ -59,8 +61,18 @@ test('concurrent email creation is reused and never silently reset', async () =>
   assert.equal(result.status, 'linked'); assert.equal(result.temporaryPassword, null)
   assert.deepEqual(calls, [{ operation: 'link', id: 'concurrent' }])
 })
-test('account mismatch and unsupported password reset actions are rejected', async () => {
+test('a connected participant password resets to the contact digits and requires change', async () => {
+  const { gateway, calls } = setup({
+    participant: async () => ({ ...participant, profile_id: 'student' }),
+    findAccount: async () => ({ id: 'student', banned: false, managed: true }),
+    profile: async () => ({ role: 'student', is_active: true, must_change_password: false }),
+  })
+  const result = await provisionAccount(gateway, 'professor', participantId, 'reset_temporary')
+  assert.equal(result.temporaryPassword, '87227922')
+  assert.deepEqual(calls, [{ operation: 'reset', id: 'student', password: '87227922' }, { operation: 'require-change', id: 'student' }])
+})
+test('account mismatch and unsupported actions are rejected', async () => {
   const { gateway } = setup({ participant: async () => ({ ...participant, profile_id: 'wrong' }) })
   await assert.rejects(provisionAccount(gateway, 'professor', participantId, 'provision'))
-  await assert.rejects(provisionAccount(gateway, 'professor', participantId, 'reset_temporary'))
+  await assert.rejects(provisionAccount(gateway, 'professor', participantId, 'unsupported'))
 })

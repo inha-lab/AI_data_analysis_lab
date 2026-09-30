@@ -32,6 +32,14 @@ Deno.serve(handle(async request => {
       if (error || !data.user) throw error ?? new Error('Account creation failed')
       return accountRecord(data.user)
     },
+    async resetPassword(userId, password) {
+      const { error } = await admin.auth.admin.updateUserById(userId, { password })
+      if (error) throw new PublicError('참가자 비밀번호를 초기화하지 못했습니다.', 502)
+    },
+    async requirePasswordChange(userId) {
+      const { error } = await admin.from('AD_profiles').update({ must_change_password: true, updated_at: new Date().toISOString() }).eq('id', userId).eq('role', 'student')
+      if (error) throw new PublicError('비밀번호는 변경되었지만 최초 변경 상태를 저장하지 못했습니다. 관리자에게 문의해 주세요.', 502)
+    },
     async link(participant, userId, actorId) {
       const { error } = await admin.rpc('AD_link_participant_account', { p_participant: participant.id, p_user: userId, p_actor: actorId, p_email: participant.email, p_version: participant.updated_at })
       if (error) throw error
