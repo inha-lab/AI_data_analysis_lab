@@ -1,4 +1,5 @@
 export const jobGroups = {
+  unspecified: '미입력',
   sw_engineering: 'SW 엔지니어링', sw_development: 'SW 개발', ai_development: 'AI 개발',
   other: '기타',
 } as const
@@ -40,7 +41,7 @@ export function validateParticipant(input: ParticipantInput): string | null {
   }
   if (input.email.trim().length > 254 || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(input.email.trim())) return '올바른 이메일을 입력해 주세요.'
   if (!/^[+0-9() .-]+$/.test(input.phone.trim()) || input.phone.trim().length > 30 || !/^\d{9,15}$/.test(input.phone.replace(/\D/g, ''))) return '연락처는 숫자 9~15자리로 입력해 주세요.'
-  if (!Object.hasOwn(jobGroups, input.job_group)) return '희망 직무를 선택해 주세요.'
+  if (!Object.hasOwn(jobGroups, input.job_group)) return '희망 직무 값을 확인해 주세요.'
   if (!Object.hasOwn(genderLabels, input.gender)) return '성별을 확인해 주세요.'
   if (input.job_group === 'other' && (!input.job_group_other?.trim() || input.job_group_other.trim().length > 80)) return '기타 희망 직무를 1~80자로 입력해 주세요.'
   if (!Object.hasOwn(participantStatusLabels,input.status)) return '참여 상태를 확인해 주세요.'

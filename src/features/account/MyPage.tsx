@@ -8,7 +8,7 @@ export function MyPage() {
   const { profile, session, refreshProfile } = useAuth()
   const [displayName, setDisplayName] = useState(profile?.display_name ?? '')
   const [phone, setPhone] = useState(profile?.phone ?? '')
-  const [academic, setAcademic] = useState({ department: '', grade: '', job_group: 'sw_development' as keyof typeof jobGroups, job_group_other: '' })
+  const [academic, setAcademic] = useState({ department: '', grade: '', job_group: 'unspecified' as keyof typeof jobGroups, job_group_other: '' })
   const [academicLoading, setAcademicLoading] = useState(profile?.role === 'student')
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState('')
@@ -29,8 +29,8 @@ export function MyPage() {
         <label htmlFor="my-phone">연락처 *</label><input id="my-phone" type="tel" value={phone} onChange={event => setPhone(event.target.value)} maxLength={30} required />
         {profile?.role === 'student' && <><label htmlFor="my-department">학과 *</label><input id="my-department" value={academic.department} onChange={event => setAcademic(current => ({ ...current, department: event.target.value }))} maxLength={100} required />
           <label htmlFor="my-grade">학년 *</label><input id="my-grade" value={academic.grade} onChange={event => setAcademic(current => ({ ...current, grade: event.target.value }))} maxLength={30} required />
-          <label htmlFor="my-job">희망 직무 *</label><select id="my-job" value={academic.job_group} onChange={event => setAcademic(current => ({ ...current, job_group: event.target.value as keyof typeof jobGroups }))}>{Object.entries(jobGroups).map(([value, label]) => <option key={value} value={value}>{label}</option>)}</select>
-          {academic.job_group === 'other' && <><label htmlFor="my-job-other">기타 희망 직무 *</label><input id="my-job-other" value={academic.job_group_other} onChange={event => setAcademic(current => ({ ...current, job_group_other: event.target.value }))} maxLength={80} required /></>}</>}
+          <label htmlFor="my-job">희망 직무</label><select id="my-job" value={academic.job_group} onChange={event => setAcademic(current => ({ ...current, job_group: event.target.value as keyof typeof jobGroups }))}>{Object.entries(jobGroups).map(([value, label]) => <option key={value} value={value}>{label}</option>)}</select>
+          {academic.job_group === 'other' && <><label htmlFor="my-job-other">기타 희망 직무</label><input id="my-job-other" value={academic.job_group_other} onChange={event => setAcademic(current => ({ ...current, job_group_other: event.target.value }))} maxLength={80} required /></>}</>}
         {error && <p className="form-error" role="alert">{error}</p>}{notice && <p className="success-message" role="status">{notice}</p>}
         <div className="button-row"><Button type="submit" disabled={busy || academicLoading}>{busy ? '저장 중…' : academicLoading ? '정보 확인 중…' : '개인정보 저장'}</Button></div>
       </fieldset></form></section></>

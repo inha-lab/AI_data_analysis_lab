@@ -16,6 +16,10 @@ test('grade input uses the Korean year and semester format',()=>{
   assert.equal(normalizeImportedGrade('4학년 1학기'),'4-1')
   assert.equal(normalizeImportedGrade('4-1'),null)
 })
+test('blank desired job imports as unspecified',()=>{
+  const blankJob=[...row];blankJob[8]=''
+  assert.equal(previewImport([[...importHeaders],blankJob],[],'기수1')[0].input.job_group,'unspecified')
+})
 test('numeric identifiers, formulas and cohort mismatches cannot be imported', () => {
   assert.equal(previewImport([[...importHeaders], row.map((value, index) => index === 4 ? 123456 : value)], [], '기수1')[0].status, 'invalid')
   assert.equal(previewImport([[...importHeaders], row.map((value, index) => index === 1 ? { formula: '1+1' } : value)], [], '기수1')[0].status, 'invalid')

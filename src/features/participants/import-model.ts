@@ -20,7 +20,7 @@ export function previewImport(grid: unknown[][], existing: Participant[], cohort
     if (!row.some(value => value !== null && value !== undefined && value !== '')) continue
     const raw = (name: string) => row[headers.indexOf(name)]
     const value = (name: string) => String(raw(name) ?? '').trim()
-    const job = Object.entries(jobGroups).find(([key, label]) => key === value('희망직무') || label === value('희망직무'))?.[0]
+    const job = value('희망직무') === '' ? 'unspecified' : Object.entries(jobGroups).find(([key, label]) => key === value('희망직무') || label === value('희망직무'))?.[0]
     const gender = Object.entries(genderLabels).find(([key,label]) => key === value('성별') || label === value('성별'))?.[0]
     const grade=normalizeImportedGrade(value('학년'))
     const input = normalizeParticipant({ full_name: value('이름'), email: value('이메일'), department: value('학과'), student_number: value('학번'), grade: grade??value('학년'), gender: gender as Gender, phone: value('연락처'), job_group: job as ParticipantInput['job_group'], status: 'active' })

@@ -37,7 +37,7 @@ export async function resetAdminPassword(id: string): Promise<string> {
   return result.temporaryPassword
 }
 
-export interface MyAcademicProfile { department: string; grade: string; job_group: 'sw_engineering' | 'sw_development' | 'ai_development' | 'other'; job_group_other: string | null }
+export interface MyAcademicProfile { department: string; grade: string; job_group: 'unspecified' | 'sw_engineering' | 'sw_development' | 'ai_development' | 'other'; job_group_other: string | null }
 export async function getMyAcademicProfile(): Promise<MyAcademicProfile | null> {
   const { data, error } = await client().rpc('AD_my_academic_profile')
   if (error) throw new Error('학적 정보를 불러오지 못했습니다.')

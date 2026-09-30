@@ -28,6 +28,7 @@ test('only supported job groups and participation statuses are accepted', () => 
   assert.equal(validateParticipant({ ...valid, status: 'completed' }), null)
   assert.equal(validateParticipant({ ...valid, status: 'dropout' }), null)
 })
+test('unspecified desired job is valid',()=>assert.equal(validateParticipant({...valid,job_group:'unspecified'}),null))
 
 test('only supported participant genders are accepted', () => {
   assert.equal(validateParticipant({ ...valid, gender: 'female' }), null)
