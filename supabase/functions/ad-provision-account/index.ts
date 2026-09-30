@@ -10,7 +10,7 @@ Deno.serve(handle(async request => {
   })
   const gateway: ProvisionGateway = {
     async participant(id) {
-      const { data, error } = await admin.from('AD_participants').select('id,email,status,profile_id,updated_at').eq('id', id).maybeSingle()
+      const { data, error } = await admin.from('AD_participants').select('id,email,phone,status,profile_id,updated_at').eq('id', id).maybeSingle()
       if (error) throw error
       return data
     },

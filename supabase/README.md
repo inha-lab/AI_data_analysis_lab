@@ -42,7 +42,7 @@
 
 `migrations/20260924000400_ad_account_provisioning.sql`을 명시적으로 적용했습니다. `AD_profiles.must_change_password`, 서버 전용 `AD_find_auth_user`·`AD_link_participant_account`, 연결된 이메일 변경 방지 트리거와 학생 본인 참가·기수 조회 정책을 추가했습니다. 이 SQL도 공유 migration history에는 등록하지 않았으며 재실행하지 않습니다.
 
-배포 함수는 `ad-provision-account`, `ad-change-password`, `ad-create-admin`입니다. 각 함수는 Auth `getUser`로 토큰을 검증하고 활성 앱 프로필과 권한을 확인합니다. `ad-create-admin`은 교수 권한을 확인하고 역할을 `professor`로 고정하며, 기존 이메일을 거부하고 임시 비밀번호를 응답에 한 번만 포함합니다. `verify_jwt=false`는 기존 HS256 전용 게이트 대신 함수 내부 검증을 사용하기 위한 설정입니다. 무인증 접근을 허용하지 않으며 실제 배포에서 무인증·잘못된 토큰·anon 키 요청의 401 차단을 확인했습니다.
+배포 함수는 `ad-provision-account`, `ad-change-password`, `ad-create-admin`입니다. 각 함수는 Auth `getUser`로 토큰을 검증하고 활성 앱 프로필과 권한을 확인합니다. `ad-provision-account`는 신규 참가자의 `010` 연락처 뒤 8자리를 임시 비밀번호로 사용하고 최초 변경을 요구하며, 기존 계정은 비밀번호를 바꾸지 않습니다. `verify_jwt=false`는 기존 HS256 전용 게이트 대신 함수 내부 검증을 사용하기 위한 설정입니다. 무인증 접근을 허용하지 않으며 실제 배포에서 무인증·잘못된 토큰·anon 키 요청의 401 차단을 확인했습니다.
 
 `20260927000100_ad_admin_accounts_and_my_profile.sql`은 교수 전용 관리자 목록 함수와 본인 이름·연락처 수정 함수를 추가합니다. 본인 수정 시 같은 프로필에 연결된 참가자 연락처도 함께 갱신합니다. 로그인 이메일과 역할 변경은 함수 입력에 포함하지 않습니다.
 

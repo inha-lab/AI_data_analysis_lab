@@ -1,4 +1,4 @@
-export interface ParticipantRecord { id: string; email: string; status: string; profile_id: string | null; updated_at: string }
+export interface ParticipantRecord { id: string; email: string; phone: string; status: string; profile_id: string | null; updated_at: string }
 export interface AccountRecord { id: string; banned: boolean; managed: boolean }
 export interface AppProfile { role: string; is_active: boolean; must_change_password: boolean }
 export interface ProvisionGateway {
@@ -16,6 +16,11 @@ export function generateTemporaryPassword(): string {
   const bytes = crypto.getRandomValues(new Uint8Array(24))
   return 'Aa9!' + Array.from(bytes, value => value.toString(16).padStart(2, '0')).join('')
 }
+export function participantTemporaryPasswordFromPhone(phone: string): string {
+  const digits = phone.replace(/\D/g, '')
+  if (!/^010\d{8}$/.test(digits)) throw new PublicError('연락처가 010-XXXX-XXXX 형식이어야 계정을 발급할 수 있습니다.', 409)
+  return digits.slice(3)
+}
 export async function provisionAccount(gateway: ProvisionGateway, actorId: string, participantId: string, action: string) {
   if (!/^[0-9a-f-]{36}$/i.test(participantId) || action !== 'provision') throw new PublicError('요청 형식이 올바르지 않습니다.')
   const participant = await gateway.participant(participantId)
@@ -28,7 +33,7 @@ export async function provisionAccount(gateway: ProvisionGateway, actorId: strin
   let temporaryPassword: string | null = null
   let created = false
   if (!account) {
-    temporaryPassword = generateTemporaryPassword()
+    temporaryPassword = participantTemporaryPasswordFromPhone(participant.phone)
     try { account = await gateway.createAccount(participant.email, temporaryPassword); created = true }
     catch {
       // A concurrent request may have created the same email. Never reset its password.

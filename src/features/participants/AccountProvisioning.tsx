@@ -38,9 +38,9 @@ export function AccountProvisioning({ participants, onChanged, onBusy, locked }:
     setBusy(false); onBusy(false); onChanged()
   }
   return <section className="panel account-panel"><div className="section-heading"><div><h2>로그인 계정 연결</h2><p className="muted">활성 참가자 중 계정 연결 대기 {pending.length}명</p></div><Button disabled={locked || busy || !pending.length} onClick={() => void provision()}>{busy ? `처리 중 · ${results.length}/${pending.length}` : '대기 계정 일괄 처리'}</Button></div>
-    <p className="field-help">새 계정의 임시 비밀번호는 이번 결과에서만 확인할 수 있습니다. 기존 계정은 기존 비밀번호를 사용합니다. 이메일은 자동 발송하지 않습니다.</p>
+    <p className="field-help">새 참가자 계정의 임시 비밀번호는 연락처에서 010을 제외한 숫자 8자리입니다. 기존 계정은 기존 비밀번호를 사용합니다. 이메일은 자동 발송하지 않습니다.</p>
     {results.length > 0 && <><div className="button-row"><Button className="button-secondary" onClick={() => setVisible(value => !value)}>{visible ? '임시 비밀번호 숨기기' : '임시 비밀번호 보기'}</Button><Button className="button-secondary" disabled={busy} onClick={() => { if (!hasPasswords || window.confirm('임시 비밀번호를 안전하게 전달·보관했나요? 화면에서 지우면 다시 표시할 수 없습니다.')) setResults([]) }}>결과 지우기</Button></div>
-      <div className="table-scroll"><table className="data-table"><thead><tr><th>이메일</th><th>결과</th><th>임시 비밀번호</th></tr></thead><tbody>{results.map(result => <tr key={result.participantId}><td>{result.email}</td><td className="result-message">{result.message}</td><td>{result.temporaryPassword ? <code>{visible ? result.temporaryPassword : '••••••••••••'}</code> : '—'}</td></tr>)}</tbody></table></div>
+      <div className="table-scroll"><table className="data-table"><thead><tr><th>이메일</th><th>결과</th><th>임시 비밀번호</th></tr></thead><tbody>{results.map(result => <tr key={result.participantId}><td>{result.email}</td><td className="result-message">{result.message}</td><td>{result.temporaryPassword ? <code>{visible ? result.temporaryPassword : '••••••••'}</code> : '—'}</td></tr>)}</tbody></table></div>
       {hasPasswords && <p className="field-help">화면을 떠나기 전에 결과를 확인해 주세요. 임시 비밀번호 원문은 DB나 브라우저 저장소에 저장하지 않습니다.</p>}
     </>}
   </section>
