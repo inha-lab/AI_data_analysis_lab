@@ -170,7 +170,10 @@ footer { margin-top: 40px; border-top: 1px solid #dce3eb; padding: 24px 0; color
 .import-action-summary { display: flex; align-items: center; justify-content: space-between; gap: 18px; margin-top: 18px; padding: 16px 18px; border: 1px solid #b8d8cc; border-radius: 10px; background: #eef8f4; }
 .import-action-summary p { margin: 4px 0 0; }
 .import-action-summary .button { flex: 0 0 auto; }
+.participant-password-action { display: flex; align-items: center; justify-content: space-between; gap: 18px; margin-top: 20px; padding-top: 18px; border-top: 1px solid #dce3eb; }
+.participant-password-action p { margin: 5px 0 0; }
 @media (max-width: 720px) { .import-action-summary { align-items: stretch; flex-direction: column; } }
+@media (max-width: 720px) { .participant-password-action { align-items: stretch; flex-direction: column; } }
 .file-picker { display: block; margin-top: 18px; font-size: 13px; }
 .file-picker input { display: block; margin-top: 8px; font: inherit; padding: 8px; border: 1px solid #cbd8e3; border-radius: 6px; width: 100%; }
 .file-picker input::file-selector-button { background: #e9eff5; border: 0; border-radius: 5px; padding: 8px 12px; margin-right: 12px; cursor: pointer; }
@@ -324,6 +327,8 @@ footer { margin-top: 40px; border-top: 1px solid #dce3eb; padding: 24px 0; color
 .monitoring-table th, .monitoring-table td { border-bottom: 1px solid #dce3eb; padding: .8rem; text-align: left; vertical-align: top; }
 .monitoring-table th { color: #52677b; font-size: .85rem; }
 .monitoring-table small { display: block; color: #52677b; margin-top: .35rem; }
+.monitoring-team-name { color: #102e4c; font-size: 1.08rem; font-weight: 750; text-decoration: none; }
+.monitoring-team-name:hover { text-decoration: underline; }
 .monitoring-rounds { display: grid; gap: .8rem; }
 .monitoring-review-queue { display: grid; gap: 0; list-style: none; padding: 0; margin: 0 0 24px; }
 .monitoring-review-queue li { display: flex; justify-content: space-between; gap: 12px; padding: 10px 0; border-bottom: 1px solid #e5ebf1; }

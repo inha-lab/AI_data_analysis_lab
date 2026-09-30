@@ -1,5 +1,6 @@
 import { useState, type FormEvent } from 'react'
 import { Button } from '@/components/ui/button'
+import { invokeFunction } from '@/lib/functions'
 import { saveParticipant } from './participant-api'
 import { genderLabels, jobGroups, participantStatusLabels, type Participant, type ParticipantInput } from './participant-model'
 
@@ -14,11 +15,23 @@ export function ParticipantEditor({ cohortId, participant, onSaved, onCancel }: 
   })
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState('')
+  const [credential, setCredential] = useState('')
   function change(field: keyof ParticipantInput, value: string) { setValues(current => ({ ...current, [field]: value })) }
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault(); setBusy(true); setError('')
     try { onSaved(await saveParticipant(cohortId, values, participant)) }
     catch (cause) { setError(cause instanceof Error ? cause.message : '저장하지 못했습니다.') }
+    finally { setBusy(false) }
+  }
+  async function registerTemporaryPassword() {
+    if (!participant?.profile_id || participant.status !== 'active') return
+    if (values.phone !== participant.phone) { setError('변경한 연락처를 먼저 저장한 뒤 비밀번호를 등록해 주세요.'); return }
+    if (!window.confirm(`${participant.full_name} 참가자의 비밀번호를 연락처 뒤 8자리로 등록할까요? 다음 로그인에서 비밀번호를 변경해야 합니다.`)) return
+    setBusy(true); setError(''); setCredential('')
+    try {
+      const result = await invokeFunction<{ temporaryPassword: string }>('ad-provision-account', { participantId: participant.id, action: 'reset_temporary' })
+      setCredential(result.temporaryPassword)
+    } catch (cause) { setError(cause instanceof Error ? cause.message : '임시 비밀번호를 등록하지 못했습니다.') }
     finally { setBusy(false) }
   }
   return <section className="panel editor-panel" aria-labelledby="participant-editor-title">
@@ -40,5 +53,7 @@ export function ParticipantEditor({ cohortId, participant, onSaved, onCancel }: 
       {error && <p className="form-error" role="alert">{error}</p>}
       <div className="button-row"><Button type="submit">{busy ? '저장 중…' : participant ? '변경 저장' : '참가자 등록'}</Button><Button className="button-secondary" onClick={onCancel}>취소</Button></div>
     </fieldset></form>
+    {participant?.profile_id && <div className="participant-password-action"><div><strong>로그인 비밀번호</strong><p className="field-help">저장된 연락처에서 010을 제외한 8자리로 임시 비밀번호를 등록하고 다음 로그인에서 변경을 요구합니다.</p></div><Button className="button-secondary" disabled={busy || participant.status !== 'active'} onClick={() => void registerTemporaryPassword()}>임시 비밀번호 등록</Button></div>}
+    {credential && <p className="success-message" role="status">임시 비밀번호 등록 완료: <code>{credential}</code></p>}
   </section>
 }
