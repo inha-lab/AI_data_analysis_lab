@@ -5,6 +5,20 @@ import { reportTypeLabels } from '@/features/reports/report-model'
 import { teamStages } from '@/features/teams/team-model'
 import { loadProgramMonitoring, proposalRate, type ProgramMonitoring } from './program-monitoring'
 
+const chartColors=['#287fc0','#55a37c','#e3a33b','#8d69b4','#d76d74','#4aa6a6','#7a8793','#c47e3b']
+function donutBackground(values:number[],colors=chartColors){
+  const total=values.reduce((sum,value)=>sum+value,0);if(!total)return '#e8edf2'
+  let offset=0
+  return `conic-gradient(${values.map((value,index)=>{const start=offset;offset+=value/total*100;return `${colors[index%colors.length]} ${start}% ${offset}%`}).join(',')})`
+}
+function DemographicCharts({data}:{data:ProgramMonitoring['demographics']}){
+  const departmentMax=Math.max(1,...data.departments.map(item=>item.count))
+  const genderLabels={male:'남',female:'여',unspecified:'미입력'} as const
+  const genderColors=['#287fc0','#d76d9a','#a6afb8']
+  const genderTotal=data.genders.reduce((sum,item)=>sum+item.count,0)
+  return <section className="demographic-charts" aria-label="참가자 구성 통계"><article><h3>학과별 통계</h3>{data.departments.length?<div className="department-bars">{data.departments.map(item=><div key={item.label}><span title={item.label}>{item.label}</span><i><b style={{width:`${item.count/departmentMax*100}%`}}/></i><strong>{item.count}</strong></div>)}</div>:<p className="field-help">참가자가 없습니다.</p>}</article><article><h3>학년별 통계 · 성별</h3>{data.grades.length?<div className="compact-pie"><div className="donut" style={{background:donutBackground(data.grades.map(item=>item.total))}}/><ul>{data.grades.map((item,index)=><li key={item.label}><i style={{background:chartColors[index%chartColors.length]}}/><span>{item.label}</span><strong>{item.total}명</strong><small>남 {item.male} · 여 {item.female}{item.unspecified?` · 미입력 ${item.unspecified}`:''}</small></li>)}</ul></div>:<p className="field-help">참가자가 없습니다.</p>}</article><article><h3>성별 통계</h3>{genderTotal?<div className="compact-pie"><div className="donut" style={{background:donutBackground(data.genders.map(item=>item.count),genderColors)}}/><ul>{data.genders.map((item,index)=><li key={item.label}><i style={{background:genderColors[index]}}/><span>{genderLabels[item.label]}</span><strong>{item.count}명</strong></li>)}</ul></div>:<p className="field-help">참가자가 없습니다.</p>}</article></section>
+}
+
 export function ProgramMonitoringPanel({cohortId}:{cohortId:string}){
   const [revision,setRevision]=useState(0)
   const [result,setResult]=useState<{revision:number;data:ProgramMonitoring|null;error:string}|null>(null)
@@ -18,6 +32,7 @@ export function ProgramMonitoringPanel({cohortId}:{cohortId:string}){
   const data=loading?null:result.data
   return <section className="panel monitoring-panel"><div className="section-heading"><h2>프로그램 진행 현황</h2><Button className="button-secondary" onClick={()=>setRevision(value=>value+1)}>새로고침</Button></div>
     {loading?<p role="status">팀 제출 현황을 불러오고 있습니다.</p>:result.error?<p className="form-error" role="alert">{result.error}</p>:data&&<>
+      <DemographicCharts data={data.demographics}/>
       <div className="stats-grid monitoring-primary-stats"><article className="stat-card"><p>팀</p><strong>{data.team_count}</strong><span>개 팀</span></article><article className="stat-card"><p>활성 참가자</p><strong>{data.active_participants}</strong><span>명</span></article><article className="stat-card"><p>기획서 제출</p><strong>{data.proposal_submitted} / {data.team_count}</strong><span>{proposalRate(data.proposal_submitted,data.team_count)}</span></article></div>
       <div className="stats-grid monitoring-submission-stats"><article className="stat-card"><p>보고서</p><strong>{data.teams.reduce((sum,team)=>sum+team.daily_submitted+team.weekly_submitted,0)}</strong><span>일일·주간 제출</span></article><article className="stat-card"><p>산출물</p><strong>{data.deliverable_count}</strong><span>건</span></article><article className="stat-card"><p>이슈·지원 요청</p><strong>{data.teams.reduce((sum,team)=>sum+team.reports_needing_attention,0)}</strong><span>건</span></article><article className="stat-card"><p>작성 중</p><strong>{data.teams.reduce((sum,team)=>sum+team.report_drafts,0)}</strong><span>건</span></article></div>
       <h3>팀별 현황</h3>{!data.teams.length?<p className="empty-state">이 프로그램에 등록된 팀이 없습니다.</p>:<div className="monitoring-table-wrap"><table className="monitoring-table"><thead><tr><th>팀·주제</th><th>단계</th><th>기획서</th><th>일일 제출</th><th>주간 제출</th><th>산출물</th><th>작성 중</th><th>이슈·지원 요청</th></tr></thead><tbody>{data.teams.map(team=><tr key={team.id}><td><Link className="monitoring-team-name" to={`/teams/${team.id}/full-report`}>{team.name}</Link><small>{team.topic||'주제 미등록'}</small></td><td>{teamStages[team.stage]}</td><td><Link className="text-link" to={`/teams/${team.id}/proposal`}>{team.proposal_status==='submitted'||team.proposal_status==='reviewed'?'제출':team.proposal_status==='draft'?'작성 중':'미작성'} →</Link></td><td><Link className="text-link" to={`/teams/${team.id}/reports`}>{team.daily_submitted}건</Link></td><td><Link className="text-link" to={`/teams/${team.id}/reports`}>{team.weekly_submitted}건</Link></td><td><Link className="text-link" to={`/teams/${team.id}/deliverables`}>{team.deliverable_count}건</Link></td><td><Link className="text-link" to={`/teams/${team.id}/reports?status=draft`}>{team.report_drafts}건</Link></td><td><Link className="text-link" to={`/teams/${team.id}/reports`}>{team.reports_needing_attention}건</Link></td></tr>)}</tbody></table></div>}

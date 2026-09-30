@@ -320,6 +320,26 @@ footer { margin-top: 40px; border-top: 1px solid #dce3eb; padding: 24px 0; color
 .announcement-filter { display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; font-size: 14px; }
 .announcement-filter input { width: auto; }
 .announcement-selected { border-color: #2883cc; box-shadow: 0 0 0 3px rgba(40,131,204,.14); }
+.announcement-file { margin-top: 12px; max-width: 100%; overflow: hidden; text-overflow: ellipsis; }
+.announcement-current-file { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 10px 12px; border: 1px solid #dfe7ee; border-radius: 8px; }
+.cohort-form .field-help svg { vertical-align: -2px; margin-right: 4px; }
+.demographic-charts { display: grid; grid-template-columns: minmax(0,1.2fr) repeat(2,minmax(0,1fr)); gap: 12px; margin: 16px 0 10px; }
+.demographic-charts > article { min-width: 0; padding: 14px; border: 1px solid #e2e9ef; border-radius: 10px; background: #fbfcfd; }
+.demographic-charts h3 { margin: 0 0 10px; font-size: 14px; }
+.department-bars { display: grid; gap: 7px; }
+.department-bars > div { display: grid; grid-template-columns: minmax(70px,110px) minmax(70px,1fr) 24px; align-items: center; gap: 7px; font-size: 11px; }
+.department-bars span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.department-bars i { height: 8px; overflow: hidden; border-radius: 5px; background: #e5ebf0; }
+.department-bars b { display: block; height: 100%; border-radius: inherit; background: #287fc0; }
+.compact-pie { display: flex; align-items: center; gap: 12px; min-width: 0; }
+.donut { width: 74px; height: 74px; flex: 0 0 74px; border-radius: 50%; position: relative; }
+.donut::after { content: ''; position: absolute; inset: 18px; border-radius: 50%; background: #fbfcfd; }
+.compact-pie ul { min-width: 0; display: grid; gap: 4px; padding: 0; margin: 0; list-style: none; font-size: 10px; }
+.compact-pie li { display: grid; grid-template-columns: 8px minmax(36px,1fr) auto; align-items: center; gap: 4px; }
+.compact-pie li > i { width: 8px; height: 8px; border-radius: 50%; }
+.compact-pie li > span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.compact-pie li > small { grid-column: 2 / 4; color: #607486; }
+@media (max-width: 980px) { .demographic-charts { grid-template-columns: 1fr; } }
 .comment-item { border: 1px solid #dce3eb; border-radius: 12px; padding: 1rem; }
 .comment-item .section-heading { margin-bottom: .5rem; }
 .monitoring-panel .stats-grid { margin: 1.5rem 0; }

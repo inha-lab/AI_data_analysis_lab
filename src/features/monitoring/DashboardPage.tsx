@@ -25,7 +25,7 @@ function ProfessorDashboard() {
       <ParticipantCards />
       {selected&&<><section aria-labelledby="program-status-title"><div className="section-heading"><h2 id="program-status-title">프로그램 현황</h2></div><div className="cohort-selector"><label htmlFor="monitor-cohort">프로그램 선택</label><select id="monitor-cohort" value={selected.id} onChange={event=>setSelectedId(event.target.value)}>{cohorts.map(cohort=><option key={cohort.id} value={cohort.id}>{cohort.name}</option>)}</select></div></section><ProgramMonitoringPanel key={selected.id} cohortId={selected.id} /></>}
     </>}
-    <div className="notice"><h2>프로그램 운영</h2><p><Link to="/schedules" className="text-link">단계별 일정·제출 마감 관리 →</Link></p><p><Link to="/participants" className="text-link">프로그램별 참가자 관리로 이동 →</Link></p><p><Link to="/teams" className="text-link">팀 구성·프로젝트 정보 관리 →</Link></p><p><Link to="/deliverables" className="text-link">프로그램 산출물 현황 →</Link></p><p>파일 첨부와 평가 기능은 순차적으로 추가될 예정입니다.</p></div>
+    <div className="notice"><h2>프로그램 운영</h2><p><Link to="/schedules" className="text-link">단계별 일정·제출 마감 관리 →</Link></p><p><Link to="/participants" className="text-link">프로그램별 참가자 관리로 이동 →</Link></p><p><Link to="/teams" className="text-link">팀 구성·프로젝트 정보 관리 →</Link></p><p><Link to="/deliverables" className="text-link">프로그램 산출물 현황 →</Link></p></div>
   </>
 }
 export function DashboardPage() {
