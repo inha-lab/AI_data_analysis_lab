@@ -1,6 +1,10 @@
 import { genderLabels, jobGroups, normalizeParticipant, validateParticipant, type Gender, type Participant, type ParticipantInput } from './participant-model.ts'
-export const importHeaders = ['이름', '이메일', '학과', '학번', '학년', '성별', '전화번호', '희망직무'] as const
+export const importHeaders = ['순번', '이름', '이메일', '학과', '학번', '학년', '성별', '전화번호', '희망직무'] as const
 export interface ImportRow { rowNumber: number; input: ParticipantInput; status: 'ready' | 'invalid' | 'skip' | 'saved' | 'failed'; message: string }
+export function normalizeImportedGrade(value:string):string|null{
+  const matched=value.trim().match(/^([1-9]\d*)\s*학년\s*([1-9]\d*)\s*학기$/)
+  return matched?`${matched[1]}-${matched[2]}`:null
+}
 export function previewImport(grid: unknown[][], existing: Participant[], cohortName: string): ImportRow[] {
   if (!grid.length) throw new Error('빈 파일입니다.')
   const headers = grid[0].map(value => {
@@ -18,8 +22,11 @@ export function previewImport(grid: unknown[][], existing: Participant[], cohort
     const value = (name: string) => String(raw(name) ?? '').trim()
     const job = Object.entries(jobGroups).find(([key, label]) => key === value('희망직무') || label === value('희망직무'))?.[0]
     const gender = Object.entries(genderLabels).find(([key,label]) => key === value('성별') || label === value('성별'))?.[0]
-    const input = normalizeParticipant({ full_name: value('이름'), email: value('이메일'), department: value('학과'), student_number: value('학번'), grade: value('학년'), gender: gender as Gender, phone: value('전화번호'), job_group: job as ParticipantInput['job_group'], status: 'active' })
+    const grade=normalizeImportedGrade(value('학년'))
+    const input = normalizeParticipant({ full_name: value('이름'), email: value('이메일'), department: value('학과'), student_number: value('학번'), grade: grade??value('학년'), gender: gender as Gender, phone: value('전화번호'), job_group: job as ParticipantInput['job_group'], status: 'active' })
     let error = row.some(cell => typeof cell === 'object' && cell !== null) ? '수식·날짜·링크 셀은 사용할 수 없습니다. 값만 입력해 주세요.' : ''
+    if(!error&&!value('순번'))error='순번을 입력해 주세요.'
+    if(!error&&!grade)error='학년은 4학년 1학기와 같은 형식으로 입력해 주세요.'
     if (!error && (typeof raw('학번') !== 'string' || typeof raw('전화번호') !== 'string')) error = '학번과 전화번호는 앞자리 0 보존을 위해 텍스트 형식으로 입력해 주세요.'
     if (!error && headers.includes('프로그램') && value('프로그램') && value('프로그램') !== cohortName) error = '선택한 프로그램과 파일의 프로그램명이 다릅니다.'
     error ||= validateParticipant(input) ?? ''

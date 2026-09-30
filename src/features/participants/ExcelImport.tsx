@@ -20,7 +20,7 @@ export function ExcelImport({ cohortId, cohortName, existing, onChanged, onBusy,
       sheet.getRow(1).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF102E4C' } }
       sheet.views = [{ state: 'frozen', ySplit: 1 }]
       const guide = workbook.addWorksheet('작성안내')
-      guide.addRows([['참가자 시트의 2행부터 입력하세요.'], ['학번과 전화번호는 텍스트 형식을 유지하세요.'], ['성별: 남성 / 여성 / 미입력'], ['희망직무: SW 엔지니어링 / SW 개발 / AI 개발 / 기타'], ['선택한 프로그램에 등록됩니다. 기존 참가자는 자동 덮어쓰지 않습니다.'], ['최대 500행, 2MB, .xlsx 파일만 지원합니다.'], ['계정 생성은 등록 후 별도로 실행합니다.']])
+      guide.addRows([['참가자 시트의 2행부터 입력하세요.'], ['순번은 양식 확인용이며 시스템에 저장되지 않습니다.'], ['학년: 4학년 1학기 형식으로 입력하며 시스템에는 4-1로 저장됩니다.'], ['학번과 전화번호는 텍스트 형식을 유지하세요.'], ['성별: 남성 / 여성 / 미입력'], ['희망직무: SW 엔지니어링 / SW 개발 / AI 개발 / 기타'], ['선택한 프로그램에 등록됩니다. 기존 참가자는 자동 덮어쓰지 않습니다.'], ['최대 500행, 2MB, .xlsx 파일만 지원합니다.'], ['계정 생성은 등록 후 별도로 실행합니다.']])
       guide.getColumn(1).width = 90
       const buffer = await workbook.xlsx.writeBuffer()
       const url = URL.createObjectURL(new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' }))
@@ -38,7 +38,7 @@ export function ExcelImport({ cohortId, cohortName, existing, onChanged, onBusy,
       const workbook = new Workbook()
       await workbook.xlsx.load(await file.arrayBuffer())
       const sheet = workbook.getWorksheet('참가자') ?? workbook.worksheets[0]
-      if (!sheet || sheet.rowCount > 501 || sheet.columnCount > 9) throw new Error('최대 500행의 제공 양식을 사용해 주세요.')
+      if (!sheet || sheet.rowCount > 501 || sheet.columnCount > 10) throw new Error('최대 500행의 제공 양식을 사용해 주세요.')
       const grid: unknown[][] = []
       for (let number = 1; number <= sheet.rowCount; number++) grid.push(Array.from({ length: sheet.columnCount }, (_, index) => sheet.getRow(number).getCell(index + 1).value))
       setRows(previewImport(grid, existing, cohortName))
