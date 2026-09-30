@@ -17,7 +17,7 @@ export function previewImport(grid: unknown[][], existing: Participant[], cohort
     const raw = (name: string) => row[headers.indexOf(name)]
     const value = (name: string) => String(raw(name) ?? '').trim()
     const job = Object.entries(jobGroups).find(([key, label]) => key === value('희망직무') || label === value('희망직무'))?.[0]
-    const input = normalizeParticipant({ full_name: value('이름'), email: value('이메일'), department: value('학과'), student_number: value('학번'), grade: value('학년'), phone: value('전화번호'), job_group: job as ParticipantInput['job_group'], status: 'active' })
+    const input = normalizeParticipant({ full_name: value('이름'), email: value('이메일'), department: value('학과'), student_number: value('학번'), grade: value('학년'), gender: 'unspecified', phone: value('전화번호'), job_group: job as ParticipantInput['job_group'], status: 'active' })
     let error = row.some(cell => typeof cell === 'object' && cell !== null) ? '수식·날짜·링크 셀은 사용할 수 없습니다. 값만 입력해 주세요.' : ''
     if (!error && (typeof raw('학번') !== 'string' || typeof raw('전화번호') !== 'string')) error = '학번과 전화번호는 앞자리 0 보존을 위해 텍스트 형식으로 입력해 주세요.'
     if (!error && headers.includes('프로그램') && value('프로그램') && value('프로그램') !== cohortName) error = '선택한 프로그램과 파일의 프로그램명이 다릅니다.'

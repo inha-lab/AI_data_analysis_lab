@@ -4,7 +4,7 @@ import { safeTeamUrl, teamStages, type Team, type TeamMember } from '../teams/te
 import { deliverableCategories, type Deliverable } from '../deliverables/deliverable-model.ts'
 
 export type FullReportTeam=Pick<Team,'id'|'cohort_id'|'name'|'topic'|'stage'|'notion_url'|'github_url'|'demo_url'>
-export type FullReportMember=Pick<TeamMember,'full_name'|'department'|'grade'|'is_leader'|'is_active'|'role_title'>
+export type FullReportMember=Pick<TeamMember,'full_name'|'department'|'grade'|'gender'|'is_leader'|'is_active'|'role_title'>
 export type FullReportProposal=Omit<Proposal,'team_id'>
 export type FullReportReport=Report
 export interface FullReportData {program_name:string;team:FullReportTeam;members:FullReportMember[];proposal:FullReportProposal|null;reports:FullReportReport[];deliverables:Deliverable[]}

@@ -1,7 +1,7 @@
 import { useState, type FormEvent } from 'react'
 import { Button } from '@/components/ui/button'
 import { saveParticipant } from './participant-api'
-import { jobGroups, participantStatusLabels, type Participant, type ParticipantInput } from './participant-model'
+import { genderLabels, jobGroups, participantStatusLabels, type Participant, type ParticipantInput } from './participant-model'
 
 export function ParticipantEditor({ cohortId, participant, onSaved, onCancel }: {
   cohortId: string; participant?: Participant; onSaved: (value: Participant) => void; onCancel: () => void
@@ -9,7 +9,7 @@ export function ParticipantEditor({ cohortId, participant, onSaved, onCancel }: 
   const [values, setValues] = useState<ParticipantInput>({
     full_name: participant?.full_name ?? '', email: participant?.email ?? '',
     department: participant?.department ?? '', student_number: participant?.student_number ?? '',
-    grade: participant?.grade ?? '', phone: participant?.phone ?? '',
+    grade: participant?.grade ?? '', gender: participant?.gender ?? 'unspecified', phone: participant?.phone ?? '',
     job_group: participant?.job_group ?? 'sw_development', job_group_other: participant?.job_group_other ?? '', status: participant?.status ?? 'active',
   })
   const [busy, setBusy] = useState(false)
@@ -29,6 +29,7 @@ export function ParticipantEditor({ cohortId, participant, onSaved, onCancel }: 
       <label htmlFor="participant-email">이메일 *</label><input id="participant-email" type="email" readOnly={Boolean(participant?.profile_id)} value={values.email} onChange={event => change('email', event.target.value)} maxLength={254} required />
       <div className="date-fields"><div><label htmlFor="participant-department">학과 *</label><input id="participant-department" value={values.department} onChange={event => change('department', event.target.value)} maxLength={100} required /></div>
         <div><label htmlFor="participant-grade">학년 *</label><input id="participant-grade" value={values.grade} onChange={event => change('grade', event.target.value)} maxLength={30} placeholder="예: 3학년" required /></div></div>
+      <label htmlFor="participant-gender">성별</label><select id="participant-gender" value={values.gender} onChange={event => change('gender', event.target.value)}>{Object.entries(genderLabels).map(([value,label])=><option key={value} value={value}>{label}</option>)}</select>
       <label htmlFor="participant-number">학번 *</label><input id="participant-number" type="text" value={values.student_number} onChange={event => change('student_number', event.target.value)} maxLength={40} required />
       <label htmlFor="participant-phone">전화번호 *</label><input id="participant-phone" type="tel" value={values.phone} onChange={event => change('phone', event.target.value)} maxLength={30} required />
       <label htmlFor="participant-job">희망 직무 *</label><select id="participant-job" value={values.job_group} onChange={event => change('job_group', event.target.value)}>{Object.entries(jobGroups).map(([value, label]) => <option key={value} value={value}>{label}</option>)}</select>

@@ -1,6 +1,6 @@
 import { supabase } from '@/lib/supabase'
 import { normalizeParticipant, validateBulkParticipantStatus, validateParticipant, type Participant, type ParticipantInput, type ParticipantStatus } from './participant-model'
-const columns = 'id,cohort_id,profile_id,full_name,email,department,student_number,grade,phone,job_group,job_group_other,status,created_at,updated_at'
+const columns = 'id,cohort_id,profile_id,full_name,email,department,student_number,grade,gender,phone,job_group,job_group_other,status,created_at,updated_at'
 function client() {
   if (!supabase) throw new Error('데이터베이스 연결 설정이 필요합니다.')
   return supabase

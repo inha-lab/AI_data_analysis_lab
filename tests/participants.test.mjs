@@ -2,7 +2,7 @@ import test from 'node:test'
 import assert from 'node:assert/strict'
 import { normalizeParticipant, validateBulkParticipantStatus, validateParticipant } from '../src/features/participants/participant-model.ts'
 
-const valid = { full_name: 'Test Student', email: 'student@example.test', department: 'Data Science', student_number: '00123456', grade: '3', phone: '010-0000-0000', job_group: 'ai_development', status: 'active' }
+const valid = { full_name: 'Test Student', email: 'student@example.test', department: 'Data Science', student_number: '00123456', grade: '3', gender: 'male', phone: '010-0000-0000', job_group: 'ai_development', status: 'active' }
 test('normalization preserves leading zeros and normalizes email', () => {
   const result = normalizeParticipant({ ...valid, email: ' STUDENT@EXAMPLE.TEST ', student_number: ' 00123456 ' })
   assert.equal(result.email, 'student@example.test')
@@ -26,6 +26,11 @@ test('only supported job groups and participation statuses are accepted', () => 
   assert.equal(validateParticipant({ ...valid, status: 'inactive' }), null)
   assert.equal(validateParticipant({ ...valid, status: 'completed' }), null)
   assert.equal(validateParticipant({ ...valid, status: 'dropout' }), null)
+})
+
+test('only supported participant genders are accepted', () => {
+  assert.equal(validateParticipant({ ...valid, gender: 'female' }), null)
+  assert.match(validateParticipant({ ...valid, gender: 'unknown' }), /성별/)
 })
 
 test('other job group requires a manual label', () => {
