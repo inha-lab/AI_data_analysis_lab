@@ -31,7 +31,7 @@ export async function saveProposal(teamId: string, input: ProposalInput, submit:
   const { error } = await client().rpc('AD_save_proposal', { p_team: teamId, p_version: previous?.updated_at ?? null, p_values: proposalValues(input), p_submit: submit })
   if (error) throw fail(error.code)
 }
-export async function reviewProposal(previous: Proposal, action: 'reviewed' | 'returned', note: string) {
+export async function reviewProposal(previous: Proposal, action: 'reviewed', note: string) {
   const validation = validateReview(previous.status, action, note)
   if (validation) throw new Error(validation)
   const { error } = await client().rpc('AD_review_proposal', { p_team: previous.team_id, p_version: previous.updated_at, p_action: action, p_note: note })

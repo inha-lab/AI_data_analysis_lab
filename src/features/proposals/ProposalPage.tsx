@@ -25,7 +25,7 @@ function ProposalEditor({ teamId, teamName, proposal, onSaved, reload }: { teamI
   const [error, setError] = useState('')
   function change(key: keyof ProposalInput, value: string) { setInput(current => ({ ...current, [key]: value })); setDirty(true) }
   async function save(submit: boolean) {
-    if (submit && !window.confirm('기획서를 제출할까요? 제출 후에는 교수의 수정 요청이 있어야 다시 작성할 수 있습니다.')) return
+    if (submit && !window.confirm('기획서를 제출할까요? 필요한 의견은 코멘트에서 확인할 수 있습니다.')) return
     setBusy(true); setError('')
     try { await saveProposal(teamId, input, submit, proposal); setDirty(false); onSaved(submit ? '기획서를 제출했습니다.' : '기획서를 임시 저장했습니다.') }
     catch (cause) { setError(cause instanceof Error ? cause.message : '저장하지 못했습니다.') }
@@ -42,20 +42,19 @@ function ProposalEditor({ teamId, teamName, proposal, onSaved, reload }: { teamI
   </fieldset></form><UnsavedGuard dirty={dirty} busy={busy} /></section>
 }
 function ReviewPanel({ proposal, onSaved, reload }: { proposal: Proposal; onSaved: (message: string) => void; reload: () => void }) {
-  const [note, setNote] = useState('')
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState('')
-  async function review(action: 'reviewed' | 'returned') {
-    if (!window.confirm(action === 'reviewed' ? '기획서를 검토 완료로 처리할까요?' : '수정 요청을 보내 팀원이 다시 작성할 수 있게 할까요?')) return
+  async function review() {
+    if (!window.confirm('기획서를 검토 완료로 처리할까요? 필요한 의견은 코멘트에 등록해 주세요.')) return
     setBusy(true); setError('')
-    try { await reviewProposal(proposal, action, note); setNote(''); onSaved(action === 'reviewed' ? '검토 완료로 처리했습니다.' : '수정을 요청했습니다. 팀원이 다시 작성할 수 있습니다.') }
+    try { await reviewProposal(proposal, 'reviewed', ''); onSaved('검토 완료로 처리했습니다.') }
     catch (cause) { setError(cause instanceof Error ? cause.message : '검토 결과를 저장하지 못했습니다.') }
     finally { setBusy(false) }
   }
-  return <section className="panel proposal-review"><h2>교수 검토</h2><div className="cohort-form"><fieldset disabled={busy}><label htmlFor="proposal-review-note">피드백 · 수정 요청 시 필수</label><textarea id="proposal-review-note" rows={4} maxLength={4000} value={note} onChange={e => setNote(e.target.value)} />
+  return <section className="panel proposal-review"><h2>교수 검토</h2><p className="field-help">검토 의견은 아래 코멘트에 등록해 주세요.</p><div className="cohort-form"><fieldset disabled={busy}>
     {error && <p className="form-error" role="alert">{error}</p>}
-    <div className="button-row">{proposal.status === 'submitted' && <Button onClick={() => void review('reviewed')}>검토 완료</Button>}<Button className="button-secondary" onClick={() => void review('returned')}>수정 요청</Button><Button className="button-secondary" onClick={() => { if (!note || window.confirm('입력 중인 피드백을 버리고 최신 기획서를 불러올까요?')) reload() }}>최신 내용 조회</Button></div>
-  </fieldset></div><UnsavedGuard dirty={Boolean(note)} busy={busy} /></section>
+    <div className="button-row">{proposal.status === 'submitted' && <Button onClick={() => void review()}>검토 완료</Button>}<Button className="button-secondary" onClick={reload}>최신 내용 조회</Button></div>
+  </fieldset></div></section>
 }
 function ProposalWorkspace({ teamId }: { teamId: string }) {
   const { profile } = useAuth()
@@ -82,9 +81,8 @@ function ProposalWorkspace({ teamId }: { teamId: string }) {
     {notice && <p className="success-message" role="status">{notice}</p>}{!manage&&cohortStatus==='completed'&&<p className="notice">종료된 프로그램입니다. 기획서는 조회만 할 수 있습니다.</p>}
     <section className="notice"><span className={`badge ${proposal?.status === 'reviewed' ? 'status-active' : 'status-draft'}`}>{proposal ? proposalStatusLabels[proposal.status] : '미작성'}</span>
       {proposal && <><p>최종 변경: {proposal.updated_name} · {formatScheduleTime(proposal.updated_at)} (KST)</p>{proposal.submitted_at && <p>최근 제출: {proposal.submitted_name} · {formatScheduleTime(proposal.submitted_at)} (KST)</p>}</>}
-      {manage ? <p>팀원이 작성한 기획서를 확인하고 제출된 자료에 검토 결과를 남기세요.</p> : !edit && <p>제출된 기획서입니다. 교수의 수정 요청 후 다시 작성할 수 있습니다.</p>}
+      {manage ? <p>팀원이 작성한 기획서를 확인하고 필요한 의견은 코멘트에 남기세요.</p> : !edit && <p>제출 또는 검토가 완료된 기획서입니다.</p>}
     </section>
-    {proposal?.reviewed_at && <section className="panel proposal-review"><h2>최근 교수 피드백 · {proposal.review_action === 'returned' ? '수정 요청' : '검토 완료'}</h2><p className="field-help">{proposal.reviewer_name} · {formatScheduleTime(proposal.reviewed_at)} (KST)</p><p className="proposal-text">{proposal.review_note || '별도 피드백 없이 검토를 완료했습니다.'}</p></section>}
     {edit ? <ProposalEditor teamId={team.id} teamName={team.name} proposal={proposal} onSaved={saved} reload={reload} />
       : proposal ? <section className="panel"><h2>{proposal.title}</h2>{proposalSections.map((section, index) => <section className="proposal-section" key={section.key}><h3>{index + 1}. {section.label}</h3><p className="proposal-text">{proposal[section.key] || '미작성'}</p></section>)}{notion && <a className="text-link" href={notion} target="_blank" rel="noopener noreferrer">Notion 보조 문서 ↗</a>}</section>
         : <section className="panel empty-state"><h2>아직 작성된 기획서가 없습니다.</h2><p>소속 학생이 ‘워크스페이스’에서 기획서를 작성할 수 있습니다.</p></section>}

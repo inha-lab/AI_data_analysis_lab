@@ -31,9 +31,8 @@ export function validateProposal(input: ProposalInput, submit: boolean): string 
   }
   return null
 }
-export function validateReview(status: ProposalStatus, action: 'reviewed' | 'returned', note: string): string | null {
+export function validateReview(status: ProposalStatus, action: 'reviewed', note: string): string | null {
   if (note.length > 4000) return '피드백은 4,000자 이내로 입력해 주세요.'
-  if (action === 'reviewed' ? status !== 'submitted' : !['submitted', 'reviewed'].includes(status)) return '현재 상태에서는 이 검토 작업을 할 수 없습니다.'
-  if (action === 'returned' && !note.trim()) return '수정 요청 사유를 입력해 주세요.'
+  if (action !== 'reviewed' || status !== 'submitted') return '현재 상태에서는 이 검토 작업을 할 수 없습니다.'
   return null
 }

@@ -39,5 +39,5 @@ export function validateReport(input: ReportInput, submit: boolean): string | nu
   }
   return null
 }
-export function validateReportReview(status: Report['status'], action: 'reviewed' | 'returned', note: string) { return validateReview(status,action,note) }
+export function validateReportReview(status: Report['status'], action: 'reviewed', note: string) { return validateReview(status,action,note) }
 export function nextReportRound(reports: Report[], type: ReportType) { return Math.min(1000,Math.max(0,...reports.filter(report=>report.report_type===type).map(report=>report.round_number))+1) }

@@ -20,11 +20,10 @@ test('student input exposes only report fields and round suggestions are per typ
   assert.equal(nextReportRound([{ report_type: 'daily', round_number: 1 }, { report_type: 'weekly', round_number: 7 }, { report_type: 'daily', round_number: 3 }], 'daily'), 4)
   assert.equal(nextReportRound([], 'weekly'), 1)
 })
-test('review requires submitted work and return reasons', () => {
+test('review completion requires submitted work and rejects revision requests', () => {
   assert.equal(validateReportReview('submitted', 'reviewed', ''), null)
-  assert.equal(validateReportReview('reviewed', 'returned', 'Revise'), null)
   assert.ok(validateReportReview('draft', 'reviewed', ''))
   assert.ok(validateReportReview('reviewed', 'reviewed', ''))
-  assert.ok(validateReportReview('submitted', 'returned', ' '))
+  assert.ok(validateReportReview('submitted', 'returned', 'Revise'))
   assert.ok(validateReportReview('submitted', 'reviewed', 'x'.repeat(4001)))
 })

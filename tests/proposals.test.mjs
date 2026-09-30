@@ -19,12 +19,10 @@ test('editable values exclude status and audit metadata', () => {
   assert.equal(Object.keys(values).length, 8)
   for (const key of ['status','updated_name','team_id','review_note']) assert.equal(Object.hasOwn(values, key), false)
 })
-test('review transitions require submitted work and reasons for reopening', () => {
+test('review completion requires submitted work and rejects revision requests', () => {
   assert.equal(validateReview('submitted', 'reviewed', ''), null)
-  assert.equal(validateReview('submitted', 'returned', 'Add data sources'), null)
-  assert.equal(validateReview('reviewed', 'returned', 'Update the plan'), null)
   assert.ok(validateReview('draft', 'reviewed', ''))
   assert.ok(validateReview('reviewed', 'reviewed', ''))
-  assert.ok(validateReview('submitted', 'returned', ' '))
+  assert.ok(validateReview('submitted', 'returned', 'Add data sources'))
   assert.ok(validateReview('submitted', 'reviewed', 'x'.repeat(4001)))
 })

@@ -31,7 +31,7 @@ export async function saveReport(teamId:string,input:ReportInput,submit:boolean,
   if (error) throw fail(error.code)
   return data as string
 }
-export async function reviewReport(previous:Report,action:'reviewed'|'returned',note:string) {
+export async function reviewReport(previous:Report,action:'reviewed',note:string) {
   const validation=validateReportReview(previous.status,action,note)
   if (validation) throw new Error(validation)
   const {error}=await client().rpc('AD_review_report',{p_report:previous.id,p_version:previous.updated_at,p_action:action,p_note:note})
