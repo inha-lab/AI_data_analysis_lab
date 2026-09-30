@@ -8,7 +8,7 @@ function client() {
 function errorMessage(code: string) {
   if (code === '23505') return '이 프로그램에 같은 이메일 또는 학번의 참가자가 이미 등록되어 있습니다.'
   if (code === '23503') return '프로그램 정보를 확인하지 못했습니다. 새로고침 후 다시 시도해 주세요.'
-  if (code === '23514') return '필수 입력값과 이메일·전화번호 형식을 확인해 주세요.'
+  if (code === '23514') return '필수 입력값과 이메일·연락처 형식을 확인해 주세요.'
   if (code === '42501') return '참가자 관리 권한이 없습니다. 다시 로그인해 주세요.'
   if (code === 'PGRST205') return '참가자 데이터베이스 설정이 필요합니다.'
   return '처리하지 못했습니다. 연결 상태를 확인하고 다시 시도해 주세요.'
@@ -38,4 +38,12 @@ export async function bulkUpdateParticipantStatus(cohortId:string,participantIds
   const {data,error}=await client().rpc('AD_bulk_update_participant_status',{p_cohort:cohortId,p_participants:participantIds,p_status:status})
   if(error)throw new Error(errorMessage(error.code))
   return data as number
+}
+export async function deleteParticipant(participant:Participant):Promise<void>{
+  const {error}=await client().rpc('AD_delete_participant',{p_participant:participant.id,p_version:participant.updated_at})
+  if(error){
+    if(error.code==='23503')throw new Error('팀에 배정된 참가자는 팀에서 먼저 해제해 주세요.')
+    if(error.code==='40001')throw new Error('참가자 정보가 변경되었습니다. 새로고침 후 다시 시도해 주세요.')
+    throw new Error(errorMessage(error.code))
+  }
 }

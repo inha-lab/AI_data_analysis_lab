@@ -5,7 +5,7 @@ import { isManager, useAuth } from '@/features/auth/auth-context'
 import { useCohorts } from '@/features/cohorts/use-cohorts'
 import type { Cohort } from '@/features/cohorts/cohort-model'
 import { Button } from '@/components/ui/button'
-import { deleteEmptyTeam, loadTeamDocumentCounts, loadTeams, updateTeamMemberRole, type TeamDocumentCounts } from './team-api'
+import { deleteTeam, loadTeamDocumentCounts, loadTeams, updateTeamMemberRole, type TeamDocumentCounts } from './team-api'
 import { safeTeamUrl, teamStages, type Team, type TeamMember } from './team-model'
 import { TeamEditor } from './TeamEditor'
 import { genderLabels } from '@/features/participants/participant-model'
@@ -37,7 +37,7 @@ function TeamCard({team,members,manage,readOnly,counts,editing,deleting,myPartic
     <details className="team-overview-details"><summary>외부 링크 자세히</summary>
       <div className="button-row">{([['Notion',team.notion_url],['GitHub',team.github_url],['데모',team.demo_url]] as const).map(([label,value])=>{const url=safeTeamUrl(value);return url?<a key={label} href={url} target="_blank" rel="noopener noreferrer" className="text-link">{label} ↗</a>:null})}</div>
     </details>
-    <div className="team-overview-actions">{!readOnly&&<Button className="button-secondary" disabled={editing||deleting} onClick={onEdit}>{manage?'팀 수정':'프로젝트 수정'}</Button>}{manage&&!members.length&&<Button className="button-secondary" disabled={editing||deleting} onClick={onDelete}>빈 팀 삭제</Button>}</div>
+    <div className="team-overview-actions">{!readOnly&&<Button className="button-secondary" disabled={editing||deleting} onClick={onEdit}>{manage?'팀 수정':'프로젝트 수정'}</Button>}{manage&&<Button className="button-secondary" disabled={editing||deleting} onClick={onDelete}>팀 삭제</Button>}</div>
   </article>
 }
 
@@ -64,9 +64,9 @@ function TeamWorkspace({ cohort, manage, editing, setEditing, deleting, setDelet
   }, [cohort.id, manage, revision])
   const loading = result?.revision !== revision
   async function remove(team: Team) {
-    if (!window.confirm(`빈 팀 '${team.name}'을 삭제할까요? 삭제 후 복구할 수 없습니다.`)) return
+    if (!window.confirm(`'${team.name}' 팀을 삭제할까요? 팀원은 미배정 상태가 되며 제출 자료가 있는 팀은 삭제할 수 없습니다.`)) return
     setDeleting(true); setActionError(''); setNotice('')
-    try { await deleteEmptyTeam(team); setNotice('빈 팀을 삭제했습니다.'); setRevision(value => value + 1) }
+    try { await deleteTeam(team); setNotice('팀을 삭제했습니다.'); setRevision(value => value + 1) }
     catch (cause) { setActionError(cause instanceof Error ? cause.message : '팀을 삭제하지 못했습니다.') }
     finally { setDeleting(false) }
   }

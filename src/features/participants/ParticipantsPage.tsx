@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button'
 import { useCohorts } from '@/features/cohorts/use-cohorts'
 import type { Cohort } from '@/features/cohorts/cohort-model'
 import { useParticipants } from './use-participants'
-import { bulkUpdateParticipantStatus } from './participant-api'
+import { bulkUpdateParticipantStatus, deleteParticipant } from './participant-api'
 import { ExcelImport } from './ExcelImport'
 import { AccountProvisioning } from './AccountProvisioning'
 import { ParticipantEditor } from './ParticipantEditor'
@@ -41,6 +41,13 @@ function ParticipantWorkspace({ cohort, onEditingChange }: { cohort: Cohort; onE
     catch(cause){setActionError(cause instanceof Error?cause.message:'참여 상태를 일괄 변경하지 못했습니다.')}
     finally{operation(false)}
   }
+  async function removeParticipant(item:Participant){
+    if(!window.confirm(`${item.full_name} 참가자를 삭제할까요? 프로그램 참가 정보만 삭제되며 로그인 계정은 유지됩니다.`))return
+    operation(true);setActionError('');setNotice('')
+    try{await deleteParticipant(item);setSelectedIds(current=>{const next=new Set(current);next.delete(item.id);return next});setNotice(`${item.full_name} 참가자를 삭제했습니다.`);reload()}
+    catch(cause){setActionError(cause instanceof Error?cause.message:'참가자를 삭제하지 못했습니다.')}
+    finally{operation(false)}
+  }
   const statusCounts = Object.fromEntries(Object.keys(participantStatusLabels).map(status=>[status,participants.filter(item=>item.status===status).length])) as Record<ParticipantStatus,number>
   return <>
     <div className="participant-summary"><p><strong>{cohort.name}</strong><span className="muted">{loading || error ? ' · 현황 확인 중' : ` · 참여 중 ${statusCounts.active}명 · 수료 ${statusCounts.completed}명 · 중탈 ${statusCounts.dropout}명 · 비활성 ${statusCounts.inactive}명`}</span></p><Button disabled={Boolean(editor) || operationBusy} onClick={() => { updateEditor('new'); setNotice('') }}><Plus size={16} aria-hidden="true" /> 참가자 등록</Button></div>
@@ -57,11 +64,11 @@ function ParticipantWorkspace({ cohort, onEditingChange }: { cohort: Cohort; onE
       {loading ? <p className="empty-state" role="status">참가자를 불러오고 있습니다.</p> : error ? <div className="empty-state" role="alert"><p>{error}</p><Button onClick={reload}>다시 시도</Button></div>
         : !visible.length ? <div className="empty-state"><h2>{participants.length ? '검색 결과가 없습니다.' : '등록된 참가자가 없습니다.'}</h2><p>{participants.length ? '검색어나 참여 상태를 변경해 보세요.' : '선발된 참가자의 정보를 등록해 주세요.'}</p></div>
         : <div className="table-scroll"><table className="data-table"><caption className="sr-only">{cohort.name} 참가자 {visible.length}명</caption><thead><tr><th scope="col"><input type="checkbox" aria-label="표시된 참가자 전체 선택" checked={allVisibleSelected} onChange={toggleVisible} disabled={operationBusy||Boolean(editor)}/></th><th scope="col">번호</th>
-          {([['full_name', '이름'], ['student_number', '학번'], ['department', '학과'], ['grade', '학년'], ['gender', '성별'], ['email', '이메일'], ['phone', '전화번호']] as const).map(([key, label]) => key === 'grade' || key === 'gender' || key === 'phone'
+          {([['full_name', '이름'], ['student_number', '학번'], ['department', '학과'], ['grade', '학년'], ['gender', '성별'], ['email', '이메일'], ['phone', '연락처']] as const).map(([key, label]) => key === 'grade' || key === 'gender' || key === 'phone'
             ? <th key={key} scope="col">{label}</th>
             : <th key={key} scope="col" aria-sort={sort.key === key ? sort.asc ? 'ascending' : 'descending' : 'none'}><button type="button" onClick={() => sortBy(key)}>{label} {sort.key === key ? sort.asc ? '↑' : '↓' : '↕'}</button></th>)}
           <th scope="col">희망 직무</th><th scope="col">참여 / 계정</th><th scope="col">관리</th></tr></thead>
-          <tbody>{visible.map((item, index) => <tr key={item.id}><td><input type="checkbox" aria-label={`${item.full_name} 선택`} checked={selectedIds.has(item.id)} disabled={operationBusy||Boolean(editor)} onChange={()=>setSelectedIds(current=>{const next=new Set(current);if(next.has(item.id))next.delete(item.id);else next.add(item.id);return next})}/></td><td>{index + 1}</td><td className="name-cell">{item.full_name}</td><td>{item.student_number}</td><td>{item.department}</td><td>{item.grade}</td><td>{genderLabels[item.gender]}</td><td>{item.email}</td><td>{item.phone}</td><td>{jobGroupLabel(item)}</td><td><span className={`badge ${item.status === 'active' ? 'status-active' : 'status-completed'}`}>{participantStatusLabels[item.status]}</span><span className="account-status">{item.profile_id ? '계정 연결됨' : '계정 연결 대기'}</span></td><td><Button className="button-secondary" disabled={Boolean(editor) || operationBusy} onClick={() => { updateEditor(item); setNotice('') }} aria-label={`${item.full_name} 정보 수정`}>수정</Button></td></tr>)}</tbody></table></div>}
+          <tbody>{visible.map((item, index) => <tr key={item.id}><td><input type="checkbox" aria-label={`${item.full_name} 선택`} checked={selectedIds.has(item.id)} disabled={operationBusy||Boolean(editor)} onChange={()=>setSelectedIds(current=>{const next=new Set(current);if(next.has(item.id))next.delete(item.id);else next.add(item.id);return next})}/></td><td>{index + 1}</td><td className="name-cell">{item.full_name}</td><td>{item.student_number}</td><td>{item.department}</td><td>{item.grade}</td><td>{genderLabels[item.gender]}</td><td>{item.email}</td><td>{item.phone}</td><td>{jobGroupLabel(item)}</td><td><span className={`badge ${item.status === 'active' ? 'status-active' : 'status-completed'}`}>{participantStatusLabels[item.status]}</span><span className="account-status">{item.profile_id ? '계정 연결됨' : '계정 연결 대기'}</span></td><td><div className="button-row"><Button className="button-secondary" disabled={Boolean(editor) || operationBusy} onClick={() => { updateEditor(item); setNotice('') }} aria-label={`${item.full_name} 정보 수정`}>수정</Button><Button className="button-secondary" disabled={Boolean(editor)||operationBusy} onClick={()=>void removeParticipant(item)} aria-label={`${item.full_name} 참가자 삭제`}>삭제</Button></div></td></tr>)}</tbody></table></div>}
     </section>
   </>
 }

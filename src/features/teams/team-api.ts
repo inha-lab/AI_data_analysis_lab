@@ -47,7 +47,7 @@ export async function updateTeamProject(input: TeamInput, previous: Team) {
   const { error } = await client().rpc('AD_update_team_project', { p_team: previous.id, p_version: previous.updated_at, p_values: values })
   if (error) throw fail(error.code)
 }
-export async function deleteEmptyTeam(previous: Team) {
-  const { error } = await client().rpc('AD_delete_empty_team', { p_team: previous.id, p_version: previous.updated_at })
+export async function deleteTeam(previous: Team) {
+  const { error } = await client().rpc('AD_delete_team', { p_team: previous.id, p_version: previous.updated_at })
   if (error) throw fail(error.code)
 }

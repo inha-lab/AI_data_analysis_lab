@@ -8,7 +8,7 @@ test('normalizes editable profile values', () => {
 test('validates profile name and phone', () => {
   assert.equal(validateProfileInput({ displayName: '홍길동', phone: '010-1234-5678' }), '')
   assert.match(validateProfileInput({ displayName: '', phone: '010-1234-5678' }), /이름/)
-  assert.match(validateProfileInput({ displayName: '홍길동', phone: '123' }), /전화번호/)
+  assert.match(validateProfileInput({ displayName: '홍길동', phone: '123' }), /연락처/)
 })
 test('validates administrator email', () => {
   assert.equal(validateAdminInput({ displayName: '관리자', phone: '010-1234-5678', email: 'admin@inha.ac.kr', role: 'admin' }), '')

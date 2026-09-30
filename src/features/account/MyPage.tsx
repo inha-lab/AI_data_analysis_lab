@@ -26,7 +26,7 @@ export function MyPage() {
         <label htmlFor="my-email">이메일</label><input id="my-email" type="email" value={session?.user.email ?? ''} readOnly aria-describedby="email-help" /><p id="email-help" className="field-help">로그인 이메일은 변경할 수 없습니다.</p>
         <label htmlFor="my-role">역할</label><input id="my-role" value={profile ? roleLabels[profile.role] : ''} readOnly />
         <label htmlFor="my-name">이름 *</label><input id="my-name" value={displayName} onChange={event => setDisplayName(event.target.value)} maxLength={80} required />
-        <label htmlFor="my-phone">전화번호 *</label><input id="my-phone" type="tel" value={phone} onChange={event => setPhone(event.target.value)} maxLength={30} required />
+        <label htmlFor="my-phone">연락처 *</label><input id="my-phone" type="tel" value={phone} onChange={event => setPhone(event.target.value)} maxLength={30} required />
         {profile?.role === 'student' && <><label htmlFor="my-department">학과 *</label><input id="my-department" value={academic.department} onChange={event => setAcademic(current => ({ ...current, department: event.target.value }))} maxLength={100} required />
           <label htmlFor="my-grade">학년 *</label><input id="my-grade" value={academic.grade} onChange={event => setAcademic(current => ({ ...current, grade: event.target.value }))} maxLength={30} required />
           <label htmlFor="my-job">희망 직무 *</label><select id="my-job" value={academic.job_group} onChange={event => setAcademic(current => ({ ...current, job_group: event.target.value as keyof typeof jobGroups }))}>{Object.entries(jobGroups).map(([value, label]) => <option key={value} value={value}>{label}</option>)}</select>

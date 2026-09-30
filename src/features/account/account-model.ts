@@ -9,7 +9,7 @@ export function validateProfileInput(input: ProfileInput): string {
   const value = normalizeProfileInput(input)
   if (!value.displayName || value.displayName.length > 80) return '이름은 1~80자로 입력해 주세요.'
   const digits = value.phone.replace(/\D/g, '')
-  if (!/^[0-9+()\-\s]+$/.test(value.phone) || digits.length < 9 || digits.length > 15) return '전화번호를 정확히 입력해 주세요.'
+  if (!/^[0-9+()\-\s]+$/.test(value.phone) || digits.length < 9 || digits.length > 15) return '연락처를 정확히 입력해 주세요.'
   return ''
 }
 
