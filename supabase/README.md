@@ -44,6 +44,8 @@
 
 배포 함수는 `ad-provision-account`, `ad-change-password`, `ad-create-admin`입니다. 각 함수는 Auth `getUser`로 토큰을 검증하고 활성 앱 프로필과 권한을 확인합니다. `ad-provision-account`는 신규 참가자의 `010` 연락처 뒤 8자리를 임시 비밀번호로 사용하고 최초 변경을 요구하며, 기존 계정은 비밀번호를 바꾸지 않습니다. `verify_jwt=false`는 기존 HS256 전용 게이트 대신 함수 내부 검증을 사용하기 위한 설정입니다. 무인증 접근을 허용하지 않으며 실제 배포에서 무인증·잘못된 토큰·anon 키 요청의 401 차단을 확인했습니다.
 
+`ad-change-password`는 활성 사용자의 최초 비밀번호 변경과 학생 마이페이지의 자율 변경에 함께 사용합니다. 새 비밀번호는 8~128자만 검사하며 대문자·특수문자 조합을 강제하지 않습니다. 최초 변경 대상이면 Auth 변경 성공 후 `must_change_password`를 해제합니다.
+
 `20260927000100_ad_admin_accounts_and_my_profile.sql`은 교수 전용 관리자 목록 함수와 본인 이름·연락처 수정 함수를 추가합니다. 본인 수정 시 같은 프로필에 연결된 참가자 연락처도 함께 갱신합니다. 로그인 이메일과 역할 변경은 함수 입력에 포함하지 않습니다.
 
 `20260927000200_ad_manager_role_and_academic_profile.sql`은 `admin` 역할과 참가자의 기타 희망 직무를 추가합니다. 운영 관리자는 기존 교수의 프로그램 운영 권한을 공유하지만 `AD_admin_accounts()`와 `ad-create-admin`은 교수 관리자만 사용할 수 있습니다. 학생은 `AD_update_my_profile_v2()`로 본인의 학과·학년·희망 직무를 모든 연결 참가 정보에 동기화합니다.

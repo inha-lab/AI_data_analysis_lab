@@ -36,6 +36,9 @@ export async function resetAdminPassword(id: string): Promise<string> {
   const result = await invokeFunction<{ temporaryPassword: string }>('ad-create-admin', { action: 'reset_password', id })
   return result.temporaryPassword
 }
+export async function changeMyPassword(password: string): Promise<void> {
+  await invokeFunction<{ ok: boolean }>('ad-change-password', { password })
+}
 
 export interface MyAcademicProfile { department: string; grade: string; job_group: 'unspecified' | 'sw_engineering' | 'sw_development' | 'ai_development' | 'other'; job_group_other: string | null }
 export async function getMyAcademicProfile(): Promise<MyAcademicProfile | null> {

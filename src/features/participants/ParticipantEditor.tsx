@@ -53,7 +53,7 @@ export function ParticipantEditor({ cohortId, participant, onSaved, onCancel }: 
       {error && <p className="form-error" role="alert">{error}</p>}
       <div className="button-row"><Button type="submit">{busy ? '저장 중…' : participant ? '변경 저장' : '참가자 등록'}</Button><Button className="button-secondary" onClick={onCancel}>취소</Button></div>
     </fieldset></form>
-    {participant?.profile_id && <div className="participant-password-action"><div><strong>로그인 비밀번호</strong><p className="field-help">저장된 연락처에서 010을 제외한 8자리로 임시 비밀번호를 등록하고 다음 로그인에서 변경을 요구합니다.</p></div><Button className="button-secondary" disabled={busy || participant.status !== 'active'} onClick={() => void registerTemporaryPassword()}>임시 비밀번호 등록</Button></div>}
-    {credential && <p className="success-message" role="status">임시 비밀번호 등록 완료: <code>{credential}</code></p>}
+    {participant?.profile_id && <div className="participant-password-action"><div><strong>로그인 비밀번호</strong><p className="field-help">저장된 연락처에서 010을 제외한 8자리로 비밀번호를 초기화하고 다음 로그인에서 변경을 요구합니다.</p></div><Button className="button-secondary" disabled={busy || participant.status !== 'active'} onClick={() => void registerTemporaryPassword()}>비밀번호 초기화</Button></div>}
+    {credential && <p className="success-message" role="status">비밀번호 초기화 완료: <code>{credential}</code></p>}
   </section>
 }

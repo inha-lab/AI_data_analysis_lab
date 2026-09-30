@@ -18,7 +18,7 @@ export function DashboardLayout() {
     <aside className="workspace-sidebar">
       <Link to="/dashboard" className="workspace-brand">INHA<span>AI DATA ANALYSIS LAB</span></Link>
       <p className="nav-caption">프로그램 운영</p>
-      <nav aria-label="관리 메뉴">
+      <nav aria-label="관리 메뉴" onClick={event=>{const link=(event.target as HTMLElement).closest('a');if(link?.getAttribute('aria-current')==='page'){event.preventDefault();window.location.reload()}}}>
         <NavLink to="/dashboard"><LayoutDashboard size={18} aria-hidden="true" /> 대시보드</NavLink>
         {(isManager(profile?.role) || profile?.role === 'student') && <NavLink to="/announcements"><Megaphone size={18} aria-hidden="true" /> 공지사항</NavLink>}
         {(isManager(profile?.role) || profile?.role === 'student') && <NavLink to="/schedules"><CalendarDays size={18} aria-hidden="true" /> 프로그램 일정</NavLink>}

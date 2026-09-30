@@ -23,8 +23,8 @@ export function ChangePasswordPage() {
   }
   return <section className="login-card"><p className="eyebrow">ACCOUNT SETUP</p><h1>비밀번호 변경</h1><p>프로그램을 시작하기 전에 임시 비밀번호를 본인만 아는 비밀번호로 바꿔 주세요.</p>
     <form className="login-form" onSubmit={submit}>
-      <label htmlFor="new-password">새 비밀번호</label><input id="new-password" type="password" autoComplete="new-password" minLength={12} maxLength={128} value={password} onChange={event => setPassword(event.target.value)} required disabled={busy} />
-      <p className="field-help">12자 이상, 영문 대·소문자, 숫자, 특수문자를 포함해 주세요. 동일 계정을 사용하는 다른 프로그램에서도 변경된 비밀번호를 사용합니다.</p>
+      <label htmlFor="new-password">새 비밀번호</label><input id="new-password" type="password" autoComplete="new-password" minLength={8} maxLength={128} value={password} onChange={event => setPassword(event.target.value)} required disabled={busy} />
+      <p className="field-help">8자 이상 입력해 주세요. 대문자와 특수문자는 필수가 아닙니다. 동일 계정을 사용하는 다른 프로그램에서도 변경된 비밀번호를 사용합니다.</p>
       <label htmlFor="confirm-password">새 비밀번호 확인</label><input id="confirm-password" type="password" autoComplete="new-password" value={confirm} onChange={event => setConfirm(event.target.value)} required disabled={busy} />
       <Button type="submit" disabled={busy}>{busy ? '변경 중…' : '비밀번호 변경하고 시작'}</Button>
     </form>{message && <p className="notice" role="alert">{message}</p>}
