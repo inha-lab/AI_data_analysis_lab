@@ -2,7 +2,7 @@ import { useState, type ChangeEvent } from 'react'
 import { Button } from '@/components/ui/button'
 import { saveParticipant } from './participant-api'
 import { importHeaders, previewImport, type ImportRow } from './import-model'
-import type { Participant } from './participant-model'
+import { genderLabels, type Participant } from './participant-model'
 
 export function ExcelImport({ cohortId, cohortName, existing, onChanged, onBusy, locked }: { locked: boolean; cohortId: string; cohortName: string; existing: Participant[]; onChanged: () => void; onBusy: (busy: boolean) => void }) {
   const [rows, setRows] = useState<ImportRow[]>([])
@@ -20,7 +20,7 @@ export function ExcelImport({ cohortId, cohortName, existing, onChanged, onBusy,
       sheet.getRow(1).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF102E4C' } }
       sheet.views = [{ state: 'frozen', ySplit: 1 }]
       const guide = workbook.addWorksheet('작성안내')
-      guide.addRows([['참가자 시트의 2행부터 입력하세요.'], ['학번과 전화번호는 텍스트 형식을 유지하세요.'], ['희망직무: SW 엔지니어링 / SW 개발 / AI 개발'], ['선택한 프로그램에 등록됩니다. 기존 참가자는 자동 덮어쓰지 않습니다.'], ['최대 500행, 2MB, .xlsx 파일만 지원합니다.'], ['계정 생성은 등록 후 별도로 실행합니다.']])
+      guide.addRows([['참가자 시트의 2행부터 입력하세요.'], ['학번과 전화번호는 텍스트 형식을 유지하세요.'], ['성별: 남성 / 여성 / 미입력'], ['희망직무: SW 엔지니어링 / SW 개발 / AI 개발 / 기타'], ['선택한 프로그램에 등록됩니다. 기존 참가자는 자동 덮어쓰지 않습니다.'], ['최대 500행, 2MB, .xlsx 파일만 지원합니다.'], ['계정 생성은 등록 후 별도로 실행합니다.']])
       guide.getColumn(1).width = 90
       const buffer = await workbook.xlsx.writeBuffer()
       const url = URL.createObjectURL(new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' }))
@@ -38,7 +38,7 @@ export function ExcelImport({ cohortId, cohortName, existing, onChanged, onBusy,
       const workbook = new Workbook()
       await workbook.xlsx.load(await file.arrayBuffer())
       const sheet = workbook.getWorksheet('참가자') ?? workbook.worksheets[0]
-      if (!sheet || sheet.rowCount > 501 || sheet.columnCount > 8) throw new Error('최대 500행의 제공 양식을 사용해 주세요.')
+      if (!sheet || sheet.rowCount > 501 || sheet.columnCount > 9) throw new Error('최대 500행의 제공 양식을 사용해 주세요.')
       const grid: unknown[][] = []
       for (let number = 1; number <= sheet.rowCount; number++) grid.push(Array.from({ length: sheet.columnCount }, (_, index) => sheet.getRow(number).getCell(index + 1).value))
       setRows(previewImport(grid, existing, cohortName))
@@ -61,7 +61,7 @@ export function ExcelImport({ cohortId, cohortName, existing, onChanged, onBusy,
     <label className="file-picker">파일 선택<input type="file" accept=".xlsx" onChange={event => void readFile(event)} disabled={busy || locked} /></label>
     {error && <p role="alert" className="form-error">{error}</p>}
     {rows.length > 0 && <><p role="status">전체 {rows.length}행 · 등록 완료 {rows.filter(row => row.status === 'saved').length}행 · 오류 {rows.filter(row => row.status === 'invalid' || row.status === 'failed').length}행 · 건너뜀 {rows.filter(row => row.status === 'skip').length}행</p>
-      <div className="import-preview table-scroll"><table className="data-table"><thead><tr><th>행</th><th>이름</th><th>이메일</th><th>학번</th><th>검증 결과</th></tr></thead><tbody>{rows.map(row => <tr key={row.rowNumber}><td>{row.rowNumber}</td><td>{row.input.full_name}</td><td>{row.input.email}</td><td>{row.input.student_number}</td><td className="result-message">{row.message}</td></tr>)}</tbody></table></div>
+      <div className="import-preview table-scroll"><table className="data-table"><thead><tr><th>행</th><th>이름</th><th>이메일</th><th>학번</th><th>성별</th><th>검증 결과</th></tr></thead><tbody>{rows.map(row => <tr key={row.rowNumber}><td>{row.rowNumber}</td><td>{row.input.full_name}</td><td>{row.input.email}</td><td>{row.input.student_number}</td><td>{genderLabels[row.input.gender]}</td><td className="result-message">{row.message}</td></tr>)}</tbody></table></div>
       <Button disabled={busy || locked || !ready} onClick={() => void save()}>{busy ? '처리 중…' : `등록 / 실패 재시도 (${ready}행)`}</Button>
     </>}
   </section>
