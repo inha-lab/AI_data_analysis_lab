@@ -4,7 +4,7 @@ export const jobGroups = {
 } as const
 export type JobGroup = keyof typeof jobGroups
 export type ParticipantStatus = 'active' | 'completed' | 'dropout' | 'inactive'
-export const genderLabels = { unspecified: '미입력', male: '남성', female: '여성' } as const
+export const genderLabels = { unspecified: '미입력', male: '남', female: '여' } as const
 export type Gender = keyof typeof genderLabels
 export const participantStatusLabels: Record<ParticipantStatus,string> = { active:'참여 중',completed:'프로그램 수료',dropout:'프로그램 중탈',inactive:'비활성' }
 export interface ParticipantInput {

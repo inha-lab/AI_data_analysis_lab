@@ -1,7 +1,7 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
 import { importHeaders, normalizeImportedGrade, previewImport } from '../src/features/participants/import-model.ts'
-const row = [1, 'Test Student', 'STUDENT@example.test', 'Data Science', '00123456', '4학년 1학기', '남성', '010-0000-0000', 'AI 개발']
+const row = [1, 'Test Student', 'STUDENT@example.test', 'Data Science', '00123456', '4학년 1학기', '남', '010-0000-0000', 'AI 개발']
 test('import preserves identifiers and maps Korean job labels', () => {
   const [result] = previewImport([[...importHeaders], row], [], '기수1')
   assert.equal(result.status, 'ready')
