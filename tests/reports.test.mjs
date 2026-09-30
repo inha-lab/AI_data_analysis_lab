@@ -1,6 +1,6 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
-import { emptyReport, nextReportRound, reportValues, validateReport, validateReportReview } from '../src/features/reports/report-model.ts'
+import { emptyReport, nextReportRound, reportValues, validateReport } from '../src/features/reports/report-model.ts'
 const full = { ...emptyReport('daily'), round_number: '1', report_date: '2026-09-25', title: 'Daily 1', progress_summary: 'Progress', completed_work: 'Done', next_plan: 'Next' }
 test('draft accepts unfinished content while submission requires three core sections', () => {
   assert.equal(validateReport(emptyReport('weekly'), false), '제목은 1~120자로 입력해 주세요.')
@@ -19,11 +19,4 @@ test('student input exposes only report fields and round suggestions are per typ
   for (const key of ['status', 'team_id', 'updated_name']) assert.equal(Object.hasOwn(values, key), false)
   assert.equal(nextReportRound([{ report_type: 'daily', round_number: 1 }, { report_type: 'weekly', round_number: 7 }, { report_type: 'daily', round_number: 3 }], 'daily'), 4)
   assert.equal(nextReportRound([], 'weekly'), 1)
-})
-test('review completion requires submitted work and rejects revision requests', () => {
-  assert.equal(validateReportReview('submitted', 'reviewed', ''), null)
-  assert.ok(validateReportReview('draft', 'reviewed', ''))
-  assert.ok(validateReportReview('reviewed', 'reviewed', ''))
-  assert.ok(validateReportReview('submitted', 'returned', 'Revise'))
-  assert.ok(validateReportReview('submitted', 'reviewed', 'x'.repeat(4001)))
 })

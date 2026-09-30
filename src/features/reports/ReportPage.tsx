@@ -4,7 +4,7 @@ import { isManager, useAuth } from '@/features/auth/auth-context'
 import { Button } from '@/components/ui/button'
 import { formatScheduleTime } from '@/features/schedules/schedule-model'
 import { CommentsPanel } from '@/features/comments/CommentsPanel'
-import { loadReports, reviewReport, saveReport } from './report-api'
+import { loadReports, saveReport } from './report-api'
 import { emptyReport, nextReportRound, reportFields, reportStatusLabels, reportTypeLabels, reportValues, type Report, type ReportInput, type ReportType } from './report-model'
 
 function UnsavedGuard({locked,busy=false}:{locked:boolean;busy?:boolean}) {
@@ -25,7 +25,7 @@ function ReportEditor({teamId,previous,initial,onSaved,onLockedChange,onCancel}:
   useEffect(()=>{onLockedChange(dirty||busy);return ()=>onLockedChange(false)},[dirty,busy,onLockedChange])
   function change(key:keyof ReportInput,value:string) {setInput(current=>({...current,[key]:value}));setDirty(true)}
   async function save(submit:boolean) {
-    if (submit && !window.confirm('보고서를 제출할까요? 검토 완료 전에는 계속 수정할 수 있습니다.')) return
+    if (submit && !window.confirm('보고서를 제출할까요? 제출 후에도 운영 중인 프로그램에서는 수정할 수 있습니다.')) return
     setBusy(true);setError('')
     try {
       const id=await saveReport(teamId,input,submit,previous)
@@ -57,9 +57,8 @@ function ReportWorkspace({teamId}:{teamId:string}) {
   const [editing,setEditing]=useState(false)
   const [typeFilter,setTypeFilter]=useState<'all'|ReportType>('all')
   const requestedStatus=searchParams.get('status')
-  const statusFilter=requestedStatus==='draft'||requestedStatus==='submitted'||requestedStatus==='reviewed'?requestedStatus:'all'
+  const statusFilter=requestedStatus==='draft'||requestedStatus==='submitted'?requestedStatus:'all'
   const [locked,setLocked]=useState(false)
-  const [reviewBusy,setReviewBusy]=useState(false)
   const [notice,setNotice]=useState('')
   useEffect(()=>{
     let active=true
@@ -78,32 +77,25 @@ function ReportWorkspace({teamId}:{teamId:string}) {
   const {team,reports,cohortStatus}=result.data
   const current=reports.find(report=>report.id===selected)??null
   const newType=selected==='new-daily'?'daily':selected==='new-weekly'?'weekly':null
-  const editable=!manage && cohortStatus==='active' && Boolean(current&&current.status!=='reviewed')
+  const editable=!manage && cohortStatus==='active' && Boolean(current)
   const showEditor=Boolean(newType)||(editing&&editable)
   const list=reports.filter(report=>(typeFilter==='all'||report.report_type===typeFilter)&&(statusFilter==='all'||report.status===statusFilter))
-  async function completeReview(report:Report){
-    if(!window.confirm('보고서를 검토 완료로 처리할까요? 필요한 의견은 코멘트에 등록해 주세요.'))return
-    setReviewBusy(true);setNotice('')
-    try{await reviewReport(report,'reviewed','');setNotice('검토 완료로 처리했습니다.');reload()}
-    catch(cause){setNotice(cause instanceof Error?cause.message:'검토 결과를 저장하지 못했습니다.')}
-    finally{setReviewBusy(false)}
-  }
   return <>
-    <div className="page-heading"><div><p className="eyebrow">TEAM REPORTS</p><h1>{team.name} 보고서</h1><p className="muted">일일·주간 진행 내용과 제출·검토 현황을 관리합니다.</p></div><Link to={`/teams?cohort=${team.cohort_id}`} className="text-link">팀 목록으로 →</Link></div>
+    <div className="page-heading"><div><p className="eyebrow">TEAM REPORTS</p><h1>{team.name} 보고서</h1><p className="muted">일일·주간 진행 내용과 제출 현황을 관리합니다.</p></div><Link to={`/teams?cohort=${team.cohort_id}`} className="text-link">팀 목록으로 →</Link></div>
     {notice&&<p className="success-message" role="status">{notice}</p>}
     {!manage&&cohortStatus==='completed'&&<p className="notice">종료된 프로그램입니다. 보고서는 조회만 할 수 있습니다.</p>}<section className="panel"><div className="section-heading"><h2>보고서 목록 · {reports.length}건</h2>{!manage&&cohortStatus==='active'&&<div className="button-row"><Button onClick={()=>startNew('daily')}>일일 보고 작성</Button><Button className="button-secondary" onClick={()=>startNew('weekly')}>주간 보고 작성</Button></div>}</div>
       <div className="list-toolbar schedule-toolbar"><select aria-label="보고 구분 필터" value={typeFilter} onChange={e=>setTypeFilter(e.target.value as 'all'|ReportType)}><option value="all">전체 구분</option><option value="daily">일일 보고</option><option value="weekly">주간 보고</option></select>
-        <select aria-label="보고 상태 필터" value={statusFilter} onChange={e=>{const value=e.target.value;setSearchParams(value==='all'?{}:{status:value})}}><option value="all">전체 상태</option><option value="draft">작성 중</option><option value="submitted">제출</option><option value="reviewed">검토 완료</option></select>
+        <select aria-label="보고 상태 필터" value={statusFilter} onChange={e=>{const value=e.target.value;setSearchParams(value==='all'?{}:{status:value})}}><option value="all">전체 상태</option><option value="draft">작성 중</option><option value="submitted">제출</option></select>
         <Button className="button-secondary" disabled={locked} onClick={reload}>새로고침</Button></div>
       {!list.length?<div className="empty-state"><h2>{reports.length?'필터에 맞는 보고서가 없습니다.':'아직 등록된 보고서가 없습니다.'}</h2></div>
-        :<div className="schedule-list">{list.map(report=><article className="report-row" key={report.id}><div><span className="badge">{reportTypeLabels[report.report_type]} · {report.round_number}회차</span> <span className={`badge ${report.status==='reviewed'?'status-active':'status-draft'}`}>{reportStatusLabels[report.status]}</span><h3>{report.title}</h3><p className="field-help">작성일 {report.report_date} · 최종 변경 {report.updated_name} · {formatScheduleTime(report.updated_at)} (KST)</p></div><Button className="button-secondary" onClick={()=>choose(report.id)}>조회</Button></article>)}</div>}
+        :<div className="schedule-list">{list.map(report=><article className="report-row" key={report.id}><div><span className="badge">{reportTypeLabels[report.report_type]} · {report.round_number}회차</span> <span className="badge status-draft">{report.status==='draft'?reportStatusLabels.draft:reportStatusLabels.submitted}</span><h3>{report.title}</h3><p className="field-help">작성일 {report.report_date} · 최종 변경 {report.updated_name} · {formatScheduleTime(report.updated_at)} (KST)</p></div><Button className="button-secondary" onClick={()=>choose(report.id)}>조회</Button></article>)}</div>}
     </section>
     {showEditor&&<ReportEditor key={current?.id??newType!} teamId={team.id} previous={current} initial={current?{...current,round_number:String(current.round_number)}:emptyReport(newType!,nextReportRound(reports,newType!))} onLockedChange={setLocked} onCancel={()=>{if(current)setEditing(false);else choose(null)}} onSaved={saved} />}
-    {current&&!showEditor&&<section className="panel report-detail"><div className="section-heading"><h2>{current.title}</h2><span className="badge">{reportStatusLabels[current.status]}</span></div>
+    {current&&!showEditor&&<section className="panel report-detail"><div className="section-heading"><h2>{current.title}</h2><span className="badge">{current.status==='draft'?reportStatusLabels.draft:reportStatusLabels.submitted}</span></div>
       <p className="field-help">{reportTypeLabels[current.report_type]} · {current.round_number}회차 · 작성일 {current.report_date}</p>
       <p className="field-help">최종 변경 {current.updated_name} · {formatScheduleTime(current.updated_at)} (KST){current.submitted_at&&` · 최근 제출 ${current.submitted_name} · ${formatScheduleTime(current.submitted_at)} (KST)`}</p>
       {reportFields.map(field=><section className="proposal-section" key={field.key}><h3>{field.label}</h3><p className="proposal-text">{current[field.key]||'미작성'}</p></section>)}
-      <div className="button-row">{editable&&<Button onClick={()=>setEditing(true)}>수정</Button>}{manage&&current.status==='submitted'&&<Button disabled={reviewBusy} onClick={()=>void completeReview(current)}>{reviewBusy?'처리 중…':'검토 완료'}</Button>}<Button className="button-secondary" onClick={()=>choose(null)}>닫기</Button></div>
+      <div className="button-row">{editable&&<Button onClick={()=>setEditing(true)}>수정</Button>}<Button className="button-secondary" onClick={()=>choose(null)}>닫기</Button></div>
     </section>}
     {current&&<CommentsPanel key={current.id} teamId={team.id} reportId={current.id} />}
   </>

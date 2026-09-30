@@ -1,6 +1,6 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
-import { emptyProposal, proposalSections, proposalValues, validateProposal, validateReview } from '../src/features/proposals/proposal-model.ts'
+import { emptyProposal, proposalSections, proposalValues, validateProposal } from '../src/features/proposals/proposal-model.ts'
 test('drafts allow unfinished sections but submissions require every section', () => {
   const input = emptyProposal('Team A')
   assert.equal(validateProposal(input, false), null)
@@ -18,11 +18,4 @@ test('editable values exclude status and audit metadata', () => {
   const values = proposalValues({ ...emptyProposal('Team A'), status: 'reviewed', updated_name: 'Spoof', team_id: 'other', review_note: 'Injected' })
   assert.equal(Object.keys(values).length, 8)
   for (const key of ['status','updated_name','team_id','review_note']) assert.equal(Object.hasOwn(values, key), false)
-})
-test('review completion requires submitted work and rejects revision requests', () => {
-  assert.equal(validateReview('submitted', 'reviewed', ''), null)
-  assert.ok(validateReview('draft', 'reviewed', ''))
-  assert.ok(validateReview('reviewed', 'reviewed', ''))
-  assert.ok(validateReview('submitted', 'returned', 'Add data sources'))
-  assert.ok(validateReview('submitted', 'reviewed', 'x'.repeat(4001)))
 })

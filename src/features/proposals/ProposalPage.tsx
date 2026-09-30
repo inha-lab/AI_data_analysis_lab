@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button'
 import { safeTeamUrl } from '@/features/teams/team-model'
 import { formatScheduleTime } from '@/features/schedules/schedule-model'
 import { CommentsPanel } from '@/features/comments/CommentsPanel'
-import { loadProposal, saveProposal, reviewProposal } from './proposal-api'
+import { loadProposal, saveProposal } from './proposal-api'
 import { emptyProposal, proposalSections, proposalStatusLabels, proposalValues, type Proposal, type ProposalInput } from './proposal-model'
 
 function UnsavedGuard({ dirty, busy }: { dirty: boolean; busy: boolean }) {
@@ -41,21 +41,6 @@ function ProposalEditor({ teamId, teamName, proposal, onSaved, reload }: { teamI
     <div className="button-row"><Button type="submit">{busy ? '처리 중…' : '임시 저장'}</Button><Button onClick={() => void save(true)}>기획서 제출</Button><Button className="button-secondary" onClick={() => { if (!dirty || window.confirm('입력 중인 내용을 버리고 저장된 기획서를 다시 불러올까요?')) reload() }}>다시 불러오기</Button></div>
   </fieldset></form><UnsavedGuard dirty={dirty} busy={busy} /></section>
 }
-function ReviewPanel({ proposal, onSaved, reload }: { proposal: Proposal; onSaved: (message: string) => void; reload: () => void }) {
-  const [busy, setBusy] = useState(false)
-  const [error, setError] = useState('')
-  async function review() {
-    if (!window.confirm('기획서를 검토 완료로 처리할까요? 필요한 의견은 코멘트에 등록해 주세요.')) return
-    setBusy(true); setError('')
-    try { await reviewProposal(proposal, 'reviewed', ''); onSaved('검토 완료로 처리했습니다.') }
-    catch (cause) { setError(cause instanceof Error ? cause.message : '검토 결과를 저장하지 못했습니다.') }
-    finally { setBusy(false) }
-  }
-  return <section className="panel proposal-review"><h2>교수 검토</h2><p className="field-help">검토 의견은 아래 코멘트에 등록해 주세요.</p><div className="cohort-form"><fieldset disabled={busy}>
-    {error && <p className="form-error" role="alert">{error}</p>}
-    <div className="button-row">{proposal.status === 'submitted' && <Button onClick={() => void review()}>검토 완료</Button>}<Button className="button-secondary" onClick={reload}>최신 내용 조회</Button></div>
-  </fieldset></div></section>
-}
 function ProposalWorkspace({ teamId }: { teamId: string }) {
   const { profile } = useAuth()
   const manage = isManager(profile?.role)
@@ -74,19 +59,18 @@ function ProposalWorkspace({ teamId }: { teamId: string }) {
   if (result?.revision !== revision) return <p className="empty-state" role="status">기획서를 불러오고 있습니다.</p>
   if (!result.data) return <div className="notice" role="alert"><p>{result.error}</p><div className="button-row"><Button onClick={reload}>다시 시도</Button><Link className="text-link" to="/teams">팀 목록으로 →</Link></div></div>
   const { team, roster, proposal, cohortStatus } = result.data
-  const edit = !manage && cohortStatus === 'active' && (!proposal || proposal.status === 'draft')
+  const edit = !manage && cohortStatus === 'active'
   const notion = proposal ? safeTeamUrl(proposal.notion_url) : null
   return <>
     <div className="page-heading"><div><p className="eyebrow">PROJECT PROPOSAL</p><h1>프로젝트 기획서</h1><p className="muted">{team.name} · {roster.map(member => `${member.full_name}${member.is_leader ? ' (팀장)' : ''}`).join(', ') || '팀원 미배정'}</p></div><Link to={`/teams?cohort=${team.cohort_id}`} className="text-link">팀 목록으로 →</Link></div>
     {notice && <p className="success-message" role="status">{notice}</p>}{!manage&&cohortStatus==='completed'&&<p className="notice">종료된 프로그램입니다. 기획서는 조회만 할 수 있습니다.</p>}
-    <section className="notice"><span className={`badge ${proposal?.status === 'reviewed' ? 'status-active' : 'status-draft'}`}>{proposal ? proposalStatusLabels[proposal.status] : '미작성'}</span>
+    <section className="notice"><span className="badge status-draft">{proposal ? (proposal.status === 'draft' ? proposalStatusLabels.draft : proposalStatusLabels.submitted) : '미작성'}</span>
       {proposal && <><p>최종 변경: {proposal.updated_name} · {formatScheduleTime(proposal.updated_at)} (KST)</p>{proposal.submitted_at && <p>최근 제출: {proposal.submitted_name} · {formatScheduleTime(proposal.submitted_at)} (KST)</p>}</>}
-      {manage ? <p>팀원이 작성한 기획서를 확인하고 필요한 의견은 코멘트에 남기세요.</p> : !edit && <p>제출 또는 검토가 완료된 기획서입니다.</p>}
+      {manage ? <p>팀원이 작성한 기획서를 확인하고 필요한 의견은 코멘트에 남기세요.</p> : cohortStatus === 'completed' && <p>종료된 프로그램의 기획서입니다.</p>}
     </section>
     {edit ? <ProposalEditor teamId={team.id} teamName={team.name} proposal={proposal} onSaved={saved} reload={reload} />
       : proposal ? <section className="panel"><h2>{proposal.title}</h2>{proposalSections.map((section, index) => <section className="proposal-section" key={section.key}><h3>{index + 1}. {section.label}</h3><p className="proposal-text">{proposal[section.key] || '미작성'}</p></section>)}{notion && <a className="text-link" href={notion} target="_blank" rel="noopener noreferrer">Notion 보조 문서 ↗</a>}</section>
         : <section className="panel empty-state"><h2>아직 작성된 기획서가 없습니다.</h2><p>소속 학생이 ‘워크스페이스’에서 기획서를 작성할 수 있습니다.</p></section>}
-    {manage && proposal && proposal.status !== 'draft' && <ReviewPanel proposal={proposal} onSaved={saved} reload={reload} />}
     {proposal && <CommentsPanel teamId={team.id} />}
   </>
 }

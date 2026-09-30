@@ -1,4 +1,3 @@
-import { validateReview } from '../proposals/proposal-model.ts'
 export type ReportType = 'daily' | 'weekly'
 export const reportTypeLabels: Record<ReportType, string> = { daily: '일일 보고', weekly: '주간 보고' }
 export const reportStatusLabels = { draft: '작성 중', submitted: '제출', reviewed: '검토 완료' } as const
@@ -39,5 +38,4 @@ export function validateReport(input: ReportInput, submit: boolean): string | nu
   }
   return null
 }
-export function validateReportReview(status: Report['status'], action: 'reviewed', note: string) { return validateReview(status,action,note) }
 export function nextReportRound(reports: Report[], type: ReportType) { return Math.min(1000,Math.max(0,...reports.filter(report=>report.report_type===type).map(report=>report.round_number))+1) }

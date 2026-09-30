@@ -1,5 +1,5 @@
 import { supabase } from '@/lib/supabase'
-import { reportValues, validateReport, validateReportReview, type Report, type ReportInput } from './report-model'
+import { reportValues, validateReport, type Report, type ReportInput } from './report-model'
 const columns = 'id,team_id,report_type,round_number,report_date,title,progress_summary,completed_work,next_plan,issues,support_request,status,updated_at,updated_name,submitted_at,submitted_name,review_note,review_action,reviewed_at,reviewer_name'
 function client() { if (!supabase) throw new Error('데이터베이스 연결 설정이 필요합니다.'); return supabase }
 function fail(code: string) {
@@ -30,10 +30,4 @@ export async function saveReport(teamId:string,input:ReportInput,submit:boolean,
   const {data,error}=await client().rpc('AD_save_report',{p_team:teamId,p_report:previous?.id??null,p_version:previous?.updated_at??null,p_values:reportValues(input),p_submit:submit})
   if (error) throw fail(error.code)
   return data as string
-}
-export async function reviewReport(previous:Report,action:'reviewed',note:string) {
-  const validation=validateReportReview(previous.status,action,note)
-  if (validation) throw new Error(validation)
-  const {error}=await client().rpc('AD_review_report',{p_report:previous.id,p_version:previous.updated_at,p_action:action,p_note:note})
-  if (error) throw fail(error.code)
 }

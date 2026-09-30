@@ -1,6 +1,6 @@
 import { supabase } from '@/lib/supabase'
 import type { TeamMember } from '@/features/teams/team-model'
-import { proposalValues, validateProposal, validateReview, type Proposal, type ProposalInput } from './proposal-model'
+import { proposalValues, validateProposal, type Proposal, type ProposalInput } from './proposal-model'
 const columns = 'team_id,title,overview,data_plan,methods,validation,service_plan,execution_plan,notion_url,status,updated_at,updated_name,submitted_at,submitted_name,review_note,review_action,reviewed_at,reviewer_name'
 function client() { if (!supabase) throw new Error('데이터베이스 연결 설정이 필요합니다.'); return supabase }
 function fail(code: string) {
@@ -29,11 +29,5 @@ export async function saveProposal(teamId: string, input: ProposalInput, submit:
   const validation = validateProposal(input, submit)
   if (validation) throw new Error(validation)
   const { error } = await client().rpc('AD_save_proposal', { p_team: teamId, p_version: previous?.updated_at ?? null, p_values: proposalValues(input), p_submit: submit })
-  if (error) throw fail(error.code)
-}
-export async function reviewProposal(previous: Proposal, action: 'reviewed', note: string) {
-  const validation = validateReview(previous.status, action, note)
-  if (validation) throw new Error(validation)
-  const { error } = await client().rpc('AD_review_proposal', { p_team: previous.team_id, p_version: previous.updated_at, p_action: action, p_note: note })
   if (error) throw fail(error.code)
 }
