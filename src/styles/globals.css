@@ -323,6 +323,9 @@ footer { margin-top: 40px; border-top: 1px solid #dce3eb; padding: 24px 0; color
 .comment-item { border: 1px solid #dce3eb; border-radius: 12px; padding: 1rem; }
 .comment-item .section-heading { margin-bottom: .5rem; }
 .monitoring-panel .stats-grid { margin: 1.5rem 0; }
+.monitoring-panel .monitoring-primary-stats { grid-template-columns: repeat(3,minmax(0,1fr)); margin-bottom: 0; }
+.monitoring-panel .monitoring-submission-stats { grid-template-columns: repeat(4,minmax(0,1fr)); margin-top: 18px; }
+@media (max-width: 760px) { .monitoring-panel .monitoring-primary-stats, .monitoring-panel .monitoring-submission-stats { grid-template-columns: 1fr 1fr; } }
 .monitoring-table-wrap { overflow-x: auto; }
 .monitoring-table { width: 100%; border-collapse: collapse; min-width: 700px; }
 .monitoring-table th, .monitoring-table td { border-bottom: 1px solid #dce3eb; padding: .8rem; text-align: left; vertical-align: top; }
