@@ -323,6 +323,22 @@ footer { margin-top: 40px; border-top: 1px solid #dce3eb; padding: 24px 0; color
 .report-row h3 { margin: 10px 0; overflow-wrap: anywhere; }
 .report-row p { margin: 0; }
 @media(max-width:760px) { .report-meta-fields { grid-template-columns: 1fr; } .report-row { align-items: flex-start; flex-direction: column; } }
+.program-report-list { display: grid; gap: 14px; margin-top: 18px; }
+.program-report-group { padding-top: 18px; padding-bottom: 18px; }
+.program-report-team { display: grid; grid-template-columns: minmax(180px,1fr) auto auto; align-items: center; gap: 20px; }
+.program-report-team h3 { margin: 7px 0 2px; }
+.program-report-team p { margin: 0; color: #62768a; font-size: 13px; overflow-wrap: anywhere; }
+.program-report-counts { display: flex; align-items: center; flex-wrap: wrap; gap: 7px; }
+.program-report-counts span { padding: 7px 9px; border-radius: 7px; background: #f3f6f9; color: #62768a; font-size: 12px; white-space: nowrap; }
+.program-report-counts strong { color: #18344e; }
+.program-report-items { display: grid; margin-top: 14px; }
+.program-report-items article { display: grid; grid-template-columns: minmax(210px,auto) minmax(0,1fr) auto; align-items: center; gap: 14px; padding: 13px 0; border-top: 1px solid #e5ebf1; }
+.program-report-items article > div { min-width: 0; }
+.program-report-items article strong { overflow-wrap: anywhere; }
+.program-report-items article p { margin: 4px 0 0; }
+.program-report-badges { display: flex; flex-wrap: wrap; gap: 5px; }
+@media(max-width:900px) { .program-report-team { grid-template-columns: 1fr auto; } .program-report-team > a { grid-column: 1 / -1; justify-self: start; } .program-report-items article { grid-template-columns: minmax(180px,auto) minmax(0,1fr); } .program-report-items article > a { grid-column: 2; justify-self: start; } }
+@media(max-width:600px) { .program-report-team { grid-template-columns: 1fr; } .program-report-team > a { grid-column: auto; } .program-report-counts { align-items: stretch; display: grid; grid-template-columns: 1fr 1fr; } .program-report-items article { grid-template-columns: 1fr; } .program-report-items article > a { grid-column: auto; } }
 .comment-list { display: grid; gap: 1rem; margin: 1rem 0; }
 .announcement-filter { display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; font-size: 14px; }
 .announcement-filter input { width: auto; }

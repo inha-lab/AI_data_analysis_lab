@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Link, NavLink, Outlet } from 'react-router-dom'
-import { CalendarDays, CircleUserRound, Cpu, FileStack, LayoutDashboard, Layers3, LogOut, Menu, Megaphone, ShieldCheck, UserRoundSearch, Users, UsersRound, X } from 'lucide-react'
+import { CalendarDays, CircleUserRound, Cpu, FileStack, FileText, LayoutDashboard, Layers3, LogOut, Menu, Megaphone, ShieldCheck, UserRoundSearch, Users, UsersRound, X } from 'lucide-react'
 import { isManager, useAuth, roleLabels } from '@/features/auth/auth-context'
 import { Button } from '@/components/ui/button'
 
@@ -37,7 +37,7 @@ export function DashboardLayout() {
         {(isManager(profile?.role) || profile?.role === 'student') && <NavLink to="/schedules"><CalendarDays size={18} aria-hidden="true" /> 프로그램 일정</NavLink>}
         {isManager(profile?.role) && <NavLink to="/cohorts"><Layers3 size={18} aria-hidden="true" /> 프로그램 관리</NavLink>}
         {(isManager(profile?.role) || profile?.role === 'student') && <NavLink to="/teams"><UsersRound size={18} aria-hidden="true" /> {isManager(profile.role) ? '팀 관리' : '워크스페이스'}</NavLink>}
-        {isManager(profile?.role) && <><NavLink to="/participants"><Users size={18} aria-hidden="true" /> 참가자 관리</NavLink><NavLink to="/deliverables"><FileStack size={18} aria-hidden="true" /> 산출물 현황</NavLink></>}
+        {isManager(profile?.role) && <><NavLink to="/participants"><Users size={18} aria-hidden="true" /> 참가자 관리</NavLink><NavLink to="/reports"><FileText size={18} aria-hidden="true" /> 보고서 현황</NavLink><NavLink to="/deliverables"><FileStack size={18} aria-hidden="true" /> 산출물 현황</NavLink></>}
         {(isManager(profile?.role) || profile?.role === 'student') && <NavLink to="/gpu"><Cpu size={18} aria-hidden="true" /> GPU 서버 사용 신청</NavLink>}
         {profile?.role === 'professor' && <NavLink to="/admins"><ShieldCheck size={18} aria-hidden="true" /> 관리자 관리</NavLink>}
         {isManager(profile?.role) && <NavLink to="/login-activity"><UserRoundSearch size={18} aria-hidden="true" /> 로그인 활동</NavLink>}

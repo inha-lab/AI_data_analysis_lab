@@ -30,6 +30,7 @@ export const router = createHashRouter([
       { element: <RequireAuth roles={['professor', 'admin']} />, children: [
         { path: '/cohorts', lazy: async () => ({ Component: (await import('@/features/cohorts/CohortsPage')).CohortsPage }) },
         { path: '/participants', lazy: async () => ({ Component: (await import('@/features/participants/ParticipantsPage')).ParticipantsPage }) },
+        { path: '/reports', lazy: async () => ({ Component: (await import('@/features/reports/ProgramReportsPage')).ProgramReportsPage }) },
         { path: '/deliverables', lazy: async () => ({ Component: (await import('@/features/deliverables/ProgramDeliverablesPage')).ProgramDeliverablesPage }) },
         { path: '/login-activity', lazy: async () => ({ Component: (await import('@/features/login-activity/LoginActivityPage')).LoginActivityPage }) },
       ] },
