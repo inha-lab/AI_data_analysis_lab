@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState, type FormEvent } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
 import { Button } from '@/components/ui/button'
+import { CommentsPanel } from '@/features/comments/CommentsPanel'
 import { useCohorts } from '@/features/cohorts/use-cohorts'
 import { formatScheduleTime } from '@/features/schedules/schedule-model'
 import { teamStages, type Team } from '@/features/teams/team-model'
@@ -39,7 +40,7 @@ function ReportsOverview({cohortId}:{cohortId:string}){
   const [search,setSearch]=useState('')
   const [type,setType]=useState<'all'|ReportType>('all')
   const [status,setStatus]=useState<'all'|ReportStatus>('all')
-  const [popup,setPopup]=useState<{teamName:string;report:ReportDetail|null;error:string}|null>(null)
+  const [popup,setPopup]=useState<{teamId:string;teamName:string;report:ReportDetail|null;error:string}|null>(null)
   const popupRequest=useRef(0)
   useEffect(()=>{
     let active=true
@@ -63,11 +64,11 @@ function ReportsOverview({cohortId}:{cohortId:string}){
     return true
   })
   function submitSearch(event:FormEvent){event.preventDefault();setSearch(searchInput)}
-  async function openReport(teamName:string,reportId:string){
+  async function openReport(teamId:string,teamName:string,reportId:string){
     const request=++popupRequest.current
-    setPopup({teamName,report:null,error:''})
-    try{const report=await loadReportDetail(reportId);if(popupRequest.current===request)setPopup({teamName,report,error:''})}
-    catch(cause){if(popupRequest.current===request)setPopup({teamName,report:null,error:cause instanceof Error?cause.message:'보고서 내용을 불러오지 못했습니다.'})}
+    setPopup({teamId,teamName,report:null,error:''})
+    try{const report=await loadReportDetail(reportId);if(popupRequest.current===request)setPopup({teamId,teamName,report,error:''})}
+    catch(cause){if(popupRequest.current===request)setPopup({teamId,teamName,report:null,error:cause instanceof Error?cause.message:'보고서 내용을 불러오지 못했습니다.'})}
   }
   function closePopup(){popupRequest.current+=1;setPopup(null)}
   return <>
@@ -76,11 +77,11 @@ function ReportsOverview({cohortId}:{cohortId:string}){
     <form className="list-toolbar schedule-toolbar" onSubmit={submitSearch}><div><input type="search" aria-label="팀명·보고서 검색" placeholder="팀명·주제·제목·작성자 검색" value={searchInput} onChange={event=>setSearchInput(event.target.value)}/></div><Button type="submit">검색</Button><select aria-label="보고 구분" value={type} onChange={event=>setType(event.target.value as 'all'|ReportType)}><option value="all">전체 구분</option><option value="daily">일일 보고</option><option value="weekly">주간 보고</option></select><select aria-label="보고 상태" value={status} onChange={event=>setStatus(event.target.value as 'all'|ReportStatus)}><option value="all">전체 상태</option><option value="draft">작성 중</option><option value="submitted">제출</option></select></form>
     <p className="field-help" role="status">전체 {data.team_count}개 팀 · 표시 {groups.length}개 팀 · 최근 변경된 팀부터 표시합니다.</p>
     {!groups.length?<p className="empty-state">조건에 맞는 팀 또는 보고서가 없습니다.</p>:<div className="program-report-list">{groups.map(group=><section className="panel program-report-group" key={group.id}><div className="program-report-team"><div><span className="badge">{teamStages[group.stage]}</span><h3>{group.name}</h3><p>{group.topic||'주제 미등록'}</p></div><div className="program-report-counts"><span>일일 <strong>{group.daily_count}</strong></span><span>주간 <strong>{group.weekly_count}</strong></span><span>작성 중 <strong>{group.draft_count}</strong></span><span>제출 <strong>{group.submitted_count}</strong></span></div><Link className="text-link" to={`/teams/${group.id}/reports`}>팀 보고서 전체 보기 →</Link></div>
-      {group.reports.length?<div className="program-report-items">{group.reports.map(report=><article key={report.id}><div className="program-report-badges"><span className="badge">{reportTypeLabels[report.report_type]} · {report.round_number}회차</span><span className={`badge ${report.status==='draft'?'status-draft':'status-active'}`}>{reportStatusLabels[report.status]}</span>{report.has_attention&&<span className="badge status-pending">이슈/지원</span>}</div><div><strong>{report.title}</strong><p className="program-report-summary"><b>진행 요약</b>{report.progress_summary||'미작성'}</p><p className="field-help">작성일 {report.report_date} · {report.updated_name} · {formatScheduleTime(report.updated_at)} (KST){report.submitted_name&&` · 제출 ${report.submitted_name}`}</p></div><Button className="button-secondary" onClick={()=>void openReport(group.name,report.id)}>조회</Button></article>)}</div>:<p className="field-help">{group.daily_count+group.weekly_count?'선택한 조건에 맞는 보고서가 없습니다.':'아직 등록된 보고서가 없습니다.'}</p>}
+      {group.reports.length?<div className="program-report-items">{group.reports.map(report=><article key={report.id}><div className="program-report-badges"><span className="badge">{reportTypeLabels[report.report_type]} · {report.round_number}회차</span><span className={`badge ${report.status==='draft'?'status-draft':'status-active'}`}>{reportStatusLabels[report.status]}</span>{report.has_attention&&<span className="badge status-pending">이슈/지원</span>}</div><div><strong>{report.title}</strong><p className="program-report-summary"><b>진행 요약</b>{report.progress_summary||'미작성'}</p><p className="field-help">작성일 {report.report_date} · {report.updated_name} · {formatScheduleTime(report.updated_at)} (KST){report.submitted_name&&` · 제출 ${report.submitted_name}`}</p></div><Button className="button-secondary" onClick={()=>void openReport(group.id,group.name,report.id)}>조회</Button></article>)}</div>:<p className="field-help">{group.daily_count+group.weekly_count?'선택한 조건에 맞는 보고서가 없습니다.':'아직 등록된 보고서가 없습니다.'}</p>}
     </section>)}</div>}
     {popup&&<div className="report-modal-backdrop" onMouseDown={event=>{if(event.target===event.currentTarget)closePopup()}}><section className="report-modal" role="dialog" aria-modal="true" aria-labelledby="report-modal-title">
       <div className="report-modal-header"><div><p className="eyebrow">{popup.teamName}</p><h2 id="report-modal-title">{popup.report?.title??'보고서 조회'}</h2></div><Button className="button-secondary" autoFocus onClick={closePopup}>닫기</Button></div>
-      {!popup.report&&!popup.error?<p className="empty-state" role="status">보고서 내용을 불러오고 있습니다.</p>:popup.error?<div className="notice" role="alert"><p>{popup.error}</p><Button className="button-secondary" onClick={closePopup}>닫기</Button></div>:popup.report&&<><div className="program-report-badges"><span className="badge">{reportTypeLabels[popup.report.report_type]} · {popup.report.round_number}회차</span><span className={`badge ${popup.report.status==='draft'?'status-draft':'status-active'}`}>{reportStatusLabels[popup.report.status]}</span>{popup.report.has_attention&&<span className="badge status-pending">이슈/지원</span>}</div><p className="field-help">작성일 {popup.report.report_date} · 최종 변경 {popup.report.updated_name} · {formatScheduleTime(popup.report.updated_at)} (KST){popup.report.submitted_at&&` · 제출 ${popup.report.submitted_name??''} · ${formatScheduleTime(popup.report.submitted_at)} (KST)`}</p><div className="report-modal-content">{reportFields.map(field=><section key={field.key}><h3>{field.label}</h3><p>{popup.report![field.key]||'미작성'}</p></section>)}</div><div className="report-modal-footer"><Button onClick={closePopup}>닫기</Button></div></>}
+      {!popup.report&&!popup.error?<p className="empty-state" role="status">보고서 내용을 불러오고 있습니다.</p>:popup.error?<div className="notice" role="alert"><p>{popup.error}</p><Button className="button-secondary" onClick={closePopup}>닫기</Button></div>:popup.report&&<><div className="program-report-badges"><span className="badge">{reportTypeLabels[popup.report.report_type]} · {popup.report.round_number}회차</span><span className={`badge ${popup.report.status==='draft'?'status-draft':'status-active'}`}>{reportStatusLabels[popup.report.status]}</span>{popup.report.has_attention&&<span className="badge status-pending">이슈/지원</span>}</div><p className="field-help">작성일 {popup.report.report_date} · 최종 변경 {popup.report.updated_name} · {formatScheduleTime(popup.report.updated_at)} (KST){popup.report.submitted_at&&` · 제출 ${popup.report.submitted_name??''} · ${formatScheduleTime(popup.report.submitted_at)} (KST)`}</p><div className="report-modal-content">{reportFields.map(field=><section key={field.key}><h3>{field.label}</h3><p>{popup.report![field.key]||'미작성'}</p></section>)}</div><CommentsPanel key={popup.report.id} teamId={popup.teamId} reportId={popup.report.id}/><div className="report-modal-footer"><Button onClick={closePopup}>닫기</Button></div></>}
     </section></div>}
   </>
 }

@@ -348,6 +348,8 @@ footer { margin-top: 40px; border-top: 1px solid #dce3eb; padding: 24px 0; color
 .report-modal-content section { padding: 16px; border: 1px solid #e1e8ef; border-radius: 9px; background: #f8fafc; }
 .report-modal-content h3 { margin: 0 0 8px; font-size: 15px; }
 .report-modal-content p { margin: 0; color: #40586d; line-height: 1.7; white-space: pre-wrap; overflow-wrap: anywhere; }
+.report-modal .comments-panel { margin-top: 22px; padding: 20px 0 0; border: 0; border-top: 2px solid #dce3eb; border-radius: 0; box-shadow: none; }
+.report-modal .comments-panel .section-heading h2 { font-size: 18px; }
 .report-modal-footer { display: flex; justify-content: flex-end; margin-top: 20px; }
 body.report-modal-open { overflow: hidden; }
 @media(max-width:900px) { .program-report-team { grid-template-columns: 1fr auto; } .program-report-team > a { grid-column: 1 / -1; justify-self: start; } .program-report-items article { grid-template-columns: minmax(180px,auto) minmax(0,1fr); } .program-report-items article > .button { grid-column: 2; justify-self: start; } }
