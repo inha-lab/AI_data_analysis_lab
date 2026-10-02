@@ -336,6 +336,8 @@ footer { margin-top: 40px; border-top: 1px solid #dce3eb; padding: 24px 0; color
 .program-report-items article > div { min-width: 0; }
 .program-report-items article strong { overflow-wrap: anywhere; }
 .program-report-items article p { margin: 4px 0 0; }
+.program-report-summary { display: -webkit-box; margin-top: 7px !important; overflow: hidden; color: #40586d; font-size: 13px; line-height: 1.55; white-space: pre-wrap; overflow-wrap: anywhere; -webkit-box-orient: vertical; -webkit-line-clamp: 3; }
+.program-report-summary b { margin-right: 8px; color: #18344e; }
 .program-report-badges { display: flex; flex-wrap: wrap; gap: 5px; }
 @media(max-width:900px) { .program-report-team { grid-template-columns: 1fr auto; } .program-report-team > a { grid-column: 1 / -1; justify-self: start; } .program-report-items article { grid-template-columns: minmax(180px,auto) minmax(0,1fr); } .program-report-items article > a { grid-column: 2; justify-self: start; } }
 @media(max-width:600px) { .program-report-team { grid-template-columns: 1fr; } .program-report-team > a { grid-column: auto; } .program-report-counts { align-items: stretch; display: grid; grid-template-columns: 1fr 1fr; } .program-report-items article { grid-template-columns: 1fr; } .program-report-items article > a { grid-column: auto; } }
