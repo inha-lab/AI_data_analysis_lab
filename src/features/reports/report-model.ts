@@ -14,6 +14,7 @@ export interface ReportInput extends Record<ReportField,string> {
 }
 export interface Report extends Omit<ReportInput,'round_number'> {
   id: string; team_id: string; round_number: number; status: keyof typeof reportStatusLabels
+  has_review_comment?: boolean
   updated_at: string; updated_name: string; submitted_at: string | null; submitted_name: string | null
   review_note: string; review_action: 'reviewed' | 'returned' | null; reviewed_at: string | null; reviewer_name: string | null
 }

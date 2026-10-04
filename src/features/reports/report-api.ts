@@ -13,16 +13,19 @@ function fail(code: string) {
 }
 export async function loadReports(teamId: string) {
   const db=client()
-  const [team,reports]=await Promise.all([
+  const [team,reports,comments]=await Promise.all([
     db.from('AD_teams').select('id,cohort_id,name').eq('id',teamId).maybeSingle(),
     db.from('AD_reports').select(columns).eq('team_id',teamId).order('report_date',{ascending:false}).order('updated_at',{ascending:false}),
+    db.from('AD_comments').select('report_id').eq('team_id',teamId).not('report_id','is',null),
   ])
   if (team.error) throw fail(team.error.code)
   if (reports.error) throw fail(reports.error.code)
+  if (comments.error) throw fail(comments.error.code)
   if (!team.data) throw new Error('팀이 없거나 현재 소속 팀에 접근할 수 없습니다.')
   const cohort=await db.from('AD_cohorts').select('status').eq('id',team.data.cohort_id).single()
   if(cohort.error)throw fail(cohort.error.code)
-  return {team:team.data,cohortStatus:cohort.data.status as 'active'|'completed',reports:reports.data as Report[]}
+  const reviewed=new Set((comments.data??[]).flatMap(comment=>comment.report_id?[comment.report_id]:[]))
+  return {team:team.data,cohortStatus:cohort.data.status as 'active'|'completed',reports:(reports.data as Report[]).map(report=>({...report,has_review_comment:reviewed.has(report.id)}))}
 }
 export async function saveReport(teamId:string,input:ReportInput,submit:boolean,previous:Report|null):Promise<string> {
   const validation=validateReport(input,submit)

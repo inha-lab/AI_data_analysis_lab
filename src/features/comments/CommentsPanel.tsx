@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { isManager, useAuth } from '@/features/auth/auth-context'
 import { formatScheduleTime } from '@/features/schedules/schedule-model'
@@ -11,7 +11,7 @@ function errorMessage(code:string) {
   if(code==='23514'||code==='23502') return '코멘트 내용을 확인해 주세요.'
   return '코멘트를 처리하지 못했습니다. 잠시 후 다시 시도해 주세요.'
 }
-export function CommentsPanel({teamId,reportId,deliverableId}:{teamId:string;reportId?:string;deliverableId?:string}) {
+export function CommentsPanel({teamId,reportId,deliverableId,onCommentCountChange}:{teamId:string;reportId?:string;deliverableId?:string;onCommentCountChange?:(count:number)=>void}) {
   const {profile}=useAuth()
   const manage=isManager(profile?.role)
   const [comments,setComments]=useState<Comment[]>([])
@@ -21,11 +21,13 @@ export function CommentsPanel({teamId,reportId,deliverableId}:{teamId:string;rep
   const [body,setBody]=useState('')
   const [editing,setEditing]=useState<Comment|null>(null)
   const [busy,setBusy]=useState(false)
+  const countChangeRef=useRef(onCommentCountChange)
+  useEffect(()=>{countChangeRef.current=onCommentCountChange},[onCommentCountChange])
   useEffect(()=>{
     let active=true
     if(!supabase) return
     const query=supabase.from('AD_comments').select('id,team_id,proposal_team_id,report_id,deliverable_id,author_id,author_name,body,created_at,updated_at').eq(deliverableId?'deliverable_id':reportId?'report_id':'proposal_team_id',deliverableId??reportId??teamId).order('created_at',{ascending:true})
-    void query.then(({data,error:failure})=>{if(active){setComments((data??[]) as Comment[]);setError(failure?errorMessage(failure.code):'');setLoading(false)}})
+    void query.then(({data,error:failure})=>{if(active){const rows=(data??[]) as Comment[];setComments(rows);setError(failure?errorMessage(failure.code):'');setLoading(false);if(!failure)countChangeRef.current?.(rows.length)}})
     return ()=>{active=false}
   },[teamId,reportId,deliverableId,revision])
   function reload(){setLoading(true);setRevision(value=>value+1)}

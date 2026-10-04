@@ -75,6 +75,7 @@ footer { margin-top: 40px; border-top: 1px solid #dce3eb; padding: 24px 0; color
 .status-active { background: #dff3ed; color: #167052; }
 .status-draft { background: #e7f0ff; color: #3260a0; }
 .status-pending { background: #fff1dc; color: #9a5700; }
+.status-reviewed { background: #e8e2ff; color: #5941a7; }
 .status-completed { background: #eceef0; color: #596471; }
 .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; margin-bottom: 28px; }
 .stat-card { border: 1px solid #dce3eb; border-radius: 12px; background: white; padding: 24px; }
