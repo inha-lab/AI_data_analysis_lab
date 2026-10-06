@@ -390,10 +390,12 @@ body.report-modal-open { overflow: hidden; }
 .monitoring-panel .monitoring-submission-stats { grid-template-columns: repeat(4,minmax(0,1fr)); margin-top: 18px; }
 @media (max-width: 760px) { .monitoring-panel .monitoring-primary-stats, .monitoring-panel .monitoring-submission-stats { grid-template-columns: 1fr 1fr; } }
 .monitoring-table-wrap { overflow-x: auto; }
-.monitoring-table { width: 100%; border-collapse: collapse; min-width: 700px; }
+.monitoring-table { width: 100%; border-collapse: collapse; table-layout: fixed; min-width: 860px; }
+.monitoring-team-column { width: 190px; }
 .monitoring-table th, .monitoring-table td { border-bottom: 1px solid #dce3eb; padding: .8rem; text-align: left; vertical-align: top; }
 .monitoring-table th { color: #52677b; font-size: .85rem; }
 .monitoring-table small { display: block; color: #52677b; margin-top: .35rem; }
+.monitoring-team-cell small { display: -webkit-box; overflow: hidden; line-height: 1.45; overflow-wrap: anywhere; -webkit-box-orient: vertical; -webkit-line-clamp: 2; }
 .monitoring-team-name { color: #102e4c; font-size: 1.08rem; font-weight: 750; text-decoration: none; }
 .monitoring-team-name:hover { text-decoration: underline; }
 .monitoring-rounds { display: grid; gap: .8rem; }
